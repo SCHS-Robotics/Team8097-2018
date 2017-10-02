@@ -112,9 +112,16 @@ import org.firstinspires.inspection.RcInspectionActivity;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.JavaCameraView;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 @SuppressWarnings("WeakerAccess")
 public class FtcRobotControllerActivity extends Activity
   {
+    public static JavaCameraView mOpenCvCameraView;
+
   public static final String TAG = "RCActivity";
   public String getTag() { return TAG; }
 
@@ -298,6 +305,9 @@ public class FtcRobotControllerActivity extends Activity
 
     hittingMenuButtonBrightensScreen();
 
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    mOpenCvCameraView = (JavaCameraView) findViewById(R.id.cameraView);
+
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
     readNetworkType();
@@ -346,6 +356,13 @@ public class FtcRobotControllerActivity extends Activity
   protected void onResume() {
     super.onResume();
     RobotLog.vv(TAG, "onResume()");
+    if (!OpenCVLoader.initDebug()) {
+      Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+      OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
+    } else {
+      Log.d(TAG, "OpenCV library found inside package. Using it!");
+      mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+    }
   }
 
   @Override
@@ -355,6 +372,8 @@ public class FtcRobotControllerActivity extends Activity
     if (programmingModeController.isActive()) {
       programmingModeController.stopProgrammingMode();
     }
+    if (mOpenCvCameraView != null)
+      mOpenCvCameraView.disableView();
   }
 
   @Override
@@ -383,6 +402,8 @@ public class FtcRobotControllerActivity extends Activity
 
     preferencesHelper.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(sharedPreferencesListener);
     RobotLog.cancelWriteLogcatToDisk();
+    if (mOpenCvCameraView != null)
+      mOpenCvCameraView.disableView();
   }
 
   protected void bindToService() {
@@ -621,4 +642,33 @@ public class FtcRobotControllerActivity extends Activity
       }
     }
   }
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+      @Override
+      public void onManagerConnected(int status) {
+        switch (status) {
+          case LoaderCallbackInterface.SUCCESS: {
+            Log.i(TAG, "OpenCV loaded successfully");
+            mOpenCvCameraView.enableView();
+          }
+          break;
+          default: {
+            super.onManagerConnected(status);
+          }
+          break;
+        }
+      }
+    };
+    public final static Handler turnOnCameraView = new Handler() {
+      @Override
+      public void handleMessage(Message msg) {
+        mOpenCvCameraView.setVisibility(View.VISIBLE);
+      }
+    };
+
+    public final static Handler turnOffCameraView = new Handler() {
+      @Override
+      public void handleMessage(Message msg) {
+        mOpenCvCameraView.setVisibility(View.GONE);
+      }
+    };
 }
