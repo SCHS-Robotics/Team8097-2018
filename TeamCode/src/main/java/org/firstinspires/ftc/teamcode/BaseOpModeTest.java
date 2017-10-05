@@ -60,8 +60,6 @@ public abstract class BaseOpModeTest extends LinearOpMode {
         //Setting up encoders
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        encoderStartPos.put(motor1, 0);
-        encoderStartPos.put(motor2, 0);
 
         //setting servo initial positions on initialize method
         servo1.setPosition(servoInitPosition);
