@@ -15,19 +15,20 @@ public abstract class BaseOpModeTest extends LinearOpMode {
     ColorSensor colorSense;
     OpticalDistanceSensor rangeSense;
 
-    Servo servo1;
-    Servo servo2;
-    Servo servo3;
+    Servo servoL;
+    Servo servoR;
 
-    DcMotor motor1;
-    DcMotor motor2;
+    DcMotor motor1d;
+    DcMotor motor2d;
+    DcMotor motor1f;
+    DcMotor motor2f;
 
-    HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
+    //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
 
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoInitPosition = 0;
 
-    int wheelEncoderPpr = 1680;
+    //int wheelEncoderPpr = 1680;
 
 
     // Trying to get range sensor to work: -Includes changing I2C address
@@ -48,23 +49,26 @@ public abstract class BaseOpModeTest extends LinearOpMode {
     {
         //Assigning previously declared variables to expansion hub names
         colorSense = hardwareMap.colorSensor.get("colorMR");
-        servo1 = hardwareMap.servo.get("servo1");
-        servo2 = hardwareMap.servo.get("servo2");
-        servo3 = hardwareMap.servo.get("servo3");
         rangeSense = hardwareMap.opticalDistanceSensor.get("rangeREV");
 
-        //Creating motors
-        motor2 = hardwareMap.dcMotor.get("motor2");
-        motor1 = hardwareMap.dcMotor.get("motor1");
+        servoR = hardwareMap.servo.get("servoR");
+        servoL = hardwareMap.servo.get("servoL");
 
-        //Setting up encoders
+
+        //Creating motors
+        motor2d = hardwareMap.dcMotor.get("motor2d");
+        motor1d = hardwareMap.dcMotor.get("motor1d");
+        motor2f = hardwareMap.dcMotor.get("motor2f");
+        motor1f = hardwareMap.dcMotor.get("motor1f");
+
+        /*//Setting up encoders
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+*/
         //setting servo initial positions on initialize method
-        servo1.setPosition(servoInitPosition);
-        servo2.setPosition(servoInitPosition);
-        servo3.setPosition(servoInitPosition);
+        servoR.setPosition(servoInitPosition);
+        servoL.setPosition(servoInitPosition);
+
 
 
         //rangeSensor = hardwareMap.get(DistanceSensor.class, "rangeREV");
@@ -72,7 +76,7 @@ public abstract class BaseOpModeTest extends LinearOpMode {
         RANGE1Reader = new I2cDeviceSynchImpl(RANGE1, RANGE1ADDRESS, false);*/
 
     }
-    public double getCurrentRpm(int encoderPpr, DcMotor motor, int waitTime) {
+   /* public double getCurrentRpm(int encoderPpr, DcMotor motor, int waitTime) {
         return ((double) (Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
-    }
+   */
 }
