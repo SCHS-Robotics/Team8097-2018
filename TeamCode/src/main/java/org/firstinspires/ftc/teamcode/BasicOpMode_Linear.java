@@ -36,21 +36,26 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.opencv.imgproc.Imgproc;
+import org.opencv.videoio.VideoCapture;
+
 
 /**
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class BasicOpMode_Linear extends LinearOpMode {
+public class BasicOpMode_Linear extends BaseOpModeTest {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        initialize();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -58,11 +63,9 @@ public class BasicOpMode_Linear extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            
-
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
+        
     }
 }
