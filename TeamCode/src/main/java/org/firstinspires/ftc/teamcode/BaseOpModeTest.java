@@ -79,7 +79,6 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         //rangeSensor = hardwareMap.get(DistanceSensor.class, "rangeREV");
         /*RANGE1 = hardwareMap.i2cDevice.get("rangeMR");
         RANGE1Reader = new I2cDeviceSynchImpl(RANGE1, RANGE1ADDRESS, false);*/
-
     }
 
     public void startOpenCV(CameraBridgeViewBase.CvCameraViewListener2 cameraViewListener) {

@@ -60,6 +60,7 @@ import java.util.List;
  */
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
 public class BasicOpMode_Linear extends BaseOpModeTest {
+
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
