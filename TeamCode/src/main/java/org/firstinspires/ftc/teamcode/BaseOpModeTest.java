@@ -95,6 +95,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         FtcRobotControllerActivity.turnOffCameraView.obtainMessage().sendToTarget();
         FtcRobotControllerActivity.mOpenCvCameraView.disableView();
     }
+
    /* public double getCurrentRpm(int encoderPpr, DcMotor motor, int waitTime) {
         return ((double) (Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
    */
