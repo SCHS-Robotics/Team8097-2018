@@ -112,6 +112,9 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 motorFR.setPower(gamepad1.right_trigger);
                 motorBR.setPower(gamepad1.right_trigger);
             }
+            else {
+
+            }
 
             if (gamepad1.dpad_up) {
                 servoCamera.setPosition(servoCamera.getPosition() + .001);
