@@ -51,9 +51,8 @@ public abstract class BaseOpModeTest extends LinearOpMode {
         colorSense = hardwareMap.colorSensor.get("colorMR");
         rangeSense = hardwareMap.opticalDistanceSensor.get("rangeREV");
 
-        servoR = hardwareMap.servo.get("servoR");
-        servoL = hardwareMap.servo.get("servoL");
-
+        //Setting up servos
+        servoR = hardwareMap.servo.get("servoCamera");
 
         //Creating motors
         motor2d = hardwareMap.dcMotor.get("motor2d");
@@ -61,21 +60,21 @@ public abstract class BaseOpModeTest extends LinearOpMode {
         motor2f = hardwareMap.dcMotor.get("motor2f");
         motor1f = hardwareMap.dcMotor.get("motor1f");
 
-        /*//Setting up encoders
-        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-*/
+        //Setting up encoders
+        motor1d.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor2d.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor1f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor2f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         //setting servo initial positions on initialize method
         servoR.setPosition(servoInitPosition);
         servoL.setPosition(servoInitPosition);
 
-
-
         //rangeSensor = hardwareMap.get(DistanceSensor.class, "rangeREV");
         /*RANGE1 = hardwareMap.i2cDevice.get("rangeMR");
         RANGE1Reader = new I2cDeviceSynchImpl(RANGE1, RANGE1ADDRESS, false);*/
-
     }
+    
    /* public double getCurrentRpm(int encoderPpr, DcMotor motor, int waitTime) {
         return ((double) (Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
    */

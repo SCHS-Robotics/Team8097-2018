@@ -42,7 +42,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class BasicOpMode_Linear extends LinearOpMode {
+public class BasicOpMode_Linear extends BaseOpModeTest {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -52,6 +52,8 @@ public class BasicOpMode_Linear extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        initilaize();
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -59,7 +61,6 @@ public class BasicOpMode_Linear extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
