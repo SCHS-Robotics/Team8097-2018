@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
