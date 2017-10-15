@@ -52,6 +52,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 
@@ -72,6 +73,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     private Mat                  mSpectrum;
     private Size SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
+    private Rect                 returnedBoundingRect;
 
     @Override
     public void runOpMode() {
@@ -81,7 +83,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         initialize();
         startOpenCV(this);
         mDetector = new ColorBlobDetector();
-        mDetector.setHsvColor(new Scalar(21.96, 247.35, 226.95));
+        mDetector.setHsvColor(new Scalar(195, 255, 255));
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -89,14 +91,41 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            for (MatOfPoint contour: mDetector.getContours()) {
-                Imgproc.boundingRect(contour);
+//            for (MatOfPoint contour: mDetector.getContours()) {
+//                returnedBoundingRect = Imgproc.boundingRect(contour);
+//            }
+            if (Math.abs(gamepad1.left_stick_y) > .1) {
+                motorBL.setPower(gamepad1.left_stick_y);
+                motorBR.setPower(-gamepad1.left_stick_y);
+                motorFL.setPower(gamepad1.left_stick_y);
+                motorFR.setPower(-gamepad1.left_stick_y);
+            }
+            else if (gamepad1.right_trigger > .1){
+                motorBL.setPower(gamepad1.right_trigger);
+                motorFL.setPower(gamepad1.right_trigger);
+                motorFR.setPower(-gamepad1.right_trigger);
+                motorBR.setPower(-gamepad1.right_trigger);
+            }
+            else if (gamepad1.left_trigger > .1){
+                motorBL.setPower(-gamepad1.right_trigger);
+                motorFL.setPower(-gamepad1.right_trigger);
+                motorFR.setPower(gamepad1.right_trigger);
+                motorBR.setPower(gamepad1.right_trigger);
             }
 
+            if (gamepad1.dpad_up) {
+                servoCamera.setPosition(servoCamera.getPosition() + .001);
+            }
+            else if (gamepad1.dpad_down){
+                servoCamera.setPosition(servoCamera.getPosition() - .001);
+            }
+
+            telemetry.addData("Servo Pos: ", servoCamera.getPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            //telemetry.addData("Status", "Bounding Rect: " + returnedBoundingRect.toString());
             telemetry.update();
         }
-        
+
     }
 
     public void onCameraViewStarted(int width, int height) {

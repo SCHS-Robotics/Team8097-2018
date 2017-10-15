@@ -5,9 +5,14 @@ import android.graphics.Camera;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.I2cDevice;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.opencv.android.CameraBridgeViewBase;
 
@@ -18,20 +23,18 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
     ColorSensor colorSense;
-    OpticalDistanceSensor rangeSense;
 
-    Servo servoL;
-    Servo servoR;
+    Servo servoCamera;
 
-    DcMotor motor1d;
-    DcMotor motor2d;
-    DcMotor motor1f;
-    DcMotor motor2f;
+    DcMotor motorBL;
+    DcMotor motorBR;
+    DcMotor motorFL;
+    DcMotor motorFR;
 
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
 
     //Setting constant variables, final so that it cannot be changed later by accident
-    final double servoInitPosition = 0;
+    final double servoInitPosition = .267;
 
     //int wheelEncoderPpr = 1680;
 
@@ -53,32 +56,24 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     public void initialize()
     {
         //Assigning previously declared variables to expansion hub names
-        //colorSense = hardwareMap.colorSensor.get("colorMR");
-//        rangeSense = hardwareMap.opticalDistanceSensor.get("rangeREV");
+        colorSense = hardwareMap.colorSensor.get("colorBottom");
 
-//        servoR = hardwareMap.servo.get("servoR");
-//        servoL = hardwareMap.servo.get("servoL");
-
+        servoCamera = hardwareMap.servo.get("servoCamera");
 
         //Creating motors
-//        motor2d = hardwareMap.dcMotor.get("motor2d");
-//        motor1d = hardwareMap.dcMotor.get("motor1d");
-//        motor2f = hardwareMap.dcMotor.get("motor2f");
-//        motor1f = hardwareMap.dcMotor.get("motor1f");
+        motorBL = hardwareMap.dcMotor.get("motorBackLeft");
+        motorBR = hardwareMap.dcMotor.get("motorBackRight");
+        motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
+        motorFR = hardwareMap.dcMotor.get("motorFrontRight");
 
         //Setting up encoders
-//        motor1d.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motor2d.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motor1f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motor2f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //setting servo initial positions on initialize method
-//        servoR.setPosition(servoInitPosition);
-//        servoL.setPosition(servoInitPosition);
-
-        //rangeSensor = hardwareMap.get(DistanceSensor.class, "rangeREV");
-        /*RANGE1 = hardwareMap.i2cDevice.get("rangeMR");
-        RANGE1Reader = new I2cDeviceSynchImpl(RANGE1, RANGE1ADDRESS, false);*/
+        servoCamera.setPosition(servoInitPosition);
     }
 
     public void startOpenCV(CameraBridgeViewBase.CvCameraViewListener2 cameraViewListener) {
