@@ -63,7 +63,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
-    private boolean              mIsColorSelected = false;
+    private boolean              mIsColorSelected = true;
     private Mat                  mRgba;
     private Scalar mBlobColorRgba;
     private Scalar               mBlobColorHsv;
@@ -80,8 +80,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         initialize();
         startOpenCV(this);
         mDetector = new ColorBlobDetector();
-        mDetector.setHsvColor(new Scalar(19, 196, 242));
-
+        mDetector.setHsvColor(new Scalar(21.96, 247.35, 226.95));
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -89,6 +88,9 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            for (MatOfPoint contour: mDetector.getContours()) {
+                Imgproc.boundingRect(contour);
+            }
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
