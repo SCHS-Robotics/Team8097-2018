@@ -53,29 +53,28 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     public void initialize()
     {
         //Assigning previously declared variables to expansion hub names
-        colorSense = hardwareMap.colorSensor.get("colorMR");
-        rangeSense = hardwareMap.opticalDistanceSensor.get("rangeREV");
+        //colorSense = hardwareMap.colorSensor.get("colorMR");
+//        rangeSense = hardwareMap.opticalDistanceSensor.get("rangeREV");
 
-        servoR = hardwareMap.servo.get("servoR");
-        servoL = hardwareMap.servo.get("servoL");
+//        servoR = hardwareMap.servo.get("servoR");
+//        servoL = hardwareMap.servo.get("servoL");
 
 
         //Creating motors
-        motor2d = hardwareMap.dcMotor.get("motor2d");
-        motor1d = hardwareMap.dcMotor.get("motor1d");
-        motor2f = hardwareMap.dcMotor.get("motor2f");
-        motor1f = hardwareMap.dcMotor.get("motor1f");
+//        motor2d = hardwareMap.dcMotor.get("motor2d");
+//        motor1d = hardwareMap.dcMotor.get("motor1d");
+//        motor2f = hardwareMap.dcMotor.get("motor2f");
+//        motor1f = hardwareMap.dcMotor.get("motor1f");
 
-        /*//Setting up encoders
-        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-*/
+        //Setting up encoders
+//        motor1d.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor2d.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor1f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor2f.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         //setting servo initial positions on initialize method
-        servoR.setPosition(servoInitPosition);
-        servoL.setPosition(servoInitPosition);
-
-        startOpenCV(this);
-
+//        servoR.setPosition(servoInitPosition);
+//        servoL.setPosition(servoInitPosition);
 
         //rangeSensor = hardwareMap.get(DistanceSensor.class, "rangeREV");
         /*RANGE1 = hardwareMap.i2cDevice.get("rangeMR");

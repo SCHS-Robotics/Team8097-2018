@@ -29,6 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -36,9 +40,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
+
+import java.util.List;
 
 
 /**
@@ -46,10 +60,17 @@ import org.opencv.videoio.VideoCapture;
  */
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
 public class BasicOpMode_Linear extends BaseOpModeTest {
-
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
+    private boolean              mIsColorSelected = false;
+    private Mat                  mRgba;
+    private Scalar mBlobColorRgba;
+    private Scalar               mBlobColorHsv;
+    private ColorBlobDetector    mDetector;
+    private Mat                  mSpectrum;
+    private Size SPECTRUM_SIZE;
+    private Scalar               CONTOUR_COLOR;
 
     @Override
     public void runOpMode() {
@@ -57,6 +78,10 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         telemetry.update();
 
         initialize();
+        startOpenCV(this);
+        mDetector = new ColorBlobDetector();
+        mDetector.setHsvColor(new Scalar(19, 196, 242));
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -64,9 +89,52 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
         
     }
+
+    public void onCameraViewStarted(int width, int height) {
+        mRgba = new Mat(height, width, CvType.CV_8UC4);
+        mDetector = new ColorBlobDetector();
+        mSpectrum = new Mat();
+        mBlobColorRgba = new Scalar(255);
+        mBlobColorHsv = new Scalar(255);
+        SPECTRUM_SIZE = new Size(200, 64);
+        CONTOUR_COLOR = new Scalar(255,0,0,255);
+    }
+
+    public void onCameraViewStopped() {
+        mRgba.release();
+    }
+
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        mRgba = inputFrame.rgba();
+
+        if (mIsColorSelected) {
+            mDetector.process(mRgba);
+            List<MatOfPoint> contours = mDetector.getContours();
+            Log.e("Tag", "Contours count: " + contours.size());
+            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+
+            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
+            colorLabel.setTo(mBlobColorRgba);
+
+            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
+            mSpectrum.copyTo(spectrumLabel);
+        }
+
+        return mRgba;
+    }
+
+    private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
+        Mat pointMatRgba = new Mat();
+        Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
+        Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
+
+        return new Scalar(pointMatRgba.get(0, 0));
+    }
+
 }
