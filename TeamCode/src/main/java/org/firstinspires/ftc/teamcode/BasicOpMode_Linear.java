@@ -101,19 +101,22 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 motorFR.setPower(-gamepad1.left_stick_y);
             }
             else if (gamepad1.right_trigger > .1){
-                motorBL.setPower(gamepad1.right_trigger);
-                motorFL.setPower(gamepad1.right_trigger);
+                motorBL.setPower(-gamepad1.right_trigger);
+                motorFL.setPower(-gamepad1.right_trigger);
                 motorFR.setPower(-gamepad1.right_trigger);
                 motorBR.setPower(-gamepad1.right_trigger);
             }
             else if (gamepad1.left_trigger > .1){
-                motorBL.setPower(-gamepad1.right_trigger);
-                motorFL.setPower(-gamepad1.right_trigger);
-                motorFR.setPower(gamepad1.right_trigger);
-                motorBR.setPower(gamepad1.right_trigger);
+                motorBL.setPower(gamepad1.left_trigger);
+                motorFL.setPower(gamepad1.left_trigger);
+                motorFR.setPower(gamepad1.left_trigger);
+                motorBR.setPower(gamepad1.left_trigger);
             }
             else {
-
+                motorBL.setPower(0);
+                motorBR.setPower(0);
+                motorFL.setPower(0);
+                motorFR.setPower(0);
             }
 
             if (gamepad1.dpad_up) {
