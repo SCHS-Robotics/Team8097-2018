@@ -120,11 +120,24 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             }
 
             if (gamepad1.dpad_up) {
-                servoCamera.setPosition(servoCamera.getPosition() + .001);
+                //servoCamera.setPosition(servoCamera.getPosition() + .001);
+                servoLeftGrab.setPosition(servoLeftGrab.getPosition()+.001);
             }
             else if (gamepad1.dpad_down){
-                servoCamera.setPosition(servoCamera.getPosition() - .001);
+                //servoCamera.setPosition(servoCamera.getPosition() - .001);
+                servoLeftGrab.setPosition(servoLeftGrab.getPosition()-.001);
             }
+
+            if (gamepad1.dpad_left) {
+                //servoCamera.setPosition(servoCamera.getPosition() + .001);
+                servoRightGrab.setPosition(servoRightGrab.getPosition()+.001);
+            }
+            else if (gamepad1.dpad_right){
+                //servoCamera.setPosition(servoCamera.getPosition() - .001);
+                servoRightGrab.setPosition(servoRightGrab.getPosition()-.001);
+            }
+
+
 
             telemetry.addData("Servo Pos: ", servoCamera.getPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());

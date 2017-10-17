@@ -25,6 +25,8 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     ColorSensor colorSense;
 
     Servo servoCamera;
+    Servo servoLeftGrab;
+    Servo servoRightGrab;
 
     DcMotor motorBL;
     DcMotor motorBR;
@@ -59,6 +61,9 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         colorSense = hardwareMap.colorSensor.get("colorBottom");
 
         servoCamera = hardwareMap.servo.get("servoCamera");
+        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
+        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
+
 
         //Creating motors
         motorBL = hardwareMap.dcMotor.get("motorBackLeft");
@@ -73,7 +78,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //setting servo initial positions on initialize method
-        servoCamera.setPosition(servoInitPosition);
+        
     }
 
     public void startOpenCV(CameraBridgeViewBase.CvCameraViewListener2 cameraViewListener) {
