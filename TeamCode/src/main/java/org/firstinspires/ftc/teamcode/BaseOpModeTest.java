@@ -33,10 +33,10 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     DcMotor motorFL;
     DcMotor motorFR;
 
-    //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
 
+    //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
-    final double servoInitPosition = .267;
+    final double servoInitPositoin = .267;
 
     //int wheelEncoderPpr = 1680;
 
@@ -58,7 +58,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     public void initialize()
     {
         //Assigning previously declared variables to expansion hub names
-        colorSense = hardwareMap.colorSensor.get("colorBottom");
+        colorSense =   hardwareMap.colorSensor.get("colorBottom");
 
         servoCamera = hardwareMap.servo.get("servoCamera");
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");

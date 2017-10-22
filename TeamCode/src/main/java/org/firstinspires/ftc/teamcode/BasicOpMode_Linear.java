@@ -81,6 +81,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         telemetry.update();
 
         initialize();
+
         startOpenCV(this);
         mDetector = new ColorBlobDetector();
         mDetector.setHsvColor(new Scalar(195, 255, 255));
@@ -94,6 +95,8 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 //            for (MatOfPoint contour: mDetector.getContours()) {
 //                returnedBoundingRect = Imgproc.boundingRect(contour);
 //            }
+
+            
             if (Math.abs(gamepad1.left_stick_y) > .1) {
                 motorBL.setPower(gamepad1.left_stick_y);
                 motorBR.setPower(-gamepad1.left_stick_y);
