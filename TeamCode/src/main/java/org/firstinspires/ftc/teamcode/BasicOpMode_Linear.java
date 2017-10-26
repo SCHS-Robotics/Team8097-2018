@@ -96,30 +96,41 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 //                returnedBoundingRect = Imgproc.boundingRect(contour);
 //            }
 
-            
-            if (Math.abs(gamepad1.left_stick_y) > .1) {
-                motorBL.setPower(gamepad1.left_stick_y);
-                motorBR.setPower(-gamepad1.left_stick_y);
-                motorFL.setPower(gamepad1.left_stick_y);
-                motorFR.setPower(-gamepad1.left_stick_y);
-            }
-            else if (gamepad1.right_trigger > .1){
-                motorBL.setPower(-gamepad1.right_trigger);
-                motorFL.setPower(-gamepad1.right_trigger);
-                motorFR.setPower(-gamepad1.right_trigger);
-                motorBR.setPower(-gamepad1.right_trigger);
+            double inputX = gamepad1.left_stick_x;
+            double inputY = gamepad1.left_stick_y;
+            if (inputX >= .1 || inputY >= .1) {
+                double inputMag = Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2));
+                double angle = Math.toDegrees(Math.atan2(inputY, inputX));
+                if (angle >= 22.5 && angle <= 67.5) {
+                    moveDFR(inputMag);
+                }
+                if (angle >= 67.5 && angle <= 112.5) {
+                    moveForward(inputMag);
+                }
+                if (angle >= 112.5 && angle <= 157.5) {
+                    moveDFL(inputMag);
+                }
+                if (angle >= 157.5 && angle <= 202.5) {
+                    moveLeft(inputMag);
+                }
+                if (angle >= 202.5 && angle <= 247.5) {
+                    moveDBL(inputMag);
+                }
+                if (angle >= 247.5 && angle <= 295.5) {
+                    moveBackward(inputMag);
+                }
+                if (angle >= 295.5 && angle <= 337.5) {
+                    moveDBR(inputMag);
+                }
+                if (angle >= 337.5 || angle <= 22.5) {
+                    moveRight(inputMag);
+                }
             }
             else if (gamepad1.left_trigger > .1){
-                motorBL.setPower(gamepad1.left_trigger);
-                motorFL.setPower(gamepad1.left_trigger);
-                motorFR.setPower(gamepad1.left_trigger);
-                motorBR.setPower(gamepad1.left_trigger);
+                turnLeft(gamepad1.left_trigger);
             }
-            else {
-                motorBL.setPower(0);
-                motorBR.setPower(0);
-                motorFL.setPower(0);
-                motorFR.setPower(0);
+            else if (gamepad1.right_trigger > .1){
+                turnRight(gamepad1.right_trigger);
             }
 
             if (gamepad1.dpad_up) {
@@ -142,7 +153,10 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
 
 
-            telemetry.addData("Servo Pos: ", servoCamera.getPosition());
+            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
+            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
+            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
+
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             //telemetry.addData("Status", "Bounding Rect: " + returnedBoundingRect.toString());
             telemetry.update();

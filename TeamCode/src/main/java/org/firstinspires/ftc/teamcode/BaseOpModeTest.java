@@ -27,6 +27,8 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     Servo servoCamera;
     Servo servoLeftGrab;
     Servo servoRightGrab;
+    Servo servoRightHolder;
+    Servo servoLeftHolder;
 
     DcMotor motorBL;
     DcMotor motorBR;
@@ -36,7 +38,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
-    final double servoInitPositoin = .267;
+    final double servoCameraInitPositoin = .267;
 
     //int wheelEncoderPpr = 1680;
 
@@ -62,8 +64,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
         servoCamera = hardwareMap.servo.get("servoCamera");
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-
+        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
 
         //Creating motors
         motorBL = hardwareMap.dcMotor.get("motorBackLeft");
@@ -78,7 +79,61 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //setting servo initial positions on initialize method
-        
+        servoCamera.setPosition(servoCameraInitPositoin);
+    }
+
+    //Movement code
+    public void moveForward(double power) {
+        motorFL.setPower(power);
+        motorBL.setPower(power);
+        motorFR.setPower(-power);
+        motorBR.setPower(-power);
+    }
+    public void moveBackward(double power) {
+        motorFL.setPower(-power);
+        motorBL.setPower(-power);
+        motorFR.setPower(power);
+        motorBR.setPower(power);
+    }
+    public void moveRight(double power) {
+        motorFL.setPower(power);
+        motorBL.setPower(-power);
+        motorFR.setPower(power);
+        motorBR.setPower(-power);
+    }
+    public void moveLeft(double power) {
+        motorFL.setPower(-power);
+        motorBL.setPower(power);
+        motorFR.setPower(-power);
+        motorBR.setPower(power);
+    }
+    public void moveDFR(double power) {
+        motorBL.setPower(power);
+        motorFR.setPower(-power);
+    }
+    public void moveDFL(double power) {
+        motorFL.setPower(power);
+        motorBR.setPower(-power);
+    }
+    public void moveDBR(double power) {
+        motorFL.setPower(-power);
+        motorBR.setPower(power);
+    }
+    public void moveDBL(double power) {
+        motorBL.setPower(-power);
+        motorFR.setPower(power);
+    }
+    public void turnLeft(double power) {
+        motorFL.setPower(power);
+        motorBL.setPower(power);
+        motorFR.setPower(power);
+        motorBR.setPower(power);
+    }
+    public void turnRight(double power) {
+        motorFL.setPower(-power);
+        motorBL.setPower(-power);
+        motorFR.setPower(-power);
+        motorBR.setPower(-power);
     }
 
     public void startOpenCV(CameraBridgeViewBase.CvCameraViewListener2 cameraViewListener) {
