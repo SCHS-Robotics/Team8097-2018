@@ -662,6 +662,7 @@ public class FtcRobotControllerActivity extends Activity
         }
       }
     };
+
     public final static Handler turnOnCameraView = new Handler() {
       @Override
       public void handleMessage(Message msg) {

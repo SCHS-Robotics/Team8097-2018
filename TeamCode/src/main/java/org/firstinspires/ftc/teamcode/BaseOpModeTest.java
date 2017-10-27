@@ -38,7 +38,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
-    final double servoCameraInitPositoin = .267;
+    final double servoCameraInitPosition = .267;
 
     //int wheelEncoderPpr = 1680;
 
@@ -79,7 +79,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //setting servo initial positions on initialize method
-        servoCamera.setPosition(servoCameraInitPositoin);
+        servoCamera.setPosition(servoCameraInitPosition);
     }
 
     //Movement code
@@ -144,7 +144,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         FtcRobotControllerActivity.mOpenCvCameraView.enableView();
     }
 
-    public void stopOpenCv() {
+    public void stopOpenCV() {
         FtcRobotControllerActivity.turnOffCameraView.obtainMessage().sendToTarget();
         FtcRobotControllerActivity.mOpenCvCameraView.disableView();
     }

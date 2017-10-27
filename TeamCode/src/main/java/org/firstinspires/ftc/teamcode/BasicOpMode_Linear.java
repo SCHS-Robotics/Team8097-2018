@@ -67,11 +67,11 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
     private boolean              mIsColorSelected = true;
     private Mat                  mRgba;
-    private Scalar mBlobColorRgba;
+    private Scalar               mBlobColorRgba;
     private Scalar               mBlobColorHsv;
     private ColorBlobDetector    mDetector;
     private Mat                  mSpectrum;
-    private Size SPECTRUM_SIZE;
+    private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
     private Rect                 returnedBoundingRect;
 
@@ -83,8 +83,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         initialize();
 
         startOpenCV(this);
-        mDetector = new ColorBlobDetector();
-        mDetector.setHsvColor(new Scalar(195, 255, 255));
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -168,10 +167,22 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mSpectrum = new Mat();
+        CONTOUR_COLOR = new Scalar(255,0,0,255);
+        SPECTRUM_SIZE = new Size(200, 64);
+
+        // Weeeeee assign values to the color scalars weeeee (I'm not actually sure why we have to do this but every example I've seen did the same thing)
         mBlobColorRgba = new Scalar(255);
         mBlobColorHsv = new Scalar(255);
-        SPECTRUM_SIZE = new Size(200, 64);
-        CONTOUR_COLOR = new Scalar(255,0,0,255);
+
+        // and then change them immediately :DDDDDDDDD
+        mBlobColorHsv = new Scalar(195, 255, 255);
+        mBlobColorRgba = convertScalarHsv2Rgba(mBlobColorHsv);
+
+        mDetector.setHsvColor(mBlobColorHsv);
+
+        mIsColorSelected = true;
+
+
     }
 
     public void onCameraViewStopped() {
@@ -197,7 +208,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         return mRgba;
     }
 
-    private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
+    private Scalar convertScalarHsv2Rgba(Scalar hsvColor) {
         Mat pointMatRgba = new Mat();
         Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
         Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
