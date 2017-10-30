@@ -203,7 +203,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         mBlobColorHsv = new Scalar(255);
 
         // and then change them immediately :DDDDDDDDD
-        mBlobColorHsv = new Scalar(195, 255, 255);
+        mBlobColorHsv = new Scalar(0, 255, 140.25);
         mBlobColorRgba = convertScalarHsv2Rgba(mBlobColorHsv);
 
         mDetector.setHsvColor(mBlobColorHsv);
