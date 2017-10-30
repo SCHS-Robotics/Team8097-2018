@@ -60,7 +60,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     public void initialize()
     {
         //Assigning previously declared variables to expansion hub names
-        colorSense =   hardwareMap.colorSensor.get("colorBottom");
+        //colorSense =   hardwareMap.colorSensor.get("colorBottom");
 
         servoCamera = hardwareMap.servo.get("servoCamera");
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
@@ -83,57 +83,74 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     }
 
     //Movement code
-    public void moveForward(double power) {
-        motorFL.setPower(power);
-        motorBL.setPower(power);
-        motorFR.setPower(-power);
-        motorBR.setPower(-power);
+    public void turnRight(double speed) {
+        motorBL.setPower(speed);
+        motorBR.setPower(speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed);
     }
-    public void moveBackward(double power) {
-        motorFL.setPower(-power);
-        motorBL.setPower(-power);
-        motorFR.setPower(power);
-        motorBR.setPower(power);
+
+    public void turnLeft(double speed) {
+        motorBL.setPower(-speed);
+        motorBR.setPower(-speed);
+        motorFL.setPower(-speed);
+        motorFR.setPower(-speed);
     }
-    public void moveRight(double power) {
-        motorFL.setPower(power);
-        motorBL.setPower(-power);
-        motorFR.setPower(power);
-        motorBR.setPower(-power);
+    
+    public void goForward(double speed) {
+        motorBL.setPower(speed);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(-speed);
     }
-    public void moveLeft(double power) {
-        motorFL.setPower(-power);
-        motorBL.setPower(power);
-        motorFR.setPower(-power);
-        motorBR.setPower(power);
+
+    public void goBackward(double speed) {
+        motorBL.setPower(-speed);
+        motorBR.setPower(speed);
+        motorFL.setPower(-speed);
+        motorFR.setPower(speed);
     }
-    public void moveDFR(double power) {
-        motorBL.setPower(power);
-        motorFR.setPower(-power);
+
+    public void goLeft(double speed) {
+        motorBL.setPower(speed * 1);
+        motorBR.setPower(speed);
+        motorFL.setPower(-speed);
+        motorFR.setPower(-speed * 1);
     }
-    public void moveDFL(double power) {
-        motorFL.setPower(power);
-        motorBR.setPower(-power);
+
+    public void goRight(double speed) {
+        motorBL.setPower(-speed * 1);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed * 1);
     }
-    public void moveDBR(double power) {
-        motorFL.setPower(-power);
-        motorBR.setPower(power);
+
+    public void goDiagonalForwardRight(double speed) {
+        motorBL.setPower(0);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(0);
     }
-    public void moveDBL(double power) {
-        motorBL.setPower(-power);
-        motorFR.setPower(power);
+
+    public void goDiagonalForwardLeft(double speed) {
+        motorBL.setPower(speed);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(-speed);
     }
-    public void turnLeft(double power) {
-        motorFL.setPower(power);
-        motorBL.setPower(power);
-        motorFR.setPower(power);
-        motorBR.setPower(power);
+
+    public void goDiagonalBackwardRight(double speed) {
+        motorBL.setPower(-speed);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(speed);
     }
-    public void turnRight(double power) {
-        motorFL.setPower(-power);
-        motorBL.setPower(-power);
-        motorFR.setPower(-power);
-        motorBR.setPower(-power);
+
+    public void goDiagonalBackwardLeft(double speed) {
+        motorBL.setPower(0);
+        motorBR.setPower(speed);
+        motorFL.setPower(-speed);
+        motorFR.setPower(0);
     }
 
     public void startOpenCV(CameraBridgeViewBase.CvCameraViewListener2 cameraViewListener) {
