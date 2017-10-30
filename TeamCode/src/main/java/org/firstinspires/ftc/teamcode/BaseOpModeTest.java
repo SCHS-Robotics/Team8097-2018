@@ -112,44 +112,44 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     }
 
     public void goLeft(double speed) {
-        motorBL.setPower(speed * 1);
-        motorBR.setPower(speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(-speed * 1);
-    }
-
-    public void goRight(double speed) {
         motorBL.setPower(-speed * 1);
         motorBR.setPower(-speed);
         motorFL.setPower(speed);
         motorFR.setPower(speed * 1);
     }
 
+    public void goRight(double speed) {
+        motorBL.setPower(speed * 1);
+        motorBR.setPower(speed);
+        motorFL.setPower(-speed);
+        motorFR.setPower(-speed * 1);
+    }
+
     public void goDiagonalForwardRight(double speed) {
         motorBL.setPower(0);
-        motorBR.setPower(-speed);
-        motorFL.setPower(speed);
+        motorBR.setPower(speed);
+        motorFL.setPower(-speed);
         motorFR.setPower(0);
     }
 
     public void goDiagonalForwardLeft(double speed) {
-        motorBL.setPower(speed);
-        motorBR.setPower(0);
-        motorFL.setPower(0);
-        motorFR.setPower(-speed);
-    }
-
-    public void goDiagonalBackwardRight(double speed) {
         motorBL.setPower(-speed);
         motorBR.setPower(0);
         motorFL.setPower(0);
         motorFR.setPower(speed);
     }
 
+    public void goDiagonalBackwardRight(double speed) {
+        motorBL.setPower(speed);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(-speed);
+    }
+
     public void goDiagonalBackwardLeft(double speed) {
         motorBL.setPower(0);
-        motorBR.setPower(speed);
-        motorFL.setPower(-speed);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
         motorFR.setPower(0);
     }
 
