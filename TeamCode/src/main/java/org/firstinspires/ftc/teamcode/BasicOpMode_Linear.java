@@ -208,7 +208,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mSpectrum = new Mat();
-        CONTOUR_COLOR = new Scalar(255,0,0,255);
+        CONTOUR_COLOR = new Scalar(165,255,255,255);
         SPECTRUM_SIZE = new Size(200, 64);
 
         // Weeeeee assign values to the color scalars weeeee (I'm not actually sure why we have to do this but every example I've seen did the same thing)
@@ -216,10 +216,10 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         mBlobColorHsv = new Scalar(255);
 
         // and then change them immediately :DDDDDDDDD
-        mBlobColorHsv = new Scalar(0, 255, 140.25);
-        mBlobColorRgba = convertScalarHsv2Rgba(mBlobColorHsv);
+        // mBlobColorHsv = new Scalar(245.91, 201.45, 221.85);
+        mBlobColorRgba = convertScalarHsv2Rgba(glyphBrownHSV);
 
-        mDetector.setHsvColor(mBlobColorHsv);
+        mDetector.setHsvColor(glyphBrownHSV);
 
         mIsColorSelected = true;
 
