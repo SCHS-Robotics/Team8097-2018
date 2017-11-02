@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Camera;
+import android.graphics.drawable.ScaleDrawable;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -15,6 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.core.Scalar;
 
 import java.util.HashMap;
 
@@ -39,6 +41,8 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
+
+    final Scalar glyphBrownHSV = new Scalar(10, 48.45, 140.25);
 
     //int wheelEncoderPpr = 1680;
 
