@@ -80,6 +80,8 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
         //setting servo initial positions on initialize method
         servoCamera.setPosition(servoCameraInitPosition);
+        servoLeftGrab.setPosition(1);
+        servoRightGrab.setPosition(0);
     }
 
     //Movement code

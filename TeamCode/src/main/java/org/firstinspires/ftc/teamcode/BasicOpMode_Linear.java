@@ -137,6 +137,15 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 //servoCamera.setPosition(servoCamera.getPosition() - .001);
                 servoRightGrab.setPosition(servoRightGrab.getPosition()-.01);
             }
+            if(gamepad1.a){
+                if(servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5){
+                    servoLeftGrab.setPosition(0.3);
+                    servoRightGrab.setPosition(0.7);
+                }else{
+                    servoLeftGrab.setPosition(1);
+                    servoRightGrab.setPosition(0);
+                }
+            }
 
 
 
