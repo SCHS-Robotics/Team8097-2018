@@ -78,6 +78,11 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
         //setting servo initial positions on initialize method
         servoCamera.setPosition(servoCameraInitPosition);
         servoLeftGrab.setPosition(1);

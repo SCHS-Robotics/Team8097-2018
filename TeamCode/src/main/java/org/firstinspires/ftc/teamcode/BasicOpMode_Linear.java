@@ -222,6 +222,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         mDetector.setHsvColor(mBlobColorHsv);
 
         mIsColorSelected = true;
+        
 
 
     }
