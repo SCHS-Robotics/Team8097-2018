@@ -74,6 +74,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
     private Rect                 returnedBoundingRect;
+    private int                  buttonACooldown;
 
     @Override
     public void runOpMode() {
@@ -91,9 +92,9 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-//            for (MatOfPoint contour: mDetector.getContours()) {
-//                returnedBoundingRect = Imgproc.boundingRect(contour);
-//            }
+            //for (MatOfPoint contour: mDetector.getContours()) {
+            //    returnedBoundingRect = Imgproc.boundingRect(contour);
+            //}
 
             double inputX = gamepad1.left_stick_x;
             double inputY = gamepad1.left_stick_y;
@@ -137,7 +138,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 //servoCamera.setPosition(servoCamera.getPosition() - .001);
                 servoRightGrab.setPosition(servoRightGrab.getPosition()-.01);
             }
-            if(gamepad1.a){
+            if(gamepad1.a && buttonACooldown > 1000){
                 if(servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5){
                     servoLeftGrab.setPosition(0.3);
                     servoRightGrab.setPosition(0.7);
@@ -145,7 +146,9 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                     servoLeftGrab.setPosition(1);
                     servoRightGrab.setPosition(0);
                 }
+                buttonACooldown = 0;
             }
+            buttonACooldown++;
 
 
 
@@ -156,6 +159,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
             telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Button A cooldown", buttonACooldown);
             //telemetry.addData("Status", "Bounding Rect: " + returnedBoundingRect.toString());
             telemetry.update();
         }
