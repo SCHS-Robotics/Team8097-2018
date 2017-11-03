@@ -10,6 +10,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class ColorBlobDetector {
     // Minimum contour area in percent for contours filtering
     private static double mMinContourArea = 0.1;
     // Color radius for range checking in HSV color space
-    private Scalar mColorRadius = new Scalar(25, 50, 50, 0);// Adjust this as needed
+    private Scalar mColorRadius = new Scalar(50, 90, 50, 0);// Adjust this as needed
     private Mat mSpectrum = new Mat();
     private List<MatOfPoint> mContours = new ArrayList<MatOfPoint>();
 
@@ -36,8 +37,11 @@ public class ColorBlobDetector {
     Mat mMask = new Mat();
     Mat mMask1 = new Mat();
     Mat mMask2 = new Mat();
-    Mat mDilatedMask = new Mat();
+    Mat mErodedMask = new Mat();
     Mat mHierarchy = new Mat();
+    Mat mDilatedMask = new Mat();
+    Mat mBlurredMask = new Mat();
+
 
     public void setColorRadius(Scalar radius) {
         mColorRadius = radius;
@@ -113,7 +117,10 @@ public class ColorBlobDetector {
         } else {
             Core.inRange(mHsvMat, mLowerBound, mUpperBound, mMask);
         }
-        Imgproc.dilate(mMask, mDilatedMask, new Mat());
+        Imgproc.erode(mMask, mErodedMask, new Mat());
+        Imgproc.dilate(mErodedMask, mDilatedMask, new Mat());
+        Imgproc.blur(mDilatedMask, mBlurredMask, new Size(6, 6));
+
 
         List<MatOfPoint> contours = new ArrayList<>();
 

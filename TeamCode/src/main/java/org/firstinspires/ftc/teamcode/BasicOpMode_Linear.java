@@ -65,122 +65,177 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
-    private boolean              mIsColorSelected = true;
-    private Mat                  mRgba;
-    private Scalar mBlobColorRgba;
-    private Scalar               mBlobColorHsv;
-    private ColorBlobDetector    mDetector;
-    private Mat                  mSpectrum;
-    private Size SPECTRUM_SIZE;
-    private Scalar               CONTOUR_COLOR;
-    private Rect                 returnedBoundingRect;
+    // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
+    private int                  buttonACooldown;
+    private int                  buttonBCooldown;
 
     @Override
     public void runOpMode() {
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         initialize();
-
         startOpenCV(this);
-        mDetector = new ColorBlobDetector();
-        mDetector.setHsvColor(new Scalar(195, 255, 255));
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
+        // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-//            for (MatOfPoint contour: mDetector.getContours()) {
-//                returnedBoundingRect = Imgproc.boundingRect(contour);
-//            }
 
             double inputX = gamepad1.left_stick_x;
             double inputY = gamepad1.left_stick_y;
-            if (inputX >= .1 || inputY >= .1) {
-                double inputMag = Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2));
-                double angle = Math.toDegrees(Math.atan2(inputY, inputX));
-                if (angle >= 22.5 && angle <= 67.5) {
-                    moveDFR(inputMag);
+            double inputMag = Math.abs(Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2)));
+            double angle = Math.toDegrees(Math.atan2(inputY, inputX));
+
+            if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
+                try {
+                    goDirection(inputMag, angle);
                 }
-                if (angle >= 67.5 && angle <= 112.5) {
-                    moveForward(inputMag);
-                }
-                if (angle >= 112.5 && angle <= 157.5) {
-                    moveDFL(inputMag);
-                }
-                if (angle >= 157.5 && angle <= 202.5) {
-                    moveLeft(inputMag);
-                }
-                if (angle >= 202.5 && angle <= 247.5) {
-                    moveDBL(inputMag);
-                }
-                if (angle >= 247.5 && angle <= 295.5) {
-                    moveBackward(inputMag);
-                }
-                if (angle >= 295.5 && angle <= 337.5) {
-                    moveDBR(inputMag);
-                }
-                if (angle >= 337.5 || angle <= 22.5) {
-                    moveRight(inputMag);
+                catch (java.lang.InterruptedException a) {
+                    stop();
                 }
             }
+
             else if (gamepad1.left_trigger > .1){
                 turnLeft(gamepad1.left_trigger);
             }
+
             else if (gamepad1.right_trigger > .1){
                 turnRight(gamepad1.right_trigger);
             }
 
+            else {
+                motorBL.setPower(0);
+                motorBR.setPower(0);
+                motorFL.setPower(0);
+                motorFR.setPower(0);
+            }
+
             if (gamepad1.dpad_up) {
                 //servoCamera.setPosition(servoCamera.getPosition() + .001);
-                servoLeftGrab.setPosition(servoLeftGrab.getPosition()+.001);
+                servoCamera.setPosition(servoCamera.getPosition() + .01);
             }
+
             else if (gamepad1.dpad_down){
                 //servoCamera.setPosition(servoCamera.getPosition() - .001);
-                servoLeftGrab.setPosition(servoLeftGrab.getPosition()-.001);
+                servoCamera.setPosition(servoCamera.getPosition() - .01);
             }
 
-            if (gamepad1.dpad_left) {
-                //servoCamera.setPosition(servoCamera.getPosition() + .001);
-                servoRightGrab.setPosition(servoRightGrab.getPosition()+.001);
+            if(gamepad1.a && buttonACooldown >= 1000) {
+                if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
+                    servoLeftGrab.setPosition(0.3);
+                    servoRightGrab.setPosition(0.7);
+                } else {
+                    servoLeftGrab.setPosition(1);
+                    servoRightGrab.setPosition(0);
+                }
+                buttonACooldown = 0;
             }
-            else if (gamepad1.dpad_right){
-                //servoCamera.setPosition(servoCamera.getPosition() - .001);
-                servoRightGrab.setPosition(servoRightGrab.getPosition()-.001);
+
+            if(buttonACooldown < 2000){
+                buttonACooldown++;
             }
 
+            if(gamepad1.b && buttonBCooldown >= 500) {
+                if (mBlobColorHsv == glyphBrownHSV) {
+                    setDetectColor(glyphGrayHSV);
+                }
+                else  if(mBlobColorHsv == glyphGrayHSV) {
+                    setDetectColor(glyphBrownHSV);
+                }
+                else {
+                    setDetectColor(glyphGrayHSV);
+                }
+                buttonBCooldown = 0;
+            }
 
+            if(buttonBCooldown < 2000){
+                buttonBCooldown++;
+            }
 
+            // Telemetry fun
             telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
             telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
             telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
-
+            telemetry.addData("Angle of Left Joystick: ", angle);
+            telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
+            telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Status", "Bounding Rect: " + returnedBoundingRect.toString());
+            telemetry.addData("Glyph Detection Color", getDetectColor());
             telemetry.update();
         }
 
     }
 
+    // Direction Functions
+    public boolean angleIsNearAngle(double angle1, double angle2) {
+
+        while (angle1 >= 360) {
+            angle1 -= 360;
+        }
+        while (angle1 < 0) {
+            angle1 += 360;
+        }
+        while (angle2 >= 360) {
+            angle2 -= 360;
+        }
+        while (angle2 < 0) {
+            angle2 += 360;
+        }
+        double diff = Math.abs(angle2 - angle1);
+        return diff <= 45.0 / 2 || diff >= 360 - 45.0 / 2;
+    }
+
+    public void goDirection(double magnitude, double angle) throws InterruptedException {
+
+        if (angleIsNearAngle(angle, 0)) {
+            goRight(magnitude);
+        } else if (angleIsNearAngle(angle, 45)) {
+            goDiagonalForwardRight(magnitude);
+        } else if (angleIsNearAngle(angle, 90)) {
+            goForward(magnitude);
+        } else if (angleIsNearAngle(angle, 135)) {
+            goDiagonalForwardLeft(magnitude);
+        } else if (angleIsNearAngle(angle, 180)) {
+            goLeft(magnitude);
+        } else if (angleIsNearAngle(angle, 225)) {
+            goDiagonalBackwardLeft(magnitude);
+        } else if (angleIsNearAngle(angle, 270)) {
+            goBackward(magnitude);
+        } else if (angleIsNearAngle(angle, 315)) {
+            goDiagonalBackwardRight(magnitude);
+        } else {
+            System.out.print("Where will this go");
+        }
+    }
+
+    // OpenCV functions
     public void onCameraViewStarted(int width, int height) {
+
+        // Creating display, color detector, defining variables for outlines (contours), not sure what a spectrum is, but we should figure that out
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mSpectrum = new Mat();
-        mBlobColorRgba = new Scalar(255);
-        mBlobColorHsv = new Scalar(255);
+        CONTOUR_COLOR = new Scalar(165,255,255,255);
         SPECTRUM_SIZE = new Size(200, 64);
-        CONTOUR_COLOR = new Scalar(255,0,0,255);
+
+        // The color that should be detected by default on start
+        setDetectColor(glyphBrownHSV);
+
     }
 
     public void onCameraViewStopped() {
+
         mRgba.release();
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
 
+        mRgba = inputFrame.rgba();
         if (mIsColorSelected) {
             mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
@@ -195,14 +250,6 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         }
 
         return mRgba;
-    }
-
-    private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
-        Mat pointMatRgba = new Mat();
-        Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
-        Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
-
-        return new Scalar(pointMatRgba.get(0, 0));
     }
 
 }
