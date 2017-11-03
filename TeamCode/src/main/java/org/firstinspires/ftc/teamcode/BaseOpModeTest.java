@@ -16,7 +16,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.HashMap;
 
@@ -24,13 +31,10 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
-    ColorSensor colorSense;
 
     Servo servoCamera;
     Servo servoLeftGrab;
     Servo servoRightGrab;
-    Servo servoRightHolder;
-    Servo servoLeftHolder;
 
     DcMotor motorBL;
     DcMotor motorBR;
@@ -42,11 +46,20 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
 
-    final Scalar glyphBrownHSV = new Scalar(10, 48.45, 140.25);
+    final Scalar glyphBrownHSV = new Scalar(252.16, 40, 168.3);
+    final Scalar glyphGrayHSV = new Scalar(149.45, 32.7, 173.4);
+
+    protected boolean              mIsColorSelected = false;
+    protected Mat mRgba;
+    protected Scalar               mBlobColorRgba;
+    protected Scalar               mBlobColorHsv;
+    protected ColorBlobDetector    mDetector;
+    protected Mat                  mSpectrum;
+    protected Size                 SPECTRUM_SIZE;
+    protected Scalar               CONTOUR_COLOR;
+
 
     //int wheelEncoderPpr = 1680;
-
-
     // Trying to get range sensor to work: -Includes changing I2C address
     //DistanceSensor rangeSensor;
     /*byte[] range1Cache; //The read will return an array of bytes. They are stored in this variable
@@ -59,41 +72,41 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     public I2cDeviceSynch RANGE1Reader;*/
 
 
-    //initialize() (method??) run when an op mode is run, this is where you map the config file names to the
-    //variable names in the code
+    // Initialization, literally what happens when you select any OpMode and press "init"
     public void initialize()
     {
         //Assigning previously declared variables to expansion hub names
-        //colorSense =   hardwareMap.colorSensor.get("colorBottom");
 
+        // Setting up servos
         servoCamera = hardwareMap.servo.get("servoCamera");
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
         servoRightGrab = hardwareMap.servo.get("servoRightGrab");
 
-        //Creating motors
+        // Creating motors
         motorBL = hardwareMap.dcMotor.get("motorBackLeft");
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
 
-        //Setting up encoders
+        // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
         motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        //setting servo initial positions on initialize method
+        // Setting servo initial positions on initialize method
         servoCamera.setPosition(servoCameraInitPosition);
         servoLeftGrab.setPosition(1);
         servoRightGrab.setPosition(0);
     }
 
-    //Movement code
+    // Movement code
     public void turnRight(double speed) {
         motorBL.setPower(-speed);
         motorBR.setPower(-speed);
@@ -165,6 +178,36 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setPower(speed);
     }
 
+    // OpenCV code
+    public void setDetectColor(Scalar newColor) {
+        mIsColorSelected = false;
+        mBlobColorHsv = newColor;
+        mBlobColorRgba = convertScalarHsv2Rgba(mBlobColorHsv);
+        mDetector.setHsvColor(newColor);
+        mIsColorSelected = true;
+    }
+
+    // Only used for telemetry, surely there's another way to do this better, but I'm lazy.
+    public String getDetectColor() {
+        if(mBlobColorHsv == glyphGrayHSV){
+            return "Gray";
+        }
+        else if (mBlobColorHsv == glyphBrownHSV){
+            return "Brown";
+        }
+        else {
+            return "None";
+        }
+    }
+
+    public Scalar convertScalarHsv2Rgba(Scalar hsvColor) {
+        Mat pointMatRgba = new Mat();
+        Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
+        Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
+
+        return new Scalar(pointMatRgba.get(0, 0));
+    }
+
     public void startOpenCV(CameraBridgeViewBase.CvCameraViewListener2 cameraViewListener) {
         if (FtcRobotControllerActivity.mOpenCvCameraView.isEnabled())
             FtcRobotControllerActivity.mOpenCvCameraView.disableView();
@@ -178,7 +221,4 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         FtcRobotControllerActivity.mOpenCvCameraView.disableView();
     }
 
-   /* public double getCurrentRpm(int encoderPpr, DcMotor motor, int waitTime) {
-        return ((double) (Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
-   */
 }

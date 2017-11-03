@@ -65,24 +65,17 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
-    private boolean              mIsColorSelected = true;
-    private Mat                  mRgba;
-    private Scalar               mBlobColorRgba;
-    private Scalar               mBlobColorHsv;
-    private ColorBlobDetector    mDetector;
-    private Mat                  mSpectrum;
-    private Size                 SPECTRUM_SIZE;
-    private Scalar               CONTOUR_COLOR;
-    private Rect                 returnedBoundingRect;
+    // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
     private int                  buttonACooldown;
+    private int                  buttonBCooldown;
 
     @Override
     public void runOpMode() {
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         initialize();
-
         startOpenCV(this);
 
 
@@ -90,16 +83,14 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
+        // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            //for (MatOfPoint contour: mDetector.getContours()) {
-            //    returnedBoundingRect = Imgproc.boundingRect(contour);
-            //}
 
             double inputX = gamepad1.left_stick_x;
             double inputY = gamepad1.left_stick_y;
             double inputMag = Math.abs(Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2)));
             double angle = Math.toDegrees(Math.atan2(inputY, inputX));
+
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
                 try {
                     goDirection(inputMag, angle);
@@ -108,12 +99,15 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                     stop();
                 }
             }
+
             else if (gamepad1.left_trigger > .1){
                 turnLeft(gamepad1.left_trigger);
             }
+
             else if (gamepad1.right_trigger > .1){
                 turnRight(gamepad1.right_trigger);
             }
+
             else {
                 motorBL.setPower(0);
                 motorBR.setPower(0);
@@ -123,35 +117,47 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
             if (gamepad1.dpad_up) {
                 //servoCamera.setPosition(servoCamera.getPosition() + .001);
-                servoLeftGrab.setPosition(servoLeftGrab.getPosition() + .01);
-            }
-            else if (gamepad1.dpad_down){
-                //servoCamera.setPosition(servoCamera.getPosition() - .001);
-                servoLeftGrab.setPosition(servoLeftGrab.getPosition()-.01);
+                servoCamera.setPosition(servoCamera.getPosition() + .01);
             }
 
-            if (gamepad1.dpad_left) {
-                //servoCamera.setPosition(servoCamera.getPosition() + .001);
-                servoRightGrab.setPosition(servoRightGrab.getPosition()+.01);
-            }
-            else if (gamepad1.dpad_right){
+            else if (gamepad1.dpad_down){
                 //servoCamera.setPosition(servoCamera.getPosition() - .001);
-                servoRightGrab.setPosition(servoRightGrab.getPosition()-.01);
+                servoCamera.setPosition(servoCamera.getPosition() - .01);
             }
-            if(gamepad1.a && buttonACooldown > 1000){
-                if(servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5){
+
+            if(gamepad1.a && buttonACooldown >= 1000) {
+                if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
                     servoLeftGrab.setPosition(0.3);
                     servoRightGrab.setPosition(0.7);
-                }else{
+                } else {
                     servoLeftGrab.setPosition(1);
                     servoRightGrab.setPosition(0);
                 }
                 buttonACooldown = 0;
             }
-            buttonACooldown++;
 
+            if(buttonACooldown < 2000){
+                buttonACooldown++;
+            }
 
+            if(gamepad1.b && buttonBCooldown >= 500) {
+                if (mBlobColorHsv == glyphBrownHSV) {
+                    setDetectColor(glyphGrayHSV);
+                }
+                else  if(mBlobColorHsv == glyphGrayHSV) {
+                    setDetectColor(glyphBrownHSV);
+                }
+                else {
+                    setDetectColor(glyphGrayHSV);
+                }
+                buttonBCooldown = 0;
+            }
 
+            if(buttonBCooldown < 2000){
+                buttonBCooldown++;
+            }
+
+            // Telemetry fun
             telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
             telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
             telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
@@ -159,13 +165,15 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
             telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Button A cooldown", buttonACooldown);
-            //telemetry.addData("Status", "Bounding Rect: " + returnedBoundingRect.toString());
+            telemetry.addData("Glyph Detection Color", getDetectColor());
             telemetry.update();
         }
 
     }
+
+    // Direction Functions
     public boolean angleIsNearAngle(double angle1, double angle2) {
+
         while (angle1 >= 360) {
             angle1 -= 360;
         }
@@ -183,6 +191,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     }
 
     public void goDirection(double magnitude, double angle) throws InterruptedException {
+
         if (angleIsNearAngle(angle, 0)) {
             goRight(magnitude);
         } else if (angleIsNearAngle(angle, 45)) {
@@ -204,36 +213,29 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         }
     }
 
+    // OpenCV functions
     public void onCameraViewStarted(int width, int height) {
+
+        // Creating display, color detector, defining variables for outlines (contours), not sure what a spectrum is, but we should figure that out
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mSpectrum = new Mat();
         CONTOUR_COLOR = new Scalar(165,255,255,255);
         SPECTRUM_SIZE = new Size(200, 64);
 
-        // Weeeeee assign values to the color scalars weeeee (I'm not actually sure why we have to do this but every example I've seen did the same thing)
-        mBlobColorRgba = new Scalar(255);
-        mBlobColorHsv = new Scalar(255);
-
-        // and then change them immediately :DDDDDDDDD
-        // mBlobColorHsv = new Scalar(245.91, 201.45, 221.85);
-        mBlobColorRgba = convertScalarHsv2Rgba(glyphBrownHSV);
-
-        mDetector.setHsvColor(glyphBrownHSV);
-
-        mIsColorSelected = true;
-        
-
+        // The color that should be detected by default on start
+        setDetectColor(glyphBrownHSV);
 
     }
 
     public void onCameraViewStopped() {
+
         mRgba.release();
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
 
+        mRgba = inputFrame.rgba();
         if (mIsColorSelected) {
             mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
@@ -248,14 +250,6 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         }
 
         return mRgba;
-    }
-
-    private Scalar convertScalarHsv2Rgba(Scalar hsvColor) {
-        Mat pointMatRgba = new Mat();
-        Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
-        Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
-
-        return new Scalar(pointMatRgba.get(0, 0));
     }
 
 }
