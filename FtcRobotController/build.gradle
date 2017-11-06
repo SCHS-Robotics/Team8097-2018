@@ -1,7 +1,7 @@
 //
 // build.gradle in FtcRobotController
 //
-        apply plugin: 'com.android.library'
+apply plugin: 'com.android.library'
 android {
 
     defaultConfig {
@@ -23,6 +23,7 @@ repositories {
     }
 }
 apply from: 'build.release.gradle'
+
 dependencies {
     compile project(':openCVLibrary330')
 }

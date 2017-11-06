@@ -39,8 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               xmlns:style="http://schemas.android.com/apk/res-auto"
               tools:context="org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity"
               android:focusable="true"
-
               android:orientation="vertical">
+
+  <!-- black bar on top -->
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
@@ -48,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:orientation="vertical"
       android:id="@+id/entire_screen">
 
-  <!-- black bar on top -->
   <RelativeLayout
     android:id="@+id/top_bar"
     android:layout_width="fill_parent"

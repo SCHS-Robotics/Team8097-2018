@@ -169,6 +169,9 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             telemetry.update();
         }
 
+        stopOpenCV();
+
+
     }
 
     // Direction Functions
