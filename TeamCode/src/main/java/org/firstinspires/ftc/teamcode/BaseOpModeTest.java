@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Camera;
 import android.graphics.drawable.ScaleDrawable;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +17,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -26,6 +34,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
 
@@ -40,7 +49,12 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     DcMotor motorBR;
     DcMotor motorFL;
     DcMotor motorFR;
+    // DcMotor motorLift;
 
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+    Orientation angles;
 
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
@@ -75,12 +89,23 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     // Initialization, literally what happens when you select any OpMode and press "init"
     public void initialize()
     {
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
         //Assigning previously declared variables to expansion hub names
 
         // Setting up servos
         servoCamera = hardwareMap.servo.get("servoCamera");
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
         servoRightGrab = hardwareMap.servo.get("servoRightGrab");
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         // Creating motors
         motorBL = hardwareMap.dcMotor.get("motorBackLeft");
@@ -93,6 +118,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
         motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -104,6 +130,15 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         servoCamera.setPosition(servoCameraInitPosition);
         servoLeftGrab.setPosition(1);
         servoRightGrab.setPosition(0);
+    }
+
+    public void resetEncoders(DcMotor...motors) {
+        for(DcMotor motor : motors){
+            if(motor.getCurrentPosition() != 0){
+                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
 
     // Movement code
@@ -178,6 +213,12 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setPower(speed);
     }
 
+    public void moveDistance(double speed, double distance) {
+
+    }
+
+
+
     // OpenCV code
     public void setDetectColor(Scalar newColor) {
         mIsColorSelected = false;
@@ -221,4 +262,29 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         FtcRobotControllerActivity.mOpenCvCameraView.disableView();
     }
 
+    void composeTelemetry() {
+
+        telemetry.addAction(new Runnable() { @Override public void run() {
+            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            }
+        });
+
+        telemetry.addLine()
+                .addData("heading", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.firstAngle);
+                    }
+                });
+    }
+
+    String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
+
+
 }
+

@@ -41,6 +41,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -68,6 +73,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
     private int                  buttonACooldown;
     private int                  buttonBCooldown;
+    private int                  buttonLBCooldown;
 
     @Override
     public void runOpMode() {
@@ -78,18 +84,32 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         initialize();
         startOpenCV(this);
 
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+
         runtime.reset();
 
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+
             double inputX = gamepad1.left_stick_x;
             double inputY = gamepad1.left_stick_y;
             double inputMag = Math.abs(Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2)));
             double angle = Math.toDegrees(Math.atan2(inputY, inputX));
+
+            // Telemetry fun
+            telemetry.update();
+            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
+            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
+            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
+            telemetry.addData("Angle of Left Joystick: ", angle);
+            telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
+            telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Glyph Detection Color", getDetectColor());
+
+            // telemetry.addData("Motor Lift Position:", position);
 
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
                 try {
@@ -115,7 +135,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 motorFR.setPower(0);
             }
 
-            if (gamepad1.dpad_up) {
+             if (gamepad1.dpad_up) {
                 //servoCamera.setPosition(servoCamera.getPosition() + .001);
                 servoCamera.setPosition(servoCamera.getPosition() + .01);
             }
@@ -157,16 +177,23 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 buttonBCooldown++;
             }
 
-            // Telemetry fun
-            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
-            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
-            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
-            telemetry.addData("Angle of Left Joystick: ", angle);
-            telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
-            telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Glyph Detection Color", getDetectColor());
-            telemetry.update();
+            if(gamepad1.left_bumper && buttonLBCooldown >= 100) {
+                composeTelemetry();
+                double initHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+                while (Math.abs(initHeading - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle) < 90)
+                {
+                    composeTelemetry();
+                    turnLeft(0.1);
+                }
+                buttonLBCooldown = 0;
+            }
+
+            if(buttonLBCooldown < 200){
+                buttonLBCooldown++;
+            }
+
+            // int position = motorLift.getCurrentPosition();
+
         }
 
         stopOpenCV();
