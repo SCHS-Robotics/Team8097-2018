@@ -55,10 +55,13 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
     // State used for updating telemetry
     Orientation angles;
+    double heading;
 
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
+
+    final double angleTolerance = 3;
 
     final Scalar glyphBrownHSV = new Scalar(252.16, 40, 168.3);
     final Scalar glyphGrayHSV = new Scalar(149.45, 32.7, 173.4);
@@ -217,7 +220,24 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
     }
 
-
+    public void turnTo(double angle, double speed, double tolerance) {
+        double givenSpeed = speed;
+        while(Math.abs(getHeading() - angle) > tolerance) {
+            if (getHeading() > angle) {
+                turnLeft(speed);
+            } else {
+                turnRight(speed);
+            }
+            if (Math.abs(getHeading() - angle) < 20){
+                speed = 0.25;
+            }
+            else {
+                speed = givenSpeed;
+            }
+            telemetry.addData("Heading", getHeading());
+            telemetry.update();
+        }
+    }
 
     // OpenCV code
     public void setDetectColor(Scalar newColor) {
@@ -238,6 +258,17 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         }
         else {
             return "None";
+        }
+    }
+
+    public double getHeading() {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        if (angles.firstAngle < 0){
+            return angles.firstAngle += 360;
+        }
+        else{
+            return angles.firstAngle;
+
         }
     }
 
@@ -266,16 +297,23 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
         telemetry.addAction(new Runnable() { @Override public void run() {
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            if(angles.firstAngle < 0){
+                angles.firstAngle += 360;
+                heading = angles.firstAngle + 360;
+            } else {
+                heading = angles.firstAngle;
             }
+        }
         });
 
         telemetry.addLine()
                 .addData("heading", new Func<String>() {
                     @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.firstAngle);
+                        return formatAngle(angles.angleUnit, getHeading());
                     }
-                });
-    }
+                })
+                .addData("heading", heading);
+        }
 
     String formatAngle(AngleUnit angleUnit, double angle) {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));

@@ -89,6 +89,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
         runtime.reset();
 
+        composeTelemetry();
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -108,7 +109,6 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Glyph Detection Color", getDetectColor());
-
             // telemetry.addData("Motor Lift Position:", position);
 
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
@@ -178,13 +178,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             }
 
             if(gamepad1.left_bumper && buttonLBCooldown >= 100) {
-                composeTelemetry();
-                double initHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-                while (Math.abs(initHeading - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle) < 90)
-                {
-                    composeTelemetry();
-                    turnLeft(0.1);
-                }
+                turnTo(45, 0.25, 10);
                 buttonLBCooldown = 0;
             }
 
