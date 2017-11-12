@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.poseDetection;
 
 import org.opencv.core.MatOfPoint3;
-import org.opencv.core.MatOfPoint3f;
+import org.opencv.core.Point3;
 import org.opencv.core.Point3;
 
 import java.io.BufferedInputStream;
@@ -26,7 +26,7 @@ public class CsvReader {
 
     }
 
-    public void readPLY(Vector<MatOfPoint3f> listVertex, Vector<Integer> listTriangles) throws java.io.IOException {
+    public void readPLY(Vector<Point3> listVertex, Vector<Integer> listTriangles) throws java.io.IOException {
         // Read variables
         String line = "";
         String tmpStr = "";
@@ -85,8 +85,7 @@ public class CsvReader {
                     tmpPoint.x = (float)Integer.parseInt(x);
                     tmpPoint.y = (float)Integer.parseInt(y);
                     tmpPoint.z = (float)Integer.parseInt(z);
-                    MatOfPoint3f tmpPointMat = new MatOfPoint3f(tmpPoint);
-                    listVertex.add(tmpPointMat);
+                    listVertex.add(tmpPoint);
 
                     count++;
 

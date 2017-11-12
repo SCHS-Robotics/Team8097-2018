@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.poseDetection;
 
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint3f;
+import org.opencv.core.Point3;
 
 import java.util.Vector;
 
@@ -21,7 +21,7 @@ public class Mesh {
         return listTriangles;
     }
 
-    public MatOfPoint3f getVertex(int pos) {
+    public Point3 getVertex(int pos) {
         return listVertex.get(pos);
     }
 
@@ -43,52 +43,52 @@ public class Mesh {
     private int id;
     private int nVertices;
     private int nTriangles;
-    private Vector<MatOfPoint3f> listVertex;
+    private Vector<Point3> listVertex;
     private Vector<Integer> listTriangles;
 }
 
 class Triangle {
 
-    public Triangle(int givenId, MatOfPoint3f vertex0, MatOfPoint3f vertex1, MatOfPoint3f vertex2) {
+    public Triangle(int givenId, Point3 vertex0, Point3 vertex1, Point3 vertex2) {
         id = givenId;
         v0 = vertex0;
         v1 = vertex1;
         v2 = vertex2;
     }
 
-    public MatOfPoint3f getV0() {
+    public Point3 getV0() {
         return v0;
     }
 
-    public MatOfPoint3f getV1() {
+    public Point3 getV1() {
         return v1;
     }
 
-    public MatOfPoint3f getV2() {
+    public Point3 getV2() {
         return v2;
     }
 
     private int id;
-    private MatOfPoint3f v0;
-    private MatOfPoint3f v1;
-    private MatOfPoint3f v2;
+    private Point3 v0;
+    private Point3 v1;
+    private Point3 v2;
 }
 
 class Ray {
 
-    public Ray(MatOfPoint3f point0, MatOfPoint3f point1) {
+    public Ray(Point3 point0, Point3 point1) {
         p0 = point0;
         p1 = point1;
     }
 
-    public MatOfPoint3f getP0() {
+    public Point3 getP0() {
         return p0;
     }
 
-    public MatOfPoint3f getP1() {
+    public Point3 getP1() {
         return p1;
     }
 
-    private MatOfPoint3f p0;
-    private MatOfPoint3f p1;
+    private Point3 p0;
+    private Point3 p1;
 }
