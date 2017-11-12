@@ -87,6 +87,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:layout_centerHorizontal="true"
       android:layout_margin="10dp"/>
 
+      <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_below="@id/textDeviceName"
+          android:layout_toEndOf="@id/robotIcon"
+          android:layout_toStartOf="@id/menu_buttons"
+          android:orientation="horizontal"
+          android:weightSum="1"
+          android:id="@+id/linearLayout6">
+
+      </LinearLayout>
+
+      <Button
+          android:id="@+id/plusExposure"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_alignTop="@+id/robotIcon"
+          android:layout_toEndOf="@+id/textDeviceName"
+          android:clickable="false"
+          android:gravity="left|center_vertical"
+          android:onClick="plusExposure"
+          android:text="+"
+          android:textColor="?attr/textWhite"
+          android:textSize="30sp" />
+
+      <Button
+          android:id="@+id/minusExposure"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_alignParentTop="true"
+          android:layout_toEndOf="@+id/plusExposure"
+          android:clickable="false"
+          android:gravity="left|center_vertical"
+          android:onClick="minusExposure"
+          android:text="-"
+          android:textColor="?attr/textWhite"
+          android:textSize="30sp" />
+
+      <TextView
+          android:id="@+id/exposureText"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_toEndOf="@+id/minusExposure"
+          android:layout_weight="0.15"
+          android:clickable="false"
+          android:gravity="left|center_vertical"
+          android:text="Exposure:"
+          android:textColor="?attr/textWhite"
+          android:layout_alignBottom="@+id/robotIcon"
+          android:layout_alignTop="@+id/plusExposure" />
+
   </RelativeLayout>
   <!-- end of black bar -->
 
