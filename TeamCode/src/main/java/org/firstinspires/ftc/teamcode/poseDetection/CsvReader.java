@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.poseDetection;
 
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint3;
+import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point3;
 import org.opencv.core.Point3;
 
@@ -10,6 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -20,13 +23,15 @@ import java.util.Vector;
 public class CsvReader {
 
     public CsvReader(String path) throws java.io.FileNotFoundException{
+
         file = new FileReader(path);
         reader = new BufferedReader(file);
         scanner = new Scanner(reader);
 
     }
 
-    public void readPLY(Vector<Point3> listVertex, Vector<Integer> listTriangles) throws java.io.IOException {
+    public void readPLY(MatOfPoint3f listVertex, ArrayList<ArrayList<Integer>> listTriangles) throws java.io.IOException {
+
         // Read variables
         String line = "";
         String tmpStr = "";
@@ -41,6 +46,7 @@ public class CsvReader {
 
 
         while (scanner.hasNext()){
+
             Scanner liness = new Scanner(scanner.nextLine());
             liness.useDelimiter(separator);
 
@@ -85,7 +91,7 @@ public class CsvReader {
                     tmpPoint.x = (float)Integer.parseInt(x);
                     tmpPoint.y = (float)Integer.parseInt(y);
                     tmpPoint.z = (float)Integer.parseInt(z);
-                    listVertex.add(tmpPoint);
+                    listVertex.push_back(new MatOfPoint3f(tmpPoint));
 
                     count++;
 
@@ -107,11 +113,11 @@ public class CsvReader {
                     id1 = liness.nextLine();
                     id2 = liness.nextLine();
 
-                    Vector<Integer> tmpTriangle = new Vector<>(3);
-                    tmpTriangle.setElementAt(Integer.parseInt(id0), 0);
-                    tmpTriangle.setElementAt(Integer.parseInt(id1), 1);
-                    tmpTriangle.setElementAt(Integer.parseInt(id2), 2);
-                    listTriangles.addAll(tmpTriangle);
+                    ArrayList<Integer> tmpTriangle = new ArrayList<>(3);
+                    tmpTriangle.add(0, Integer.parseInt(id0));
+                    tmpTriangle.add(1, Integer.parseInt(id1));
+                    tmpTriangle.add(2, Integer.parseInt(id2));
+                    listTriangles.add(tmpTriangle);
 
                     count++;
                 }
