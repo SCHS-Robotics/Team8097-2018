@@ -9,6 +9,7 @@ import java.util.ArrayList;
  */
 
 public class Mesh {
+
     public Mesh() {
         id = 0;
         nVertex = 0;
@@ -23,8 +24,12 @@ public class Mesh {
         return listVertex.get(pos);
     }
 
-    public void load(String path) {
-        CsvReader csvReader(path);
+    public int getNumVertices() {
+        return nVertex;
+    }
+
+    public void load(String path) throws java.io.FileNotFoundException {
+        CsvReader csvReader = new CsvReader(path);
 
         listVertex.clear();;
         listTriangles.clear();
@@ -32,7 +37,7 @@ public class Mesh {
         csvReader.readPLY(listVertex, listTriangles);
 
         nVertex = listVertex.size();
-        nTriangles = listTriangles.size()
+        nTriangles = listTriangles.size();
 
     }
 
@@ -45,6 +50,7 @@ public class Mesh {
 }
 
 class Triangle {
+
     public Triangle(int newId, Point3 vertex0, Point3 vertex1, Point3 vertex2) {
         id = newId;
         v0 = vertex0;
@@ -70,6 +76,7 @@ class Triangle {
 }
 
 class Ray {
+
     public Ray(Point3 point0, Point3 point1) {
         p0 = point0;
         p1 = point1;
