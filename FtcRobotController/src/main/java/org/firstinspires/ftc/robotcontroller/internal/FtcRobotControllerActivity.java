@@ -56,6 +56,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -113,19 +114,17 @@ import org.firstinspires.ftc.robotcore.internal.webserver.RobotControllerWebInfo
 import org.firstinspires.ftc.robotcore.internal.webserver.WebServer;
 import org.firstinspires.inspection.RcInspectionActivity;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 @SuppressWarnings("WeakerAccess")
 public class FtcRobotControllerActivity extends Activity
   {
-    public static JavaCameraView mOpenCvCameraView;
-
   public static final String TAG = "RCActivity";
   public String getTag() { return TAG; }
 
@@ -145,7 +144,13 @@ public class FtcRobotControllerActivity extends Activity
   protected StartResult prefRemoterStartResult = new StartResult();
   protected PreferencesHelper preferencesHelper;
   protected final SharedPreferencesListener sharedPreferencesListener = new SharedPreferencesListener();
-
+  public static Button increaseExposureButton;
+  public static Button decreaseExposureButton;
+  public static TextView exposureText;
+  public static int exposureValue;
+  public static int exposureIncrement = 1;
+  public final static int MIN_EXPOSURE = -12;
+  public final static int MAX_EXPOSURE = 12;
   protected ImageButton buttonMenu;
   protected TextView textDeviceName;
   protected TextView textNetworkConnectionStatus;
@@ -154,16 +159,18 @@ public class FtcRobotControllerActivity extends Activity
   protected TextView textOpMode;
   protected TextView textErrorMessage;
   protected ImmersiveMode immersion;
-
+  public static SharedPreferences calibrationSP;
   protected UpdateUI updateUI;
   protected Dimmer dimmer;
   protected LinearLayout entireScreenLayout;
 
   protected FtcRobotControllerService controllerService;
   protected NetworkType networkType;
+  public final static String CALIBRATE_SP = "org.firstinspires.ftc.robotcontroller.calibrate";
 
   protected FtcEventLoop eventLoop;
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
+    public static JavaCameraView mOpenCvCameraView;
 
   protected class RobotRestarter implements Restarter {
 
@@ -227,6 +234,7 @@ public class FtcRobotControllerActivity extends Activity
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    RobotLog.onApplicationStart();  // robustify against onCreate() following onDestroy() but using the same app instance, which apparently does happen
     RobotLog.vv(TAG, "onCreate()");
     ThemedActivity.appAppThemeToActivity(getTag(), this); // do this way instead of inherit to help AppInventor
 
@@ -257,6 +265,8 @@ public class FtcRobotControllerActivity extends Activity
     eventLoop = null;
 
     setContentView(R.layout.activity_ftc_controller);
+
+    mOpenCvCameraView = (JavaCameraView) findViewById(R.id.cameraView);
 
     preferencesHelper = new PreferencesHelper(TAG, context);
     preferencesHelper.writeBooleanPrefIfDifferent(context.getString(R.string.pref_rc_connected), true);
@@ -295,6 +305,13 @@ public class FtcRobotControllerActivity extends Activity
     dimmer = new Dimmer(this);
     dimmer.longBright();
 
+    calibrationSP = getSharedPreferences(CALIBRATE_SP, MODE_PRIVATE);
+    increaseExposureButton = (Button) findViewById(R.id.plusExposure);
+    decreaseExposureButton = (Button) findViewById(R.id.minusExposure);
+    exposureText = (TextView) findViewById(R.id.exposureText);
+    exposureValue = calibrationSP.getInt("exposure", 0);
+    exposureText.setText("Exposure: " + exposureValue);
+
     programmingWebHandlers = new ProgrammingWebHandlers();
     programmingModeController = new ProgrammingModeControllerImpl(
             this, (TextView) findViewById(R.id.textRemoteProgrammingMode), programmingWebHandlers);
@@ -309,15 +326,15 @@ public class FtcRobotControllerActivity extends Activity
 
     hittingMenuButtonBrightensScreen();
 
-    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    mOpenCvCameraView = (JavaCameraView) findViewById(R.id.cameraView);
-
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
     readNetworkType();
     ServiceController.startService(FtcRobotControllerWatchdogService.class);
     bindToService();
     logPackageVersions();
+
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
   }
 
   protected UpdateUI createUpdateUI() {
@@ -360,6 +377,7 @@ public class FtcRobotControllerActivity extends Activity
   protected void onResume() {
     super.onResume();
     RobotLog.vv(TAG, "onResume()");
+
     if (!OpenCVLoader.initDebug()) {
       Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
       OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallback);
@@ -367,6 +385,7 @@ public class FtcRobotControllerActivity extends Activity
       Log.d(TAG, "OpenCV library found inside package. Using it!");
       mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
+
   }
 
   @Override
@@ -376,8 +395,9 @@ public class FtcRobotControllerActivity extends Activity
     if (programmingModeController.isActive()) {
       programmingModeController.stopProgrammingMode();
     }
-    if (mOpenCvCameraView != null)
+    if (mOpenCvCameraView != null) {
       mOpenCvCameraView.disableView();
+    }
   }
 
   @Override
@@ -406,8 +426,9 @@ public class FtcRobotControllerActivity extends Activity
 
     preferencesHelper.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(sharedPreferencesListener);
     RobotLog.cancelWriteLogcatToDisk();
-    if (mOpenCvCameraView != null)
+    if (mOpenCvCameraView != null) {
       mOpenCvCameraView.disableView();
+    }
   }
 
   protected void bindToService() {
@@ -639,35 +660,61 @@ public class FtcRobotControllerActivity extends Activity
     }
   }
 
-  protected class SharedPreferencesListener implements SharedPreferences.OnSharedPreferenceChangeListener {
-    @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-      if (key.equals(context.getString(R.string.pref_app_theme))) {
-        ThemedActivity.restartForAppThemeChange(getTag(), getString(R.string.appThemeChangeRestartNotifyRC));
+  public void plusExposure(View v) {
+    exposureValue = Math.min(exposureValue + exposureIncrement, MAX_EXPOSURE);
+    SharedPreferences.Editor editor = FtcRobotControllerActivity.calibrationSP.edit();
+    editor.putInt("exposure", exposureValue);
+    editor.apply();
+    exposureText.setText("Exposure: " + exposureValue);
+  }
+
+  public void minusExposure(View v) {
+    exposureValue = Math.max(exposureValue - exposureIncrement, MIN_EXPOSURE);
+    SharedPreferences.Editor editor = FtcRobotControllerActivity.calibrationSP.edit();
+    editor.putInt("exposure", exposureValue);
+    editor.apply();
+    exposureText.setText("Exposure: " + exposureValue);
+  }
+
+  public final static Handler setExposureButtonsClickable = new Handler() {
+    @Override
+    public void handleMessage(Message msg) {
+      increaseExposureButton.setClickable(true);
+      decreaseExposureButton.setClickable(true);
+    }
+  };
+
+  public final static Handler setExposureButtonsUnclickable = new Handler() {
+    @Override
+    public void handleMessage(Message msg) {
+      increaseExposureButton.setClickable(false);
+      decreaseExposureButton.setClickable(false);
+    }
+  };
+
+  private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+    @Override
+    public void onManagerConnected(int status) {
+      switch (status) {
+        case LoaderCallbackInterface.SUCCESS: {
+          Log.i(TAG, "OpenCV loaded successfully");
+          mOpenCvCameraView.enableView();
+        }
+        break;
+        default: {
+          super.onManagerConnected(status);
+        }
+        break;
       }
     }
-  }
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-      @Override
-      public void onManagerConnected(int status) {
-        switch (status) {
-          case LoaderCallbackInterface.SUCCESS: {
-            Log.i(TAG, "OpenCV loaded successfully");
-            mOpenCvCameraView.enableView();
-          }
-          break;
-          default: {
-            super.onManagerConnected(status);
-          }
-          break;
-        }
-      }
-    };
-    public final static Handler turnOnCameraView = new Handler() {
-      @Override
-      public void handleMessage(Message msg) {
-        mOpenCvCameraView.setVisibility(View.VISIBLE);
-      }
-    };
+  };
+
+  public final static Handler turnOnCameraView = new Handler() {
+    @Override
+    public void handleMessage(Message msg) {
+      mOpenCvCameraView.setVisibility(View.VISIBLE);
+    }
+  };
 
     public final static Handler turnOffCameraView = new Handler() {
       @Override
@@ -675,4 +722,12 @@ public class FtcRobotControllerActivity extends Activity
         mOpenCvCameraView.setVisibility(View.GONE);
       }
     };
+
+  protected class SharedPreferencesListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+    @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+      if (key.equals(context.getString(R.string.pref_app_theme))) {
+        ThemedActivity.restartForAppThemeChange(getTag(), getString(R.string.appThemeChangeRestartNotifyRC));
+      }
+    }
+  }
 }

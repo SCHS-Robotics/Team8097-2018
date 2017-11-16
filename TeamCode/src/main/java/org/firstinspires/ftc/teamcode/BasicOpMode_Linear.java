@@ -41,6 +41,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -66,8 +71,13 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     private ElapsedTime runtime = new ElapsedTime();
 
     // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
-    private int                  buttonACooldown;
-    private int                  buttonBCooldown;
+    private int                 buttonACooldown;
+    private int                 buttonBCooldown;
+    private int                 buttonLBCooldown;
+    private int                 buttonRBCooldown;
+
+
+    private int                 selectedAngle = 0;
 
     @Override
     public void runOpMode() {
@@ -78,11 +88,13 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         initialize();
         startOpenCV(this);
 
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        runtime.reset();
 
+        runtime.reset();
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        composeTelemetry();
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -90,6 +102,19 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             double inputY = gamepad1.left_stick_y;
             double inputMag = Math.abs(Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2)));
             double angle = Math.toDegrees(Math.atan2(inputY, inputX));
+
+            // Telemetry fun
+            telemetry.update();
+            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
+            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
+            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
+            telemetry.addData("Selected turn angle: ", selectedAngle);
+            telemetry.addData("Angle of Left Joystick: ", angle);
+            telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
+            telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Glyph Detection Color", detectColor);
+            // telemetry.addData("Motor Lift Position:", position);
 
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
                 try {
@@ -115,7 +140,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 motorFR.setPower(0);
             }
 
-            if (gamepad1.dpad_up) {
+             if (gamepad1.dpad_up) {
                 //servoCamera.setPosition(servoCamera.getPosition() + .001);
                 servoCamera.setPosition(servoCamera.getPosition() + .01);
             }
@@ -136,38 +161,48 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 buttonACooldown = 0;
             }
 
-            if(buttonACooldown < 2000){
+            if(buttonACooldown < 1000){
                 buttonACooldown++;
             }
 
             if(gamepad1.b && buttonBCooldown >= 500) {
-                if (mBlobColorHsv == glyphBrownHSV) {
-                    setDetectColor(glyphGrayHSV);
-                }
-                else  if(mBlobColorHsv == glyphGrayHSV) {
-                    setDetectColor(glyphBrownHSV);
-                }
-                else {
-                    setDetectColor(glyphGrayHSV);
+                switch (detectColor){
+                    case "brown": setDetectColor("gray");
+                        break;
+                    case "gray": setDetectColor("red");
+                        break;
+                    case "red": setDetectColor("blue");
+                        break;
+                    case "blue": setDetectColor("brown");
+                        break;
                 }
                 buttonBCooldown = 0;
             }
 
-            if(buttonBCooldown < 2000){
+            if(buttonBCooldown < 500){
                 buttonBCooldown++;
             }
 
-            // Telemetry fun
-            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
-            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
-            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
-            telemetry.addData("Angle of Left Joystick: ", angle);
-            telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
-            telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Glyph Detection Color", getDetectColor());
-            telemetry.update();
+            if(gamepad1.left_bumper && buttonLBCooldown >= 500) {
+                turnTo(selectedAngle, 0.75, 1);
+                buttonLBCooldown = 0;
+            }
+
+            if(buttonLBCooldown < 500){
+                buttonLBCooldown++;
+            }
+
+            if(gamepad1.right_bumper && buttonRBCooldown >= 500) {
+                selectTurnAngle();
+                buttonRBCooldown = 0;
+            }
+
+            if(buttonRBCooldown < 500) {
+                buttonRBCooldown++;
+            }
         }
+
+        stopOpenCV();
 
     }
 
@@ -213,6 +248,20 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         }
     }
 
+    public void selectTurnAngle() {
+
+        switch (selectedAngle) {
+            case 0: selectedAngle = 90;
+                break;
+            case 90: selectedAngle = 180;
+                break;
+            case 180: selectedAngle = 270;
+                break;
+            case 270: selectedAngle = 0;
+                break;
+        }
+    }
+
     // OpenCV functions
     public void onCameraViewStarted(int width, int height) {
 
@@ -224,7 +273,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         SPECTRUM_SIZE = new Size(200, 64);
 
         // The color that should be detected by default on start
-        setDetectColor(glyphBrownHSV);
+        setDetectColor("brown");
 
     }
 
@@ -248,8 +297,6 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
             mSpectrum.copyTo(spectrumLabel);
         }
-
         return mRgba;
     }
-
 }
