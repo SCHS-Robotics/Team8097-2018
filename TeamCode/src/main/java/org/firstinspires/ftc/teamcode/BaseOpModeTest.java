@@ -51,7 +51,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     DcMotor motorBR;
     DcMotor motorFL;
     DcMotor motorFR;
-    // DcMotor motorLift;
+    DcMotor motorLift;
 
     BNO055IMU imu;
 
@@ -63,6 +63,8 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
     final double TICKS_PER_CM_FORWARD = 53.6 / 1.5;
+    final double INCHES_TO_CM = 2.54;
+    final double TICKS_FOR_LIFT = (7 * 2.54) * TICKS_PER_CM_FORWARD;
 
     final double angleTolerance = 3;
 
@@ -126,12 +128,14 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
+        motorLift = hardwareMap.dcMotor.get("motorLift");
 
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
@@ -268,6 +272,19 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
             telemetry.addData("Heading", getHeading());
             telemetry.update();
+        }
+    }
+
+    public void toggleLift(String direction, double ticks) throws InterruptedException{
+        switch (direction) {
+            case "up":
+                motorLift.setPower(.25);
+                waitForEncoders(ticks);
+                break;
+            case "down":
+                motorLift.setPower(-.25);
+                waitForEncoders(ticks);
+                break;
         }
     }
 

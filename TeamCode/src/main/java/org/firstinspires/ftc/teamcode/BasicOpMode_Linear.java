@@ -75,6 +75,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     private int                 buttonBCooldown;
     private int                 buttonLBCooldown;
     private int                 buttonRBCooldown;
+    private int                 buttonXCooldown;
 
 
     private int                 selectedAngle = 0;
@@ -161,6 +162,8 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
                 buttonACooldown = 0;
             }
 
+
+
             if(buttonACooldown < 1000){
                 buttonACooldown++;
             }
@@ -181,6 +184,27 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
             if(buttonBCooldown < 500){
                 buttonBCooldown++;
+            }
+
+            if (gamepad1.x && buttonXCooldown < 1000) {
+                if (motorLift.getCurrentPosition() > TICKS_FOR_LIFT / 2) {
+                    try {
+                        toggleLift("down", TICKS_FOR_LIFT);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                else {
+                    try {
+                        toggleLift("up", TICKS_FOR_LIFT);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+            }
+
+            if(buttonXCooldown < 500){
+                buttonXCooldown++;
             }
 
             if(gamepad1.left_bumper && buttonLBCooldown >= 500) {
