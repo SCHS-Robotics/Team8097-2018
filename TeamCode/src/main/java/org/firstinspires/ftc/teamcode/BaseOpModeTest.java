@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
@@ -49,7 +50,6 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     DcMotor motorBL;
     DcMotor motorBR;
     DcMotor motorFL;
-
     DcMotor motorFR;
     // DcMotor motorLift;
 
@@ -62,6 +62,7 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
+    final double TICKS_PER_CM_FORWARD = 53.6 / 1.5;
 
     final double angleTolerance = 3;
 
@@ -224,6 +225,24 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorBR.setPower(0);
         motorFL.setPower(0);
         motorFR.setPower(speed);
+    }
+
+    public void goForwardDistance(double distance, double speed) throws InterruptedException{
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+        double totalEncoderTicks = distance * TICKS_PER_CM_FORWARD;
+        goForward(speed);
+        waitForEncoders(totalEncoderTicks);
+        stop();
+    }
+
+    public void waitForEncoders(double encoderTicks) throws InterruptedException {
+        while (getFurthestEncoder() < encoderTicks && opModeIsActive()) {
+            sleep(1);
+        }
+    }
+
+    public int getFurthestEncoder() {
+        return Math.max(Math.max(Math.abs(motorBL.getCurrentPosition()), Math.abs(motorBR.getCurrentPosition())), Math.max(Math.abs(motorFL.getCurrentPosition()), Math.abs(motorFR.getCurrentPosition())));
     }
 
     public void turnTo(double angle, double speed, double tolerance) {
