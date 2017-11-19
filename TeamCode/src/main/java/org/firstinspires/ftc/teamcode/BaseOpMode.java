@@ -38,7 +38,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.HashMap;
 import java.util.Locale;
 
-public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
+public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
 
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo

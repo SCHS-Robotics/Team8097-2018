@@ -65,7 +65,7 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class BasicOpMode_Linear extends BaseOpModeTest {
+public class BasicOpMode_Linear extends BaseOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
