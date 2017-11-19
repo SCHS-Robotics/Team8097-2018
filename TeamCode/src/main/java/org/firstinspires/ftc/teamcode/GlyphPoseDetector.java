@@ -16,6 +16,8 @@ import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
+import org.opencv.features2d.DescriptorExtractor;
+import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.FlannBasedMatcher;
 import org.opencv.imgproc.*;
@@ -70,7 +72,7 @@ public class GlyphPoseDetector {
     PnPProblem pnpDetection = new PnPProblem(paramsCamera);
     PnPProblem pnpDetectionEst = new PnPProblem(paramsCamera);
     RobustMatcher rMatcher;
-    FeatureDetector orb;
+    FeatureDetector orb = FeatureDetector.create(FeatureDetector.ORB);
     Model model;
     Mesh mesh;
     Mat measurements = new Mat(nMeasurements, 1, CV_64F);
@@ -243,15 +245,20 @@ public class GlyphPoseDetector {
 
             Utils.drawText(outputFrame, text, green);
             Utils.drawText(outputFrame, text2, red);
+
         }
 
         return outputFrame;
     }
 
-    public void initializePoseDetection(String meshPath, String modelPath) throws java.io.FileNotFoundException {
+    public void initializePoseDetection(String meshPath, String modelPath, String paramPath) throws java.io.FileNotFoundException {
         mesh.load(meshPath);
         model.load(modelPath);
         rMatcher.setFeatureDetector(orb);
+        rMatcher.setDescriptorExtractor(new DescriptorExtractor(DescriptorExtractor.ORB));
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
+        matcher.read(paramPath);
+        rMatcher.setDescriptorMatcher(matcher);
         initKalmanFilter(kf, nStates, nMeasurements, nInputs, dt);
         measurements.setTo(new Scalar(0));
         listPoints3dModel = model.getPoints3d();
