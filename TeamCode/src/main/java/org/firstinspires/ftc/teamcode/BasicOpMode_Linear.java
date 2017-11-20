@@ -106,7 +106,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
 
             // Telemetry fun
             telemetry.update();
-            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
             telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
             telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
             telemetry.addData("Selected turn angle: ", selectedAngle);
@@ -139,16 +138,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 motorBR.setPower(0);
                 motorFL.setPower(0);
                 motorFR.setPower(0);
-            }
-
-             if (gamepad1.dpad_up) {
-                //servoCamera.setPosition(servoCamera.getPosition() + .001);
-                servoCamera.setPosition(servoCamera.getPosition() + .01);
-            }
-
-            else if (gamepad1.dpad_down){
-                //servoCamera.setPosition(servoCamera.getPosition() - .001);
-                servoCamera.setPosition(servoCamera.getPosition() - .01);
             }
 
             if(gamepad1.a && buttonACooldown >= 1000) {

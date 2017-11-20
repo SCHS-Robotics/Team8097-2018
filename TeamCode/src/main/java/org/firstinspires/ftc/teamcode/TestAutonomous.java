@@ -49,7 +49,7 @@ public class TestAutonomous extends Autonomous {
 
         mRgba.release();
     }
-/
+
     public void onCameraViewStarted(int width, int height) {
 
         // Creating display, color detector, defining variables for outlines (contours), not sure what a spectrum is, but we should figure that out

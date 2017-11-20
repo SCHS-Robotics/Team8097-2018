@@ -43,7 +43,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
 
-    Servo servoCamera;
     Servo servoLeftGrab;
     Servo servoRightGrab;
 
@@ -62,9 +61,10 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
-    final double TICKS_PER_CM_FORWARD = 53.6 / 1.5;
+    final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
+    final double TICKS_PER_CM_FORWARD20 = TICKS_PER_CM_FORWARD40 / 2;
     final double INCHES_TO_CM = 2.54;
-    final double TICKS_FOR_LIFT = (7 * 2.54) * TICKS_PER_CM_FORWARD;
+    final double TICKS_FOR_LIFT = (7 * 2.54) * TICKS_PER_CM_FORWARD20;
 
     final double angleTolerance = 3;
 
@@ -116,7 +116,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         //Assigning previously declared variables to expansion hub names
 
         // Setting up servos
-        servoCamera = hardwareMap.servo.get("servoCamera");
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
         servoRightGrab = hardwareMap.servo.get("servoRightGrab");
 
@@ -145,7 +144,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Setting servo initial positions on initialize method
-        servoCamera.setPosition(servoCameraInitPosition);
         servoLeftGrab.setPosition(1);
         servoRightGrab.setPosition(0);
     }
@@ -233,7 +231,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
     public void goForwardDistance(double distance, double speed) throws InterruptedException{
         resetEncoders(motorBL, motorBR, motorFL, motorFR);
-        double totalEncoderTicks = distance * TICKS_PER_CM_FORWARD;
+        double totalEncoderTicks = distance * TICKS_PER_CM_FORWARD40;
         goForward(speed);
         waitForEncoders(totalEncoderTicks);
         stop();
