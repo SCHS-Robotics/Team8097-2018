@@ -30,42 +30,26 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
 
-import java.util.ConcurrentModificationException;
 import java.util.List;
 
 
 /**
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class BasicOpMode_Linear extends BaseOpMode {
+@TeleOp(name="ServoCallibration", group="Linear Opmode")
+public class ServoCallibration extends BaseOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -73,14 +57,11 @@ public class BasicOpMode_Linear extends BaseOpMode {
     // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
     private int                 buttonACooldown;
     private int                 buttonBCooldown;
-    private int                 buttonLBCooldown;
-    private int                 buttonRBCooldown;
     private int                 buttonXCooldown;
 
 
     private int                 selectedAngle = 0;
 
-    @Override
     public void runOpMode() {
 
         telemetry.addData("Status", "Initialized");
@@ -98,47 +79,18 @@ public class BasicOpMode_Linear extends BaseOpMode {
         composeTelemetry();
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            double inputX = gamepad1.left_stick_x;
-            double inputY = gamepad1.left_stick_y;
-            double inputMag = Math.abs(Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2)));
-            double angle = Math.toDegrees(Math.atan2(inputY, inputX));
-
             // Telemetry fun
             telemetry.update();
             telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
             telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
             telemetry.addData("Selected turn angle: ", selectedAngle);
-            telemetry.addData("Angle of Left Joystick: ", angle);
             telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
             telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Glyph Detection Color", detectColor);
-            // telemetry.addData("Motor Lift Position:", position);
+//            telemetry.addData("Left Lift Position", motorLeftLift.getCurrentPosition());
+//            telemetry.addData("Right Lift Position", motorRightLift.getCurrentPosition());
 
-            if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
-                try {
-                    goDirection(inputMag, angle);
-                }
-                catch (java.lang.InterruptedException a) {
-                    stop();
-                }
-            }
-
-            else if (gamepad1.left_trigger > .1){
-                turnLeft(gamepad1.left_trigger);
-            }
-
-            else if (gamepad1.right_trigger > .1){
-                turnRight(gamepad1.right_trigger);
-            }
-
-            else {
-                motorBL.setPower(0);
-                motorBR.setPower(0);
-                motorFL.setPower(0);
-                motorFR.setPower(0);
-            }
 
             if(gamepad1.a && buttonACooldown >= 1000) {
                 if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
@@ -150,6 +102,22 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 }
                 buttonACooldown = 0;
             }
+
+//            if (gamepad1.dpad_left) {
+//                servoLeftGrab.setPosition(servoLeftGrab.getPosition() - .001);
+//            }
+//
+//            if (gamepad1.dpad_right) {
+//                servoLeftGrab.setPosition(servoLeftGrab.getPosition() + .001);
+//            }
+//
+//            if (gamepad1.dpad_up) {
+//                servoRightGrab.setPosition(servoRightGrab.getPosition() - .001);
+//            }
+//
+//            if (gamepad1.dpad_down) {
+//                servoRightGrab.setPosition(servoRightGrab.getPosition() + .001);
+//            }
 
 
 
@@ -175,26 +143,18 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 buttonBCooldown++;
             }
 
+//            if (gamepad1.right_bumper) {
+//                motorLeftLift.setPower(.001);
+//                motorRightLift.setPower(-.001);
+//            }
+//
+//            if (gamepad1.left_bumper) {
+//                motorRightLift.setPower(.001);
+//                motorLeftLift.setPower(-.001);
+//            }
+
             if(buttonXCooldown < 500){
                 buttonXCooldown++;
-            }
-
-            if(gamepad1.left_bumper && buttonLBCooldown >= 500) {
-                turnTo(selectedAngle, 0.75, 1);
-                buttonLBCooldown = 0;
-            }
-
-            if(buttonLBCooldown < 500){
-                buttonLBCooldown++;
-            }
-
-            if(gamepad1.right_bumper && buttonRBCooldown >= 500) {
-                selectTurnAngle();
-                buttonRBCooldown = 0;
-            }
-
-            if(buttonRBCooldown < 500) {
-                buttonRBCooldown++;
             }
         }
 

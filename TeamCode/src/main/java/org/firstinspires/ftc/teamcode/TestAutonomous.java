@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by test on 11/19/17.
  */
-
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="TestAutonomous", group ="Autonomous")
 public class TestAutonomous extends Autonomous {
     private ElapsedTime runtime = new ElapsedTime();
     public void runOpMode() {
