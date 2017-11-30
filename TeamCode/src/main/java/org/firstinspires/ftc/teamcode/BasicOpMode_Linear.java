@@ -202,7 +202,7 @@ public class BasicOpMode_Linear extends BaseOpMode {
                     }
                 }
             }
-            
+
             if(buttonXCooldown < 500){
                 buttonXCooldown++;
             }
