@@ -106,16 +106,15 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
 
             // Telemetry fun
             telemetry.update();
-            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
-            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
-            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
+//            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
+//            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
+//            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
             telemetry.addData("Selected turn angle: ", selectedAngle);
             telemetry.addData("Angle of Left Joystick: ", angle);
             telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
             telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Glyph Detection Color", detectColor);
-            // telemetry.addData("Motor Lift Position:", position);
 
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
                 try {
@@ -142,25 +141,24 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             }
 
              if (gamepad1.dpad_up) {
-                //servoCamera.setPosition(servoCamera.getPosition() + .001);
-                servoCamera.setPosition(servoCamera.getPosition() + .01);
+                motorLeftLift.setPower(.1);
+                motorRightLift.setPower(-.1);
             }
-
             else if (gamepad1.dpad_down){
-                //servoCamera.setPosition(servoCamera.getPosition() - .001);
-                servoCamera.setPosition(servoCamera.getPosition() - .01);
+                 motorLeftLift.setPower(-.1);
+                 motorRightLift.setPower(.1);
             }
-
-            if(gamepad1.a && buttonACooldown >= 1000) {
-                if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
-                    servoLeftGrab.setPosition(0.3);
-                    servoRightGrab.setPosition(0.7);
-                } else {
-                    servoLeftGrab.setPosition(1);
-                    servoRightGrab.setPosition(0);
-                }
-                buttonACooldown = 0;
-            }
+//
+//            if(gamepad1.a && buttonACooldown >= 1000) {
+//                if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
+//                    servoLeftGrab.setPosition(0.3);
+//                    servoRightGrab.setPosition(0.7);
+//                } else {
+//                    servoLeftGrab.setPosition(1);
+//                    servoRightGrab.setPosition(0);
+//                }
+//                buttonACooldown = 0;
+//            }
 
 
 
@@ -187,7 +185,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             }
 
             if (gamepad1.x && buttonXCooldown < 1000) {
-                if (motorLift.getCurrentPosition() > TICKS_FOR_LIFT / 2) {
+                if (motorLeftLift.getCurrentPosition() > TICKS_FOR_LIFT / 2) {
                     try {
                         toggleLift("down", TICKS_FOR_LIFT);
                     } catch (InterruptedException e) {

@@ -43,15 +43,16 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
 
-    Servo servoCamera;
-    Servo servoLeftGrab;
-    Servo servoRightGrab;
+//    Servo servoCamera;
+//    Servo servoLeftGrab;
+//    Servo servoRightGrab;
 
     DcMotor motorBL;
     DcMotor motorBR;
     DcMotor motorFL;
     DcMotor motorFR;
-    DcMotor motorLift;
+    DcMotor motorLeftLift;
+    DcMotor motorRightLift;
 
     BNO055IMU imu;
 
@@ -62,9 +63,9 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
-    final double TICKS_PER_CM_FORWARD = 53.6 / 1.5;
+    final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
     final double INCHES_TO_CM = 2.54;
-    final double TICKS_FOR_LIFT = (7 * 2.54) * TICKS_PER_CM_FORWARD;
+    final double TICKS_FOR_LIFT = 2 * (TICKS_PER_CM_FORWARD / 2); //TEST ONLY VALUE PLS CHANGE
 
     final double angleTolerance = 3;
 
@@ -116,9 +117,9 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         //Assigning previously declared variables to expansion hub names
 
         // Setting up servos
-        servoCamera = hardwareMap.servo.get("servoCamera");
-        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
+//        servoCamera = hardwareMap.servo.get("servoCamera");
+//        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
+//        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
@@ -128,14 +129,14 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
-        motorLift = hardwareMap.dcMotor.get("motorLift");
+        motorLeftLift = hardwareMap.dcMotor.get("motorLeftLift");
 
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
@@ -145,9 +146,9 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Setting servo initial positions on initialize method
-        servoCamera.setPosition(servoCameraInitPosition);
-        servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
+//        servoCamera.setPosition(servoCameraInitPosition);
+//        servoLeftGrab.setPosition(1);
+//        servoRightGrab.setPosition(0);
     }
 
     public void resetEncoders(DcMotor...motors) {
@@ -278,11 +279,14 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     public void toggleLift(String direction, double ticks) throws InterruptedException{
         switch (direction) {
             case "up":
-                motorLift.setPower(.25);
+                motorLeftLift.setPower(.1);
+                motorRightLift.setPower(-.1);
                 waitForEncoders(ticks);
                 break;
+
             case "down":
-                motorLift.setPower(-.25);
+                motorLeftLift.setPower(-.1);
+                motorRightLift.setPower(.1);
                 waitForEncoders(ticks);
                 break;
         }
