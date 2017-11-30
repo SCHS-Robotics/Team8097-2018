@@ -106,14 +106,10 @@ public class BasicOpMode_Linear extends BaseOpMode {
 
             // Telemetry fun
             telemetry.update();
-<<<<<<< HEAD
+
 //            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
 //            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
 //            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
-=======
-            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
-            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8
             telemetry.addData("Selected turn angle: ", selectedAngle);
             telemetry.addData("Angle of Left Joystick: ", angle);
             telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
@@ -145,7 +141,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 motorFR.setPower(0);
             }
 
-<<<<<<< HEAD
              if (gamepad1.dpad_up) {
                 motorLeftLift.setPower(.1);
                 motorRightLift.setPower(-.1);
@@ -153,17 +148,7 @@ public class BasicOpMode_Linear extends BaseOpMode {
             else if (gamepad1.dpad_down){
                  motorLeftLift.setPower(-.1);
                  motorRightLift.setPower(.1);
-=======
-            if(gamepad1.a && buttonACooldown >= 1000) {
-                if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
-                    servoLeftGrab.setPosition(0.3);
-                    servoRightGrab.setPosition(0.7);
-                } else {
-                    servoLeftGrab.setPosition(1);
-                    servoRightGrab.setPosition(0);
-                }
-                buttonACooldown = 0;
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8
+
             }
 //
 //            if(gamepad1.a && buttonACooldown >= 1000) {
@@ -201,7 +186,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 buttonBCooldown++;
             }
 
-<<<<<<< HEAD
             if (gamepad1.x && buttonXCooldown < 1000) {
                 if (motorLeftLift.getCurrentPosition() > TICKS_FOR_LIFT / 2) {
                     try {
@@ -218,9 +202,7 @@ public class BasicOpMode_Linear extends BaseOpMode {
                     }
                 }
             }
-
-=======
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8
+            
             if(buttonXCooldown < 500){
                 buttonXCooldown++;
             }

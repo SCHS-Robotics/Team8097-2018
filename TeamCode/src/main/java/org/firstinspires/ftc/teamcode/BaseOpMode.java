@@ -43,26 +43,16 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
 
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
 //    Servo servoCamera;
 //    Servo servoLeftGrab;
 //    Servo servoRightGrab;
-=======
-    Servo servoLeftGrab;
-    Servo servoRightGrab;
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
 
     DcMotor motorBL;
     DcMotor motorBR;
     DcMotor motorFL;
     DcMotor motorFR;
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
     DcMotor motorLeftLift;
     DcMotor motorRightLift;
-=======
-//    DcMotor motorRightLift;
-//    DcMotor motorLeftLift;
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
 
     BNO055IMU imu;
 
@@ -73,15 +63,11 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
     final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
     final double INCHES_TO_CM = 2.54;
-    final double TICKS_FOR_LIFT = 2 * (TICKS_PER_CM_FORWARD / 2); //TEST ONLY VALUE PLS CHANGE
-=======
     final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
     final double TICKS_PER_CM_FORWARD20 = TICKS_PER_CM_FORWARD40 / 2;
-    final double TICKS_FOR_LIFT = (1 * 2.54) * TICKS_PER_CM_FORWARD20;
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
+    final double TICKS_FOR_LIFT = 2 * TICKS_PER_CM_FORWARD20; //Test Value and Should be Changed when it works
 
     final double angleTolerance = 3;
 
@@ -133,14 +119,9 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         //Assigning previously declared variables to expansion hub names
 
         // Setting up servos
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
 //        servoCamera = hardwareMap.servo.get("servoCamera");
 //        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
 //        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
-=======
-        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
@@ -150,25 +131,16 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
         motorLeftLift = hardwareMap.dcMotor.get("motorLeftLift");
-=======
-//        motorRightLift = hardwareMap.dcMotor.get("motorRightLift");
-//        motorLeftLift = hardwareMap.dcMotor.get("motorRightLift");
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
+        motorRightLift = hardwareMap.dcMotor.get("motorRightLift");
 
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
         motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-=======
-//        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
+        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
         motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -177,14 +149,10 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Setting servo initial positions on initialize method
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
 //        servoCamera.setPosition(servoCameraInitPosition);
 //        servoLeftGrab.setPosition(1);
 //        servoRightGrab.setPosition(0);
-=======
-        servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
+
     }
 
     public void resetEncoders(DcMotor...motors) {
@@ -312,7 +280,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         }
     }
 
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpModeTest.java
     public void toggleLift(String direction, double ticks) throws InterruptedException{
         switch (direction) {
             case "up":
@@ -329,8 +296,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         }
     }
 
-=======
->>>>>>> acf542e2c7e9fe4f8edf8746e2b663f5dcb5d0c8:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/BaseOpMode.java
     // OpenCV code
     public void setDetectColor(String newColor) {
         mIsColorSelected = false;
