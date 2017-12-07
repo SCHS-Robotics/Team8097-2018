@@ -44,8 +44,9 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //for it, ex: .setPositon for a servo
 
 //    Servo servoCamera;
-//    Servo servoLeftGrab;
-//    Servo servoRightGrab;
+
+    Servo servoLeftGrab;
+    Servo servoRightGrab;
 
     DcMotor motorBL;
     DcMotor motorBR;
@@ -60,14 +61,17 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     Orientation angles;
     double heading;
 
-    //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
-    //Setting constant variables, final so that it cannot be changed later by accident
     final double servoCameraInitPosition = .267;
     final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
     final double INCHES_TO_CM = 2.54;
     final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
     final double TICKS_PER_CM_FORWARD20 = TICKS_PER_CM_FORWARD40 / 2;
     final double TICKS_FOR_LIFT = 2 * TICKS_PER_CM_FORWARD20; //Test Value and Should be Changed when it works
+    final double INITIAL_LEFT = -230;
+    final double INITIAL_RIGHT = 380;
+    final double FINAL_LEFT = 2800;
+    final double FINAL_RIGHT = -2637;
+
 
     final double angleTolerance = 3;
 
@@ -91,8 +95,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     protected Size                 SPECTRUM_SIZE;
     protected Scalar               CONTOUR_COLOR;
 
-
-    //int wheelEncoderPpr = 1680;
     // Trying to get range sensor to work: -Includes changing I2C address
     //DistanceSensor rangeSensor;
     /*byte[] range1Cache; //The read will return an array of bytes. They are stored in this variable
@@ -120,8 +122,9 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         // Setting up servos
 //        servoCamera = hardwareMap.servo.get("servoCamera");
-//        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-//        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
+
+        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
+        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
@@ -131,8 +134,9 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
-        motorLeftLift = hardwareMap.dcMotor.get("motorLeftLift");
-        motorRightLift = hardwareMap.dcMotor.get("motorRightLift");
+        motorLeftLift = hardwareMap.dcMotor.get("motorLiftLeft");
+        motorRightLift = hardwareMap.dcMotor.get("motorLiftRight");
+
 
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -140,7 +144,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
         motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -280,18 +285,45 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         }
     }
 
-    public void toggleLift(String direction, double ticks) throws InterruptedException{
+    public void toggleLift(int direction) throws InterruptedException{
         switch (direction) {
-            case "up":
-                motorLeftLift.setPower(.1);
-                motorRightLift.setPower(-.1);
-                waitForEncoders(ticks);
+            case 0:
+                motorLeftLift.setTargetPosition(3000);
+                motorRightLift.setTargetPosition(-3000);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                motorLeftLift.setPower(.5);
+                motorRightLift.setPower(-.5);
+
+                while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
+
+                motorRightLift.setPower(0);
+                motorLeftLift.setPower(0);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
                 break;
 
-            case "down":
-                motorLeftLift.setPower(-.1);
-                motorRightLift.setPower(.1);
-                waitForEncoders(ticks);
+            case 1:
+                motorLeftLift.setTargetPosition(0);
+                motorRightLift.setTargetPosition(0);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                motorLeftLift.setPower(-.5);
+                motorRightLift.setPower(.5);
+
+                while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
+
+                motorRightLift.setPower(0);
+                motorLeftLift.setPower(0);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 break;
         }
     }
