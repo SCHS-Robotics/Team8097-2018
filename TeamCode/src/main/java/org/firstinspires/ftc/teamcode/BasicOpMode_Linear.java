@@ -77,8 +77,10 @@ public class BasicOpMode_Linear extends BaseOpMode {
     private double                 buttonLBCooldown;
     private double                 buttonRBCooldown;
     private double                 buttonXCooldown;
+    private double                 buttonYCooldown;
 
     private int liftDirection = 0; //0 = Down 1 = Up
+    private int hitStatus = 2; //2 = autonomous 1 = teleop 0 = down
 
 
     private int                 selectedAngle = 0;
@@ -112,17 +114,9 @@ public class BasicOpMode_Linear extends BaseOpMode {
             telemetry.update();
 
 //            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
-            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
-            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
             telemetry.addData("Selected turn angle: ", selectedAngle);
-            telemetry.addData("Angle of Left Joystick: ", angle);
-            telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
-            telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
-            telemetry.addData("Left Lift Position: ", motorLeftLift.getCurrentPosition());
-            telemetry.addData("Right Lift Position: ", motorRightLift.getCurrentPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Glyph Detection Color", detectColor);
-            telemetry.addData("Cooldown Time thing", runtime.time());
             telemetry.addData("Vertical Hit Position", servoVerticalHit.getPosition());
             telemetry.addData("Horizontal Hit Position", servoHorizontalHit.getPosition());
 
@@ -150,20 +144,20 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 motorFR.setPower(0);
             }
 
-            if (gamepad1.dpad_up) {
-                servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .01);
+            /*if (gamepad1.dpad_up) {
+                servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .001);
             }
             else if (gamepad1.dpad_down){
-                 servoVerticalHit.setPosition(servoVerticalHit.getPosition() - .01);
+                 servoVerticalHit.setPosition(servoVerticalHit.getPosition() - .001);
 
              }
 
             if(gamepad1.dpad_left) {
-                servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() + .01);
+                servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() + .001);
             }
             else if (gamepad1.dpad_right) {
-                servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() - .01);
-            }
+                servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() - .001);
+            }*/
 
 
 
@@ -205,6 +199,22 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 } catch (InterruptedException e) {}
 
                 buttonXCooldown = cooldown.time();
+            }
+
+            if (gamepad1.y && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
+                if (hitStatus != 1) {
+                    servoHorizontalHit.setPosition(HORIZONTAL_TELEOP_START_POS);
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
+                    hitStatus = 1;
+                }
+                else if (hitStatus == 1) {
+                    servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
+                    while (Math.abs(servoVerticalHit.getPosition() - VERTICAL_END_POS) >= .01) {
+                        servoVerticalHit.setPosition(servoVerticalHit.getPosition() - .01);
+                    }
+                    hitStatus = 0;
+                }
+                buttonYCooldown = cooldown.time();
             }
 
             if(gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {

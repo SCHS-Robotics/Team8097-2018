@@ -63,7 +63,12 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     Orientation angles;
     double heading;
 
-    final double servoCameraInitPosition = .267;
+    final double VERTICAL_AUTO_START_POS = .031;
+    final double HORIZONTAL_AUTO_START_POS = .46;
+    final double VERTICAL_TELEOP_START_POS = .576;
+    final double HORIZONTAL_TELEOP_START_POS = .404;
+    final double VERTICAL_END_POS = 1.0;
+    final double HORIZONTAL_END_POS = .404;
     final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
     final double INCHES_TO_CM = 2.54;
     final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
@@ -148,6 +153,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -203,17 +209,17 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     }
 
     public void goLeft(double speed) {
-        motorBL.setPower(-speed * 1);
+        motorBL.setPower(-speed);
         motorBR.setPower(-speed);
         motorFL.setPower(speed);
-        motorFR.setPower(speed * 1);
+        motorFR.setPower(speed);
     }
 
     public void goRight(double speed) {
-        motorBL.setPower(speed * 1);
+        motorBL.setPower(speed);
         motorBR.setPower(speed);
         motorFL.setPower(-speed);
-        motorFR.setPower(-speed * 1);
+        motorFR.setPower(-speed);
     }
 
     public void goDiagonalForwardRight(double speed) {
@@ -298,8 +304,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(.75);
-                motorRightLift.setPower(-.75);
+                motorLeftLift.setPower(.5);
+                motorRightLift.setPower(-.5);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 
@@ -318,8 +324,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(-.75);
-                motorRightLift.setPower(.75);
+                motorLeftLift.setPower(-.5);
+                motorRightLift.setPower(.5);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 
