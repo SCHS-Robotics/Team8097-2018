@@ -143,16 +143,6 @@ public class ServoCallibration extends BaseOpMode {
                 buttonBCooldown++;
             }
 
-//            if (gamepad1.right_bumper) {
-//                motorLeftLift.setPower(.001);
-//                motorRightLift.setPower(-.001);
-//            }
-//
-//            if (gamepad1.left_bumper) {
-//                motorRightLift.setPower(.001);
-//                motorLeftLift.setPower(-.001);
-//            }
-
             if(buttonXCooldown < 500){
                 buttonXCooldown++;
             }

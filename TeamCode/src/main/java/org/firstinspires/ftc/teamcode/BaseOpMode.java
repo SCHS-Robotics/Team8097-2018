@@ -81,8 +81,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final Scalar glyphGrayColorRadius = new Scalar(90, 6.5, 73);
     final Scalar redHSV = new Scalar(3.5, 233, 162.5);
     final Scalar redColorRadius = new Scalar(3.5, 22, 92.5);
-    final Scalar blueHSV = new Scalar(147.3, 235.5, 95);
-    final Scalar blueColorRadius = new Scalar(9.2, 19.5, 55);
+    final Scalar blueHSV = new Scalar(100, 200, 155);
+    final Scalar blueColorRadius = new Scalar(10, 55, 100);
 
     protected String detectColor;
     protected boolean              mIsColorSelected = false;
