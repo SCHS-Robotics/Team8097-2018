@@ -304,8 +304,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(.5);
-                motorRightLift.setPower(-.5);
+                motorLeftLift.setPower(.25);
+                motorRightLift.setPower(-.25);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 
@@ -324,8 +324,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(-.5);
-                motorRightLift.setPower(.5);
+                motorLeftLift.setPower(-.25);
+                motorRightLift.setPower(.25);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 

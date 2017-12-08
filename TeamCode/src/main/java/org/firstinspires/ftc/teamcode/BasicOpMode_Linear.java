@@ -189,12 +189,12 @@ public class BasicOpMode_Linear extends BaseOpMode {
             if (gamepad1.x && Math.abs(cooldown.time() - buttonXCooldown) >= 1) {
                 try {
                     if (liftDirection == 0){
-                        toggleLift(0);
                         liftDirection = 1;
+                        toggleLift(0);
                     }
                     else {
-                        toggleLift(1);
                         liftDirection = 0;
+                        toggleLift(1);
                     }
                 } catch (InterruptedException e) {}
 
@@ -203,16 +203,16 @@ public class BasicOpMode_Linear extends BaseOpMode {
 
             if (gamepad1.y && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
                 if (hitStatus != 1) {
+                    hitStatus = 1;
                     servoHorizontalHit.setPosition(HORIZONTAL_TELEOP_START_POS);
                     servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
-                    hitStatus = 1;
                 }
                 else if (hitStatus == 1) {
+                    hitStatus = 0;
                     servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
                     while (Math.abs(servoVerticalHit.getPosition() - VERTICAL_END_POS) >= .01) {
                         servoVerticalHit.setPosition(servoVerticalHit.getPosition() - .01);
                     }
-                    hitStatus = 0;
                 }
                 buttonYCooldown = cooldown.time();
             }
