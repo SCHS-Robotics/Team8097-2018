@@ -123,6 +123,8 @@ public class BasicOpMode_Linear extends BaseOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Glyph Detection Color", detectColor);
             telemetry.addData("Cooldown Time thing", runtime.time());
+            telemetry.addData("Vertical Hit Position", servoVerticalHit.getPosition());
+            telemetry.addData("Horizontal Hit Position", servoHorizontalHit.getPosition());
 
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
                 try {
@@ -148,28 +150,19 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 motorFR.setPower(0);
             }
 
-            /* if (gamepad1.dpad_up) {
-                motorLeftLift.setPower(.1);
-                motorRightLift.setPower(-.1);
+            if (gamepad1.dpad_up) {
+                servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .01);
             }
-
             else if (gamepad1.dpad_down){
-                 motorLeftLift.setPower(-.1);
-                 motorRightLift.setPower(.1);
+                 servoVerticalHit.setPosition(servoVerticalHit.getPosition() - .01);
 
              }
 
-             else {
-                 motorLeftLift.setPower(0);
-                 motorRightLift.setPower(0);
-             }*/
-
             if(gamepad1.dpad_left) {
-                servoLeftGrab.setPosition(servoLeftGrab.getPosition() - 0.5);
-                servoRightGrab.setPosition(servoRightGrab.getPosition() + 0.5);
-            } else if (gamepad1.dpad_right) {
-                servoLeftGrab.setPosition(servoLeftGrab.getPosition() + 0.5);
-                servoRightGrab.setPosition(servoRightGrab.getPosition() - 0.5);
+                servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() + .01);
+            }
+            else if (gamepad1.dpad_right) {
+                servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() - .01);
             }
 
 

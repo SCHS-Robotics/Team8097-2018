@@ -47,6 +47,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
     Servo servoLeftGrab;
     Servo servoRightGrab;
+    Servo servoHorizontalHit;
+    Servo servoVerticalHit;
 
     DcMotor motorBL;
     DcMotor motorBR;
@@ -125,6 +127,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
         servoRightGrab = hardwareMap.servo.get("servoRightGrab");
+        servoHorizontalHit = hardwareMap.servo.get("servoHorizontalHit");
+        servoVerticalHit = hardwareMap.servo.get("servoVerticalHit");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
@@ -294,8 +298,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(.5);
-                motorRightLift.setPower(-.5);
+                motorLeftLift.setPower(.75);
+                motorRightLift.setPower(-.75);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 
@@ -314,8 +318,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(-.5);
-                motorRightLift.setPower(.5);
+                motorLeftLift.setPower(-.75);
+                motorRightLift.setPower(.75);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 
