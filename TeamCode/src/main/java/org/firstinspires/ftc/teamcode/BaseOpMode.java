@@ -69,17 +69,13 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final double HORIZONTAL_TELEOP_START_POS = .404;
     final double VERTICAL_END_POS = 1.0;
     final double HORIZONTAL_END_POS = .404;
-    final double HORIZONTAL_LEFT_END_POS = 0;
+    final double HORIZONTAL_RIGHT_END_POS = .537;
+    final double HORIZONTAN_LEFT_END_POS = .271;
     final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
     final double INCHES_TO_CM = 2.54;
     final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
     final double TICKS_PER_CM_FORWARD20 = TICKS_PER_CM_FORWARD40 / 2;
     final double TICKS_FOR_LIFT = 2 * TICKS_PER_CM_FORWARD20; //Test Value and Should be Changed when it works
-    final double INITIAL_LEFT = -230;
-    final double INITIAL_RIGHT = 380;
-    final double FINAL_LEFT = 2800;
-    final double FINAL_RIGHT = -2637;
-
 
     final double angleTolerance = 3;
 
