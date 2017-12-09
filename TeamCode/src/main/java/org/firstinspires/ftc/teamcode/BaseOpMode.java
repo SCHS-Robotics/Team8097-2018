@@ -75,6 +75,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final double INCHES_TO_CM = 2.54;
     final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
     final double TICKS_PER_CM_FORWARD20 = TICKS_PER_CM_FORWARD40 / 2;
+    final double TICKS_PER_INCH = 100;
+    final double TICKS_PER_INCH_SIDE = 150;
     final double TICKS_FOR_LIFT = 2 * TICKS_PER_CM_FORWARD20; //Test Value and Should be Changed when it works
 
     final double angleTolerance = 3;
@@ -121,7 +123,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 //        servoCamera = hardwareMap.servo.get("servoCamera");
         colorSensorArm = hardwareMap.colorSensor.get("colorSense");
         colorSensorArm.setI2cAddress(I2cAddr.create7bit(0x39));
-        colorSensorArm.enableLed(true);
+        colorSensorArm.enableLed(false);
 
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
         servoRightGrab = hardwareMap.servo.get("servoRightGrab");
@@ -245,11 +247,99 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     }
 
     public void goForwardDistance(double distance, double speed) throws InterruptedException{
+        double targetPosition = -distance * TICKS_PER_INCH;
         resetEncoders(motorBL, motorBR, motorFL, motorFR);
-        double totalEncoderTicks = distance * TICKS_PER_CM_FORWARD40;
-        goForward(speed);
-        waitForEncoders(totalEncoderTicks);
-        stop();
+
+        motorBL.setTargetPosition((int)targetPosition);
+        motorFL.setTargetPosition((int)targetPosition);
+        motorBR.setTargetPosition((int)-targetPosition);
+        motorFR.setTargetPosition((int)-targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(speed);
+        motorBR.setPower(speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        motorBL.setPower(0);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void strafeLeftDistance (double distance, double speed) throws InterruptedException{
+        double targetPosition = -distance * TICKS_PER_INCH_SIDE;
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        motorBL.setTargetPosition((int)targetPosition);
+        motorFL.setTargetPosition((int)-targetPosition);
+        motorBR.setTargetPosition((int)targetPosition);
+        motorFR.setTargetPosition((int)-targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(-speed);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        motorBL.setPower(0);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void strafeRightDistance (double distance, double speed) throws InterruptedException{
+        double targetPosition = -distance * TICKS_PER_INCH_SIDE;
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        motorBL.setTargetPosition((int)-targetPosition);
+        motorFL.setTargetPosition((int)targetPosition);
+        motorBR.setTargetPosition((int)-targetPosition);
+        motorFR.setTargetPosition((int)targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(-speed);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        motorBL.setPower(0);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void waitForEncoders(double encoderTicks) throws InterruptedException {
@@ -291,14 +381,14 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     public void toggleLift(int direction) throws InterruptedException{
         switch (direction) {
             case 0:
-                motorLeftLift.setTargetPosition(300);
-                motorRightLift.setTargetPosition(-300);
+                motorLeftLift.setTargetPosition(600);
+                motorRightLift.setTargetPosition(-600);
 
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(-.25);
-                motorRightLift.setPower(-.25);
+                motorLeftLift.setPower(-.20);
+                motorRightLift.setPower(-.20);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 
@@ -317,8 +407,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(.25);
-                motorRightLift.setPower(.25);
+                motorLeftLift.setPower(.20);
+                motorRightLift.setPower(.20);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
 

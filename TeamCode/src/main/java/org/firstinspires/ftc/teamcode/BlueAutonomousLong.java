@@ -30,11 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -49,9 +45,8 @@ import com.qualcomm.robotcore.util.Range;
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Autonomous2", group ="Concept")
-public class TestAutonomous2 extends Autonomous {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous Long", group ="Concept")
+public class BlueAutonomousLong extends Autonomous {
     private int timeThrough = 0;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
@@ -60,22 +55,30 @@ public class TestAutonomous2 extends Autonomous {
 
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+        servoLeftGrab.setPosition(1);
+        servoRightGrab.setPosition(0);
 
+        runtime.reset();
+        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
         waitForStart();
 
         while (opModeIsActive()) {
             if (timeThrough == 0) {
-                hitJewel("red");
+                hitJewel("blue");
                 timeThrough = 1;
             }
 
+            servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
+            sleep(1000);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-            sleep(100);
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
-        }
 
-        runtime.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        composeTelemetry();
+            try {
+                strafeLeftDistance(45, 0.5);
+                sleep(1000);
+                goForwardDistance(10, 0.5);
+                sleep(25000);
+            } catch (InterruptedException e) {}
+        }
     }
 }

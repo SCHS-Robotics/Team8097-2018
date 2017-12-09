@@ -81,6 +81,7 @@ public class BasicOpMode_Linear extends BaseOpMode {
 
     private int liftDirection = 0; //0 = Down 1 = Up
     private int hitStatus = 2; //2 = autonomous 1 = teleop 0 = down
+    private int grabStatus = 0; //0 = full open 1 = full closed 2 = half open
 
 
     private int                 selectedAngle = 0;
@@ -119,6 +120,11 @@ public class BasicOpMode_Linear extends BaseOpMode {
             telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
             telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
             telemetry.addData("Color Sense Red", colorSensorArm.red());
+            telemetry.addData("Color Sense Blue", colorSensorArm.blue());
+            telemetry.addData("Motor BL Pos", motorBL.getCurrentPosition());
+            telemetry.addData("Motor BR Pos", motorBR.getCurrentPosition());
+            telemetry.addData("Motor FL Pos", motorFL.getCurrentPosition());
+            telemetry.addData("Motor FR Pos", motorFR.getCurrentPosition());
 
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
                 try {
@@ -144,26 +150,32 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 motorFR.setPower(0);
             }
 
-            if (gamepad1.dpad_up) {
-                motorLeftLift.setPower(.1);
-                motorRightLift.setPower(.1);
+            if (gamepad1.dpad_down) {
+                motorLeftLift.setPower(-.2);
+                motorRightLift.setPower(.2);
             }
-            else if (gamepad1.dpad_down){
-                 motorLeftLift.setPower(-.1);
-                 motorRightLift.setPower(-.1);
+            else if (gamepad1.dpad_up){
+                 motorLeftLift.setPower(.2);
+                 motorRightLift.setPower(-.2);
              }
              else {
                 motorRightLift.setPower(0);
                 motorLeftLift.setPower(0);
             }
 
-            if(gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= 1) {
-                if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
+            if(gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= .2) {
+                if (grabStatus == 0) {
+                    grabStatus = 1;
                     servoLeftGrab.setPosition(0.3);
                     servoRightGrab.setPosition(0.7);
-                } else {
+                } else if (grabStatus == 2){
+                    grabStatus = 0;
                     servoLeftGrab.setPosition(1);
                     servoRightGrab.setPosition(0);
+                } else {
+                    grabStatus = 2;
+                    servoLeftGrab.setPosition(.6);
+                    servoRightGrab.setPosition(.4);
                 }
                 buttonACooldown = cooldown.time();
             }
