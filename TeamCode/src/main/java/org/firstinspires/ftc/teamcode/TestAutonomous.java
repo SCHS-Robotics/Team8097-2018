@@ -66,15 +66,19 @@ public class TestAutonomous extends Autonomous {
                 foundVuMark = true;
             }
 
-            if(runtime.time() > 5) {
-                vuMark = RelicRecoveryVuMark.RIGHT;
-                foundVuMark = true;
-            }
-        }
+            //if(runtime.time() > 5) {
+            //    vuMark = RelicRecoveryVuMark.RIGHT;
+            //    foundVuMark = true;
+            //}
 
+            telemetry.addData("Vumark not found", "%s detected", vuMark);
+        }
 
         relicTrackables.deactivate();
 
+        while(opModeIsActive()) {
+            telemetry.update();
+        }
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
@@ -118,6 +122,7 @@ public class TestAutonomous extends Autonomous {
             Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
             mSpectrum.copyTo(spectrumLabel);
         }
+
         return mRgba;
     }
 

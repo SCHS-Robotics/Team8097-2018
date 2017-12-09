@@ -69,6 +69,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final double HORIZONTAL_TELEOP_START_POS = .404;
     final double VERTICAL_END_POS = 1.0;
     final double HORIZONTAL_END_POS = .404;
+    final double HORIZONTAL_LEFT_END_POS = 0;
     final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
     final double INCHES_TO_CM = 2.54;
     final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
@@ -88,8 +89,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final Scalar glyphGrayColorRadius = new Scalar(90, 6.5, 73);
     final Scalar redHSV = new Scalar(3.5, 233, 162.5);
     final Scalar redColorRadius = new Scalar(3.5, 22, 92.5);
-    final Scalar blueHSV = new Scalar(100, 200, 155);
-    final Scalar blueColorRadius = new Scalar(10, 55, 100);
+    final Scalar blueHSV = new Scalar(200, 200, 154);
+    final Scalar blueColorRadius = new Scalar(20, 55, 110);
 
     protected String detectColor;
     protected boolean              mIsColorSelected = false;

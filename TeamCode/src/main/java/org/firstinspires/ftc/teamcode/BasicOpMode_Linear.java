@@ -104,7 +104,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
         composeTelemetry();
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
             double inputX = gamepad1.left_stick_x;
             double inputY = gamepad1.left_stick_y;
             double inputMag = Math.abs(Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2)));

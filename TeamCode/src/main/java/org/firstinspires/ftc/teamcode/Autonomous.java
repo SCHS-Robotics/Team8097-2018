@@ -93,7 +93,7 @@ public abstract class Autonomous extends BaseOpMode {
 
         mRgba = inputFrame.rgba();
         if (mIsColorSelected) {
-            mDetector.process(mRgba);
+//            mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
             Log.e("Tag", "Contours count: " + contours.size());
             Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
