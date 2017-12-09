@@ -116,8 +116,9 @@ public class BasicOpMode_Linear extends BaseOpMode {
             telemetry.addData("Selected turn angle: ", selectedAngle);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Glyph Detection Color", detectColor);
-            telemetry.addData("Vertical Hit Position", servoVerticalHit.getPosition());
-            telemetry.addData("Horizontal Hit Position", servoHorizontalHit.getPosition());
+            telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
+            telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
+            telemetry.addData("Color Sense Red", colorSensorArm.red());
 
             if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
                 try {
@@ -143,12 +144,18 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 motorFR.setPower(0);
             }
 
-            /*if (gamepad1.dpad_up) {
-                servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .001);
+            if (gamepad1.dpad_up) {
+                motorLeftLift.setPower(.1);
+                motorRightLift.setPower(.1);
             }
             else if (gamepad1.dpad_down){
-                 servoVerticalHit.setPosition(servoVerticalHit.getPosition() - .001);
-             } */
+                 motorLeftLift.setPower(-.1);
+                 motorRightLift.setPower(-.1);
+             }
+             else {
+                motorRightLift.setPower(0);
+                motorLeftLift.setPower(0);
+            }
 
             if(gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= 1) {
                 if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {

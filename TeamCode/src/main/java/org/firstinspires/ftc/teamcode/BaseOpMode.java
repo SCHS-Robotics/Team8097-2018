@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorREVColorDistance;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -44,7 +45,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //for it, ex: .setPositon for a servo
 
 //    Servo servoCamera;
-
     Servo servoLeftGrab;
     Servo servoRightGrab;
     Servo servoHorizontalHit;
@@ -101,15 +101,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
     // Trying to get range sensor to work: -Includes changing I2C address
     //DistanceSensor rangeSensor;
-    /*byte[] range1Cache; //The read will return an array of bytes. They are stored in this variable
 
-    I2cAddr RANGE1ADDRESS = new I2cAddr(0x14); //Default I2C address for MR Range (7-bit)
-    public static final int RANGE1_REG_START = 0x04; //Register to start reading
-    public static final int RANGE1_READ_LENGTH = 2; //Number of byte to read
-
-    public I2cDevice RANGE1;
-    public I2cDeviceSynch RANGE1Reader;*/
-
+    ColorSensor colorSensorArm;
 
     // Initialization, literally what happens when you select any OpMode and press "init"
     public void initialize()
@@ -126,6 +119,9 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         // Setting up servos
 //        servoCamera = hardwareMap.servo.get("servoCamera");
+        colorSensorArm = hardwareMap.colorSensor.get("colorSense");
+        colorSensorArm.setI2cAddress(I2cAddr.create7bit(0x39));
+        colorSensorArm.enableLed(true);
 
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
         servoRightGrab = hardwareMap.servo.get("servoRightGrab");
@@ -295,13 +291,13 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     public void toggleLift(int direction) throws InterruptedException{
         switch (direction) {
             case 0:
-                motorLeftLift.setTargetPosition(3000);
-                motorRightLift.setTargetPosition(-3000);
+                motorLeftLift.setTargetPosition(300);
+                motorRightLift.setTargetPosition(-300);
 
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(.25);
+                motorLeftLift.setPower(-.25);
                 motorRightLift.setPower(-.25);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
@@ -321,7 +317,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                motorLeftLift.setPower(-.25);
+                motorLeftLift.setPower(.25);
                 motorRightLift.setPower(.25);
 
                 while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}

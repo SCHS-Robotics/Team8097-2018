@@ -70,6 +70,34 @@ public abstract class Autonomous extends BaseOpMode {
         }
     }
 
+    public void hitJewel(String color) {
+        setArmDown();
+        sleep(5000);
+        switch (color) {
+            case "blue":
+                if (Math.abs(colorSensorArm.blue() - 5) >= 1) {
+                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
+                }
+                else {
+                    servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
+                }
+                break;
+            case "red":
+                if (Math.abs(colorSensorArm.red() - 5) >= 1) {
+                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
+                }
+                else {
+                    servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
+                }
+                break;
+        }
+    }
+
+    public void setArmDown() {
+        servoVerticalHit.setPosition(VERTICAL_END_POS);
+        servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
+    }
+
     public void onCameraViewStopped() {
 
         mRgba.release();
