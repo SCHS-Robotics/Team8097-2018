@@ -39,11 +39,11 @@ import static org.firstinspires.ftc.teamcode.Autonomous.Team.RED;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Autonomous", group ="Concept")
 public abstract class Autonomous extends BaseOpMode {
 
-    public void hitJewel(String color) {
+    public void hitJewel() {
         setArmDown();
         sleep(5000);
-        switch (color) {
-            case "blue":
+        switch (team) {
+            case BLUE:
                 telemetry.addData("Color Blue", colorSensorArm.blue());
                 if (Math.abs(colorSensorArm.blue()) >= 20) {
                     servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
@@ -52,7 +52,7 @@ public abstract class Autonomous extends BaseOpMode {
                     servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
                 }
                 break;
-            case "red":
+            case RED:
                 telemetry.addData("Color Red", colorSensorArm.red());
                 telemetry.update();
                 if (Math.abs(colorSensorArm.red()) >= 20) {
@@ -79,6 +79,7 @@ public abstract class Autonomous extends BaseOpMode {
 
             }
         }
+
         else if(team == RED) {
             try {
                 strafeRightDistance(45, 0.5);
@@ -132,7 +133,7 @@ public abstract class Autonomous extends BaseOpMode {
 
         mRgba = inputFrame.rgba();
         if (mIsColorSelected) {
-//            mDetector.process(mRgba);
+            mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
             Log.e("Tag", "Contours count: " + contours.size());
             Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
@@ -156,6 +157,6 @@ public abstract class Autonomous extends BaseOpMode {
         NOTCLOSE
     }
 
-    private Team team;
-    private Position position;
+    public Team team;
+    public Position position;
 }

@@ -29,13 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -50,11 +44,13 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Red Autonomous", group ="Concept")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Red Autonomous", group ="Autonomous")
 public class RedAutonomous extends Autonomous {
     private int timeThrough = 0;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
+        team = Team.RED;
+        position = Position.CLOSE;
 
         initialize();
 
@@ -65,12 +61,11 @@ public class RedAutonomous extends Autonomous {
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        composeTelemetry();
         waitForStart();
 
         while (opModeIsActive()) {
             if (timeThrough == 0) {
-                hitJewel("red");
+                hitJewel();
                 timeThrough = 1;
             }
 
@@ -79,13 +74,7 @@ public class RedAutonomous extends Autonomous {
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
-            try {
-                strafeRightDistance(45, 0.5);
-                sleep(25000);
-            } catch (InterruptedException e) {
-
-            }
-
+            moveToCrypto();
         }
     }
 }

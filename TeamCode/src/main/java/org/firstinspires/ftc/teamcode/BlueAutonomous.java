@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -45,15 +44,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Concept")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Autonomous")
 public class BlueAutonomous extends Autonomous {
     private int timeThrough = 0;
-    private Team team = Team.BLUE;
-    private Position position = Position.CLOSE;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
+        team = Team.BLUE;
+        position = Position.CLOSE;
 
         initialize();
+
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoLeftGrab.setPosition(1);
@@ -65,7 +65,7 @@ public class BlueAutonomous extends Autonomous {
 
         while (opModeIsActive()) {
             if (timeThrough == 0) {
-                hitJewel("blue");
+                hitJewel();
                 timeThrough = 1;
             }
 
@@ -74,12 +74,7 @@ public class BlueAutonomous extends Autonomous {
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
-            try {
-                strafeLeftDistance(45, 0.5);
-                sleep(25000);
-            } catch (InterruptedException e) {
-
-            }
+            moveToCrypto();
         }
     }
 }

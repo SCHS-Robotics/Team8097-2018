@@ -29,9 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -45,11 +43,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Red Autonomous Long", group ="Concept")
+
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Red Autonomous Long", group ="Autonomous")
 public class RedAutonomousLong extends Autonomous {
     private int timeThrough = 0;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
+        team = Team.RED;
+        position = Position.NOTCLOSE;
 
         initialize();
 
@@ -60,12 +61,11 @@ public class RedAutonomousLong extends Autonomous {
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        composeTelemetry();
         waitForStart();
 
         while (opModeIsActive()) {
             if (timeThrough == 0) {
-                hitJewel("red");
+                hitJewel();
                 timeThrough = 1;
             }
 
@@ -74,14 +74,7 @@ public class RedAutonomousLong extends Autonomous {
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
-            try {
-                strafeLeftDistance(45, 0.5);
-                sleep(1000);
-                goForwardDistance(10, 0.5);
-                sleep(25000);
-            } catch (InterruptedException e) {
-
-            }
+            moveToCrypto();
         }
     }
 }
