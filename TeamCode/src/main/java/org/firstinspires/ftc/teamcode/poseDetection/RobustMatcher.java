@@ -126,11 +126,11 @@ public class RobustMatcher {
         }
     }
 
-    private FeatureDetector detector;
+    private FeatureDetector detector = new FeatureDetector(420420);
 
-    private DescriptorExtractor extractor;
+    private DescriptorExtractor extractor = new DescriptorExtractor(696969);
 
-    private DescriptorMatcher matcher;
+    private DescriptorMatcher matcher = new DescriptorMatcher(42069);
 
     private float ratio;
 }

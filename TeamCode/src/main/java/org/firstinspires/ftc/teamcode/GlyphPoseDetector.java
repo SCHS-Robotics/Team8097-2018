@@ -71,14 +71,14 @@ public class GlyphPoseDetector {
 
     PnPProblem pnpDetection = new PnPProblem(paramsCamera);
     PnPProblem pnpDetectionEst = new PnPProblem(paramsCamera);
-    RobustMatcher rMatcher;
+    RobustMatcher rMatcher = new RobustMatcher();
     FeatureDetector orb = FeatureDetector.create(FeatureDetector.ORB);
-    Model model;
-    Mesh mesh;
+    Model model = new Model();
+    Mesh mesh = new Mesh();
     Mat measurements = new Mat(nMeasurements, 1, CV_64F);
     Boolean goodMeasurement = false;
 
-    Mat outputFrame;
+    public Mat outputFrame = new Mat();
 
     ArrayList<Point3> listPoints3dModel;
     Mat descriptorsModel;
@@ -155,7 +155,7 @@ public class GlyphPoseDetector {
         measurements.put(5, 0, measuredEulers.get(2, 0, data));
     }
 
-    public Mat processFrame(Mat frame) {
+    public void processFrame(Mat frame) {
         MatOfDMatch goodMatches = new MatOfDMatch();
         MatOfKeyPoint keypointsScene = new MatOfKeyPoint();
 
@@ -248,16 +248,16 @@ public class GlyphPoseDetector {
 
         }
 
-        return outputFrame;
+
     }
 
-    public void initializePoseDetection(String meshPath, String modelPath, String paramPath) throws java.io.FileNotFoundException {
+    public void initializePoseDetection(String meshPath, String modelPath) throws java.io.FileNotFoundException {
         mesh.load(meshPath);
         model.load(modelPath);
         rMatcher.setFeatureDetector(orb);
         rMatcher.setDescriptorExtractor(new DescriptorExtractor(DescriptorExtractor.ORB));
+        rMatcher.setRatio(ratioTest);
         DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
-        matcher.read(paramPath);
         rMatcher.setDescriptorMatcher(matcher);
         initKalmanFilter(kf, nStates, nMeasurements, nInputs, dt);
         measurements.setTo(new Scalar(0));

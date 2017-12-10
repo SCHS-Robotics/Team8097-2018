@@ -46,11 +46,11 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     Servo servoLeftGrab;
     Servo servoRightGrab;
 
-    DcMotor motorBL;
-    DcMotor motorBR;
-    DcMotor motorFL;
+    DcMotor motorBackLeft;
+    DcMotor motorBackRight;
+    DcMotor motorFrontLeft;
 
-    DcMotor motorFR;
+    DcMotor motorFrontRight;
     // DcMotor motorLift;
 
     BNO055IMU imu;
@@ -121,23 +121,23 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         imu.initialize(parameters);
 
         // Creating motors
-        motorBL = hardwareMap.dcMotor.get("motorBackLeft");
-        motorBR = hardwareMap.dcMotor.get("motorBackRight");
-        motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
-        motorFR = hardwareMap.dcMotor.get("motorFrontRight");
+        motorBackLeft = hardwareMap.dcMotor.get("motorBackLeft");
+        motorBackRight = hardwareMap.dcMotor.get("motorBackRight");
+        motorFrontLeft = hardwareMap.dcMotor.get("motorFrontLeft");
+        motorFrontRight = hardwareMap.dcMotor.get("motorFrontRight");
 
         // Setting up encoders
-        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
-        motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Setting servo initial positions on initialize method
         servoCamera.setPosition(servoCameraInitPosition);
@@ -156,74 +156,74 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
     // Movement code
     public void turnRight(double speed) {
-        motorBL.setPower(-speed);
-        motorBR.setPower(-speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(-speed);
+        motorBackLeft.setPower(-speed);
+        motorBackRight.setPower(-speed);
+        motorFrontLeft.setPower(-speed);
+        motorFrontRight.setPower(-speed);
     }
 
     public void turnLeft(double speed) {
-        motorBL.setPower(speed);
-        motorBR.setPower(speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(speed);
+        motorBackLeft.setPower(speed);
+        motorBackRight.setPower(speed);
+        motorFrontLeft.setPower(speed);
+        motorFrontRight.setPower(speed);
     }
-    
+
     public void goForward(double speed) {
-        motorBL.setPower(speed);
-        motorBR.setPower(-speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(-speed);
+        motorBackLeft.setPower(speed);
+        motorBackRight.setPower(-speed);
+        motorFrontLeft.setPower(speed);
+        motorFrontRight.setPower(-speed);
     }
 
     public void goBackward(double speed) {
-        motorBL.setPower(-speed);
-        motorBR.setPower(speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(speed);
+        motorBackLeft.setPower(-speed);
+        motorBackRight.setPower(speed);
+        motorFrontLeft.setPower(-speed);
+        motorFrontRight.setPower(speed);
     }
 
     public void goLeft(double speed) {
-        motorBL.setPower(-speed * 1);
-        motorBR.setPower(-speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(speed * 1);
+        motorBackLeft.setPower(-speed * 1);
+        motorBackRight.setPower(-speed);
+        motorFrontLeft.setPower(speed);
+        motorFrontRight.setPower(speed * 1);
     }
 
     public void goRight(double speed) {
-        motorBL.setPower(speed * 1);
-        motorBR.setPower(speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(-speed * 1);
+        motorBackLeft.setPower(speed * 1);
+        motorBackRight.setPower(speed);
+        motorFrontLeft.setPower(-speed);
+        motorFrontRight.setPower(-speed * 1);
     }
 
     public void goDiagonalForwardRight(double speed) {
-        motorBL.setPower(speed);
-        motorBR.setPower(0);
-        motorFL.setPower(0);
-        motorFR.setPower(-speed);
+        motorBackLeft.setPower(speed);
+        motorBackRight.setPower(0);
+        motorFrontLeft.setPower(0);
+        motorFrontRight.setPower(-speed);
     }
 
     public void goDiagonalForwardLeft(double speed) {
-        motorBL.setPower(0);
-        motorBR.setPower(-speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(0);
+        motorBackLeft.setPower(0);
+        motorBackRight.setPower(-speed);
+        motorFrontLeft.setPower(speed);
+        motorFrontRight.setPower(0);
     }
 
     public void goDiagonalBackwardRight(double speed) {
 
-        motorBL.setPower(0);
-        motorBR.setPower(speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(0);
+        motorBackLeft.setPower(0);
+        motorBackRight.setPower(speed);
+        motorFrontLeft.setPower(-speed);
+        motorFrontRight.setPower(0);
     }
 
     public void goDiagonalBackwardLeft(double speed) {
-        motorBL.setPower(-speed);
-        motorBR.setPower(0);
-        motorFL.setPower(0);
-        motorFR.setPower(speed);
+        motorBackLeft.setPower(-speed);
+        motorBackRight.setPower(0);
+        motorFrontLeft.setPower(0);
+        motorFrontRight.setPower(speed);
     }
 
     public void turnTo(double angle, double speed, double tolerance) {

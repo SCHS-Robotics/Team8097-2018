@@ -12,6 +12,7 @@
 apply from: '../build.common.gradle'
 dependencies {
     compile project(':openCVLibrary330')
+    implementation files('src/main/jniLibs/yamlbeans-1.12.jar')
 }
 android {
     buildToolsVersion '26.0.2'

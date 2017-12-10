@@ -274,10 +274,10 @@ public class PnPProblem {
         }
     }
 
-    private Mat aMatrix;
-    private Mat rMatrix;
-    private Mat tMatrix;
-    private Mat pMatrix;
+    private Mat aMatrix = new Mat();
+    private Mat rMatrix = new Mat();
+    private Mat tMatrix = new Mat();
+    private Mat pMatrix = new Mat();
 
     private Point3 cross(Point3 v1, Point3 v2) {
         Point3 tmpPoint = new Point3();

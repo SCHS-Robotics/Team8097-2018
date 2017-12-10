@@ -16,7 +16,7 @@ import org.opencv.utils.Converters;
 //javadoc: DescriptorMatcher
 public class DescriptorMatcher extends Algorithm {
 
-    protected DescriptorMatcher(long addr) { super(addr); }
+    public DescriptorMatcher(long addr) { super(addr); }
 
 
     public static final int

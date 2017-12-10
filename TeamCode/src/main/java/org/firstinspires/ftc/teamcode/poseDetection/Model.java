@@ -1,12 +1,23 @@
 package org.firstinspires.ftc.teamcode.poseDetection;
 
+import com.esotericsoftware.yamlbeans.YamlException;
+import com.esotericsoftware.yamlbeans.YamlReader;
+
+import org.opencv.android.*;
+import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
+import org.opencv.utils.Converters;
 
+
+import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by sovnik on 11/14/17.
@@ -38,10 +49,27 @@ public class Model {
     }
 
     public void load(String path) {
-        Mat points3dMat;
+        try {
+            Mat points3dMat;
 
-        // TODO: Make a YML parser sometime or this won't work
-        // Alternatively, generate the YML files and just manually put the values in here.
+            YamlReader reader = new YamlReader(new FileReader(path));
+            reader.getConfig().setClassTag("tag:yaml.org,2002:opencv-matrix", MatStorage.class);
+            Map map = (Map) reader.read();
+
+            MatStorage data = (MatStorage) map.get("points_3d");
+            points3dMat = new Mat(data.rows, data.cols, CvType.CV_32FC1);
+            points3dMat.put(0, 0, data.getData());
+            points3dMat.copyTo(points3dMat);
+            Converters.Mat_to_vector_Point3(points3dMat, listPoints3dIn);
+
+            // get get get get got got got got this is a test line that I wanna try because this might be easier listPoints3dIn.add(new Point3(data.getData()));
+            data = (MatStorage) map.get("descriptors");
+            descriptors.put(0, 0, data.getData());
+        }
+
+        catch (java.io.FileNotFoundException | YamlException e) {
+            e.printStackTrace();
+        }
     }
 
     public ArrayList<Point> getPoints2dIn() {
@@ -74,4 +102,25 @@ public class Model {
     private ArrayList<Point> listPoints2dOut;
     private ArrayList<Point3> listPoints3dIn;
     private Mat descriptors;
+
+    protected static class MatStorage {
+        public int rows;
+        public int cols;
+        public String dataType;
+        public ArrayList<String> data;
+
+        public MatStorage() {
+
+        }
+
+        public double[] getData() {
+            double[] dataOut = new double[data.size()];
+
+            for(int i = 0; i < dataOut.length; i++) {
+                dataOut[i] = Double.parseDouble(data.get(i));
+            }
+
+            return dataOut;
+        }
+    }
 }

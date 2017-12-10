@@ -57,6 +57,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
+import java.io.FileNotFoundException;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
@@ -75,6 +76,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
     private int                 buttonBCooldown;
     private int                 buttonLBCooldown;
     private int                 buttonRBCooldown;
+    GlyphPoseDetector testPoseDetector;
 
 
     private int                 selectedAngle = 0;
@@ -92,7 +94,7 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         waitForStart();
 
         runtime.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
 
         composeTelemetry();
         // Run until the end of the match (driver presses STOP)
@@ -134,10 +136,10 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
             }
 
             else {
-                motorBL.setPower(0);
-                motorBR.setPower(0);
-                motorFL.setPower(0);
-                motorFR.setPower(0);
+                motorBackLeft.setPower(0);
+                motorBackRight.setPower(0);
+                motorFrontLeft.setPower(0);
+                motorFrontRight.setPower(0);
             }
 
              if (gamepad1.dpad_up) {
@@ -269,8 +271,13 @@ public class BasicOpMode_Linear extends BaseOpModeTest {
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mSpectrum = new Mat();
-        CONTOUR_COLOR = new Scalar(165,255,255,255);
+        CONTOUR_COLOR = new Scalar(165, 255, 255, 255);
         SPECTRUM_SIZE = new Size(200, 64);
+        try {
+            testPoseDetector.initializePoseDetection("box.ply", "testObject.yml");
+        } catch (FileNotFoundException e) {
+
+        }
 
         // The color that should be detected by default on start
         setDetectColor("brown");
