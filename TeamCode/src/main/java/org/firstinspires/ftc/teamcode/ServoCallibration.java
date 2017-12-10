@@ -30,63 +30,38 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
 
-import java.util.ConcurrentModificationException;
 import java.util.List;
 
 
 /**
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class BasicOpMode_Linear extends BaseOpMode {
+@TeleOp(name="ServoCallibration", group="Linear Opmode")
+public class ServoCallibration extends BaseOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private ElapsedTime cooldown = new ElapsedTime();
 
     // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
-    private double                 buttonACooldown;
-    private double                 buttonBCooldown;
-    private double                 buttonLBCooldown;
-    private double                 buttonRBCooldown;
-    private double                 buttonXCooldown;
-    private double                 buttonYCooldown;
-
-    private int liftDirection = 0; //0 = Down 1 = Up
-    private int hitStatus = 2; //2 = autonomous 1 = teleop 0 = down
-    private int grabStatus = 0; //0 = full open 1 = full closed 2 = half open
+    private int                 buttonACooldown;
+    private int                 buttonBCooldown;
+    private int                 buttonXCooldown;
 
 
     private int                 selectedAngle = 0;
 
-    @Override
     public void runOpMode() {
 
         telemetry.addData("Status", "Initialized");
@@ -99,88 +74,58 @@ public class BasicOpMode_Linear extends BaseOpMode {
         waitForStart();
 
         runtime.reset();
-        cooldown.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
 
         composeTelemetry();
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double inputX = gamepad1.left_stick_x;
-            double inputY = gamepad1.left_stick_y;
-            double inputMag = Math.abs(Math.sqrt(Math.pow(inputX, 2) + Math.pow(inputY, 2)));
-            double angle = Math.toDegrees(Math.atan2(inputY, inputX));
-
             // Telemetry fun
             telemetry.update();
-
-//            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
+            telemetry.addData("Servo Left Grab Pos: ", servoLeftGrab.getPosition());
+            telemetry.addData("Servo Right Grab Pos: ", servoRightGrab.getPosition());
             telemetry.addData("Selected turn angle: ", selectedAngle);
+            telemetry.addData("Left Stick X: ", gamepad1.left_stick_x);
+            telemetry.addData("Left Stick Y: ", gamepad1.left_stick_y);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Glyph Detection Color", detectColor);
-            telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
-            telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
-            telemetry.addData("Color Sense Red", colorSensorArm.red());
-            telemetry.addData("Color Sense Blue", colorSensorArm.blue());
-            telemetry.addData("Motor BL Pos", motorBL.getCurrentPosition());
-            telemetry.addData("Motor BR Pos", motorBR.getCurrentPosition());
-            telemetry.addData("Motor FL Pos", motorFL.getCurrentPosition());
-            telemetry.addData("Motor FR Pos", motorFR.getCurrentPosition());
+//            telemetry.addData("Left Lift Position", motorLeftLift.getCurrentPosition());
+//            telemetry.addData("Right Lift Position", motorRightLift.getCurrentPosition());
 
-            if (Math.abs(inputX) >= .1 || Math.abs(inputY) >= .1){
-                try {
-                    goDirection(inputMag, angle);
-                }
-                catch (java.lang.InterruptedException a) {
-                    stop();
-                }
-            }
 
-            else if (gamepad1.left_trigger > .1){
-                turnLeft(gamepad1.left_trigger);
-            }
-
-            else if (gamepad1.right_trigger > .1){
-                turnRight(gamepad1.right_trigger);
-            }
-
-            else {
-                motorBL.setPower(0);
-                motorBR.setPower(0);
-                motorFL.setPower(0);
-                motorFR.setPower(0);
-            }
-
-            if (gamepad1.dpad_down) {
-                motorLeftLift.setPower(-.2);
-                motorRightLift.setPower(.2);
-            }
-            else if (gamepad1.dpad_up){
-                 motorLeftLift.setPower(.2);
-                 motorRightLift.setPower(-.2);
-             }
-             else {
-                motorRightLift.setPower(0);
-                motorLeftLift.setPower(0);
-            }
-
-            if(gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= .2) {
-                if (grabStatus == 0) {
-                    grabStatus = 1;
+            if(gamepad1.a && buttonACooldown >= 1000) {
+                if (servoLeftGrab.getPosition() > .5 && servoRightGrab.getPosition() < .5) {
                     servoLeftGrab.setPosition(0.3);
                     servoRightGrab.setPosition(0.7);
-                } else if (grabStatus == 2){
-                    grabStatus = 0;
+                } else {
                     servoLeftGrab.setPosition(1);
                     servoRightGrab.setPosition(0);
-                } else {
-                    grabStatus = 2;
-                    servoLeftGrab.setPosition(.6);
-                    servoRightGrab.setPosition(.4);
                 }
-                buttonACooldown = cooldown.time();
+                buttonACooldown = 0;
             }
 
-            if(gamepad1.b && Math.abs(cooldown.time() - buttonBCooldown) >= 1) {
+//            if (gamepad1.dpad_left) {
+//                servoLeftGrab.setPosition(servoLeftGrab.getPosition() - .001);
+//            }
+//
+//            if (gamepad1.dpad_right) {
+//                servoLeftGrab.setPosition(servoLeftGrab.getPosition() + .001);
+//            }
+//
+//            if (gamepad1.dpad_up) {
+//                servoRightGrab.setPosition(servoRightGrab.getPosition() - .001);
+//            }
+//
+//            if (gamepad1.dpad_down) {
+//                servoRightGrab.setPosition(servoRightGrab.getPosition() + .001);
+//            }
+
+
+
+            if(buttonACooldown < 1000){
+                buttonACooldown++;
+            }
+
+            if(gamepad1.b && buttonBCooldown >= 500) {
                 switch (detectColor){
                     case "brown": setDetectColor("gray");
                         break;
@@ -191,55 +136,15 @@ public class BasicOpMode_Linear extends BaseOpMode {
                     case "blue": setDetectColor("brown");
                         break;
                 }
-                buttonBCooldown = cooldown.time();
+                buttonBCooldown = 0;
             }
 
-            if (gamepad1.x && Math.abs(cooldown.time() - buttonXCooldown) >= 1) {
-                try {
-                    if (liftDirection == 0){
-                        liftDirection = 1;
-                        toggleLift(0);
-                    }
-                    else {
-                        liftDirection = 0;
-                        toggleLift(1);
-                    }
-                } catch (InterruptedException e) {}
-
-                buttonXCooldown = cooldown.time();
+            if(buttonBCooldown < 500){
+                buttonBCooldown++;
             }
 
-            if (gamepad1.y && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
-                if (hitStatus != 1) {
-                    hitStatus = 1;
-                    servoHorizontalHit.setPosition(HORIZONTAL_TELEOP_START_POS);
-                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
-                }
-                else if (hitStatus == 1) {
-                    hitStatus = 0;
-                    servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
-                    while (Math.abs(servoVerticalHit.getPosition() - VERTICAL_END_POS) >= .01) {
-                        servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .005);
-                    }
-                }
-                buttonYCooldown = cooldown.time();
-            }
-
-            if(gamepad1.dpad_left && hitStatus == 0) {
-                servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
-            }
-            else if (gamepad1.dpad_right && hitStatus == 0) {
-                servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-            }
-
-            if(gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {
-                turnTo(selectedAngle, 0.75, 1);
-                buttonLBCooldown = cooldown.time();
-            }
-
-            if(gamepad1.right_bumper && Math.abs(cooldown.time() - buttonRBCooldown) >= 1) {
-                selectTurnAngle();
-                buttonRBCooldown = cooldown.time();
+            if(buttonXCooldown < 500){
+                buttonXCooldown++;
             }
         }
 

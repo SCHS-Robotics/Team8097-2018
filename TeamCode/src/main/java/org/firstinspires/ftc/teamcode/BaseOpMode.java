@@ -14,8 +14,10 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorREVColorDistance;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -37,21 +39,23 @@ import org.opencv.imgproc.Imgproc;
 import java.util.HashMap;
 import java.util.Locale;
 
-public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
+public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
 
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
 
-    Servo servoCamera;
+//    Servo servoCamera;
     Servo servoLeftGrab;
     Servo servoRightGrab;
+    Servo servoHorizontalHit;
+    Servo servoVerticalHit;
 
     DcMotor motorBL;
     DcMotor motorBR;
     DcMotor motorFL;
-
     DcMotor motorFR;
-    // DcMotor motorLift;
+    DcMotor motorLeftLift;
+    DcMotor motorRightLift;
 
     BNO055IMU imu;
 
@@ -59,9 +63,21 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     Orientation angles;
     double heading;
 
-    //HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
-    //Setting constant variables, final so that it cannot be changed later by accident
-    final double servoCameraInitPosition = .267;
+    final double VERTICAL_AUTO_START_POS = .031;
+    final double HORIZONTAL_AUTO_START_POS = .46;
+    final double VERTICAL_TELEOP_START_POS = .576;
+    final double HORIZONTAL_TELEOP_START_POS = .404;
+    final double VERTICAL_END_POS = 1.0;
+    final double HORIZONTAL_END_POS = .404;
+    final double HORIZONTAL_RIGHT_END_POS = .537;
+    final double HORIZONTAN_LEFT_END_POS = .271;
+    final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
+    final double INCHES_TO_CM = 2.54;
+    final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
+    final double TICKS_PER_CM_FORWARD20 = TICKS_PER_CM_FORWARD40 / 2;
+    final double TICKS_PER_INCH = 100;
+    final double TICKS_PER_INCH_SIDE = 150;
+    final double TICKS_FOR_LIFT = 2 * TICKS_PER_CM_FORWARD20; //Test Value and Should be Changed when it works
 
     final double angleTolerance = 3;
 
@@ -71,8 +87,8 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     final Scalar glyphGrayColorRadius = new Scalar(90, 6.5, 73);
     final Scalar redHSV = new Scalar(3.5, 233, 162.5);
     final Scalar redColorRadius = new Scalar(3.5, 22, 92.5);
-    final Scalar blueHSV = new Scalar(147.3, 235.5, 95);
-    final Scalar blueColorRadius = new Scalar(9.2, 19.5, 55);
+    final Scalar blueHSV = new Scalar(200, 200, 154);
+    final Scalar blueColorRadius = new Scalar(20, 55, 110);
 
     protected String detectColor;
     protected boolean              mIsColorSelected = false;
@@ -85,19 +101,10 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     protected Size                 SPECTRUM_SIZE;
     protected Scalar               CONTOUR_COLOR;
 
-
-    //int wheelEncoderPpr = 1680;
     // Trying to get range sensor to work: -Includes changing I2C address
     //DistanceSensor rangeSensor;
-    /*byte[] range1Cache; //The read will return an array of bytes. They are stored in this variable
 
-    I2cAddr RANGE1ADDRESS = new I2cAddr(0x14); //Default I2C address for MR Range (7-bit)
-    public static final int RANGE1_REG_START = 0x04; //Register to start reading
-    public static final int RANGE1_READ_LENGTH = 2; //Number of byte to read
-
-    public I2cDevice RANGE1;
-    public I2cDeviceSynch RANGE1Reader;*/
-
+    ColorSensor colorSensorArm;
 
     // Initialization, literally what happens when you select any OpMode and press "init"
     public void initialize()
@@ -113,9 +120,15 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         //Assigning previously declared variables to expansion hub names
 
         // Setting up servos
-        servoCamera = hardwareMap.servo.get("servoCamera");
+//        servoCamera = hardwareMap.servo.get("servoCamera");
+        colorSensorArm = hardwareMap.colorSensor.get("colorSense");
+        colorSensorArm.setI2cAddress(I2cAddr.create7bit(0x39));
+        colorSensorArm.enableLed(false);
+
         servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
         servoRightGrab = hardwareMap.servo.get("servoRightGrab");
+        servoHorizontalHit = hardwareMap.servo.get("servoHorizontalHit");
+        servoVerticalHit = hardwareMap.servo.get("servoVerticalHit");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
@@ -125,13 +138,19 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
+        motorLeftLift = hardwareMap.dcMotor.get("motorLiftLeft");
+        motorRightLift = hardwareMap.dcMotor.get("motorLiftRight");
+
 
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
         motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -140,9 +159,10 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Setting servo initial positions on initialize method
-        servoCamera.setPosition(servoCameraInitPosition);
-        servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
+//        servoCamera.setPosition(servoCameraInitPosition);
+//        servoLeftGrab.setPosition(1);
+//        servoRightGrab.setPosition(0);
+
     }
 
     public void resetEncoders(DcMotor...motors) {
@@ -184,17 +204,17 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
     }
 
     public void goLeft(double speed) {
-        motorBL.setPower(-speed * 1);
+        motorBL.setPower(-speed);
         motorBR.setPower(-speed);
         motorFL.setPower(speed);
-        motorFR.setPower(speed * 1);
+        motorFR.setPower(speed);
     }
 
     public void goRight(double speed) {
-        motorBL.setPower(speed * 1);
+        motorBL.setPower(speed);
         motorBR.setPower(speed);
         motorFL.setPower(-speed);
-        motorFR.setPower(-speed * 1);
+        motorFR.setPower(-speed);
     }
 
     public void goDiagonalForwardRight(double speed) {
@@ -226,6 +246,112 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
         motorFR.setPower(speed);
     }
 
+    public void goForwardDistance(double distance, double speed) throws InterruptedException{
+        double targetPosition = -distance * TICKS_PER_INCH;
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        motorBL.setTargetPosition((int)targetPosition);
+        motorFL.setTargetPosition((int)targetPosition);
+        motorBR.setTargetPosition((int)-targetPosition);
+        motorFR.setTargetPosition((int)-targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(speed);
+        motorBR.setPower(speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        motorBL.setPower(0);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void strafeLeftDistance (double distance, double speed) throws InterruptedException{
+        double targetPosition = -distance * TICKS_PER_INCH_SIDE;
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        motorBL.setTargetPosition((int)targetPosition);
+        motorFL.setTargetPosition((int)-targetPosition);
+        motorBR.setTargetPosition((int)targetPosition);
+        motorFR.setTargetPosition((int)-targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(-speed);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        motorBL.setPower(0);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void strafeRightDistance (double distance, double speed) throws InterruptedException{
+        double targetPosition = -distance * TICKS_PER_INCH_SIDE;
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        motorBL.setTargetPosition((int)-targetPosition);
+        motorFL.setTargetPosition((int)targetPosition);
+        motorBR.setTargetPosition((int)-targetPosition);
+        motorFR.setTargetPosition((int)targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(-speed);
+        motorBR.setPower(-speed);
+        motorFL.setPower(speed);
+        motorFR.setPower(speed);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        motorBL.setPower(0);
+        motorBR.setPower(0);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void waitForEncoders(double encoderTicks) throws InterruptedException {
+        while (getFurthestEncoder() < encoderTicks && opModeIsActive()) {
+            sleep(1);
+        }
+    }
+
+    public int getFurthestEncoder() {
+        return Math.max(Math.max(Math.abs(motorBL.getCurrentPosition()), Math.abs(motorBR.getCurrentPosition())), Math.max(Math.abs(motorFL.getCurrentPosition()), Math.abs(motorFR.getCurrentPosition())));
+    }
+
     public void turnTo(double angle, double speed, double tolerance) {
         double givenSpeed = speed;
         while(Math.abs(getHeading() - angle) > tolerance) {
@@ -249,6 +375,49 @@ public abstract class BaseOpModeTest extends LinearOpMode implements CameraBridg
 
             telemetry.addData("Heading", getHeading());
             telemetry.update();
+        }
+    }
+
+    public void toggleLift(int direction) throws InterruptedException{
+        switch (direction) {
+            case 0:
+                motorLeftLift.setTargetPosition(600);
+                motorRightLift.setTargetPosition(-600);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                motorLeftLift.setPower(-.20);
+                motorRightLift.setPower(-.20);
+
+                while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
+
+                motorRightLift.setPower(0);
+                motorLeftLift.setPower(0);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                break;
+
+            case 1:
+                motorLeftLift.setTargetPosition(0);
+                motorRightLift.setTargetPosition(0);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                motorLeftLift.setPower(.20);
+                motorRightLift.setPower(.20);
+
+                while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
+
+                motorRightLift.setPower(0);
+                motorLeftLift.setPower(0);
+
+                motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                break;
         }
     }
 

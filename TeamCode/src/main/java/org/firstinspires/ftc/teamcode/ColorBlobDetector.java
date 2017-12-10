@@ -1,8 +1,3 @@
-/*
- * Derived from sample code provided by OpenCV in the OpenCV Android SDK:
- * https://github.com/opencv/opencv/releases/tag/3.2.0 
- */
-
 package org.firstinspires.ftc.teamcode;
 
 import org.opencv.core.Core;
