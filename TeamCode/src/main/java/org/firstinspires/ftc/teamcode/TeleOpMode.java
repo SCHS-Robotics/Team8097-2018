@@ -60,12 +60,8 @@ import org.opencv.videoio.VideoCapture;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-
-/**
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class BasicOpMode_Linear extends BaseOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpMode", group="Linear Opmode")
+public class TeleOpMode extends BaseOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -93,8 +89,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
         telemetry.update();
 
         initialize();
-        startOpenCV(this);
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
@@ -103,6 +97,7 @@ public class BasicOpMode_Linear extends BaseOpMode {
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
 
         composeTelemetry();
+
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double inputX = gamepad1.left_stick_x;
@@ -113,10 +108,8 @@ public class BasicOpMode_Linear extends BaseOpMode {
             // Telemetry fun
             telemetry.update();
 
-//            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
             telemetry.addData("Selected turn angle: ", selectedAngle);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Glyph Detection Color", detectColor);
             telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
             telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
             telemetry.addData("Color Sense Red", colorSensorArm.red());
@@ -180,20 +173,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 buttonACooldown = cooldown.time();
             }
 
-            if(gamepad1.b && Math.abs(cooldown.time() - buttonBCooldown) >= 1) {
-                switch (detectColor){
-                    case "brown": setDetectColor("gray");
-                        break;
-                    case "gray": setDetectColor("red");
-                        break;
-                    case "red": setDetectColor("blue");
-                        break;
-                    case "blue": setDetectColor("brown");
-                        break;
-                }
-                buttonBCooldown = cooldown.time();
-            }
-
             if (gamepad1.x && Math.abs(cooldown.time() - buttonXCooldown) >= 1) {
                 try {
                     if (liftDirection == 0){
@@ -242,9 +221,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 buttonRBCooldown = cooldown.time();
             }
         }
-
-        stopOpenCV();
-
     }
 
     // Direction Functions
@@ -306,16 +282,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
     // OpenCV functions
     public void onCameraViewStarted(int width, int height) {
 
-        // Creating display, color detector, defining variables for outlines (contours), not sure what a spectrum is, but we should figure that out
-        mRgba = new Mat(height, width, CvType.CV_8UC4);
-        mDetector = new ColorBlobDetector();
-        mSpectrum = new Mat();
-        CONTOUR_COLOR = new Scalar(165,255,255,255);
-        SPECTRUM_SIZE = new Size(200, 64);
-
-        // The color that should be detected by default on start
-        setDetectColor("brown");
-
     }
 
     public void onCameraViewStopped() {
@@ -326,18 +292,7 @@ public class BasicOpMode_Linear extends BaseOpMode {
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         mRgba = inputFrame.rgba();
-        if (mIsColorSelected) {
-            mDetector.process(mRgba);
-            List<MatOfPoint> contours = mDetector.getContours();
-            Log.e("Tag", "Contours count: " + contours.size());
-            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
 
-            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
-            colorLabel.setTo(mBlobColorRgba);
-
-            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
-            mSpectrum.copyTo(spectrumLabel);
-        }
         return mRgba;
     }
 }

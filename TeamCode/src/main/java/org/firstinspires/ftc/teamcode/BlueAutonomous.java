@@ -32,7 +32,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -49,11 +48,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Concept")
 public class BlueAutonomous extends Autonomous {
     private int timeThrough = 0;
+    private Team team = Team.BLUE;
+    private Position position = Position.CLOSE;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
 
         initialize();
-
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoLeftGrab.setPosition(1);
@@ -75,7 +75,7 @@ public class BlueAutonomous extends Autonomous {
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
             try {
-                strafeRightDistance(45, 0.5);
+                strafeLeftDistance(45, 0.5);
                 sleep(25000);
             } catch (InterruptedException e) {
 

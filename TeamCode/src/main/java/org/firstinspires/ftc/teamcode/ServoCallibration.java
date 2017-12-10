@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -48,7 +47,7 @@ import java.util.List;
 /**
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name="ServoCallibration", group="Linear Opmode")
+@TeleOpMode(name="ServoCallibration", group="Linear Opmode")
 public class ServoCallibration extends BaseOpMode {
 
     // Declare OpMode members.

@@ -31,44 +31,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.util.List;
 
+import static org.firstinspires.ftc.teamcode.Autonomous.Position.CLOSE;
+import static org.firstinspires.ftc.teamcode.Autonomous.Position.NOTCLOSE;
+import static org.firstinspires.ftc.teamcode.Autonomous.Team.BLUE;
+import static org.firstinspires.ftc.teamcode.Autonomous.Team.RED;
+
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Autonomous", group ="Concept")
 public abstract class Autonomous extends BaseOpMode {
-
-    VuforiaLocalizer vuforia;
-
-    @Override
-    public void runOpMode() {
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-
-        parameters.vuforiaLicenseKey = "AWRsObH/////AAAAGU5bp4bnDkCYjwnKsD5okRCL7t6ejVuLHi3TwTkPTSo+EuLnlmB+G2Rz4GOel217l0cjjlYjJfot5pvsspqgEUJvtNDeoOacTA3bzKaeAFUoBeQA2r3VwolpdWR/6xxq9EraYiLIkOLee51c2Uqtzlvk8Qav301W2TJOdPbotZUAndR6QlIQ7m2UVZWY+2qlenB36jIF3ZGotK/QwihY0/96KWzHtbIPUheU4CiJmRlIi3xMGREt3SYgcPV3L/WMPi+WW7GSSoh9IVaVnfGmTZD2cWSGeB/x4RDHdUbePjZrEQ1OPNR/LvjbRYWkX+QgQUqmyff0/Etuf9o0oJ9PlYeeteZPv1m/2hiB/mUG9tz1";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
-
-        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
-
-        telemetry.update();
-        waitForStart();
-
-        relicTrackables.activate();
-
-        while (opModeIsActive()) {
-            RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-
-                telemetry.addData("VuMark", "%s visible", vuMark);
-
-            }
-
-            else {
-                telemetry.addData("VuMark", "not visible");
-            }
-
-            telemetry.update();
-        }
-    }
 
     public void hitJewel(String color) {
         setArmDown();
@@ -99,6 +68,45 @@ public abstract class Autonomous extends BaseOpMode {
     public void setArmDown() {
         servoVerticalHit.setPosition(VERTICAL_END_POS);
         servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
+    }
+
+    public void moveToCrypto() {
+        if (team == BLUE) {
+            try {
+                strafeLeftDistance(45, 0.5);
+            }
+            catch (InterruptedException e) {
+
+            }
+        }
+        else if(team == RED) {
+            try {
+                strafeRightDistance(45, 0.5);
+            }
+            catch (InterruptedException e) {
+
+            }
+        }
+
+        if (position == CLOSE) {
+            turnTo(180, 0.5, 10);
+
+        }
+
+        else if (position == NOTCLOSE) {
+            try {
+                goForwardDistance(10, 0.5);
+                if (team == RED) {
+                    turnTo(90, 0.5, 10);
+                }
+                else {
+                    turnTo(270, 0.5, 10);
+                }
+            }
+            catch (InterruptedException e) {
+
+            }
+        }
     }
 
     public void onCameraViewStopped() {
@@ -138,7 +146,16 @@ public abstract class Autonomous extends BaseOpMode {
         return mRgba;
     }
 
-    String format(OpenGLMatrix transformationMatrix) {
-        return (transformationMatrix != null) ? transformationMatrix.formatAsTransform() : "null";
+    enum Team {
+        RED,
+        BLUE
     }
+
+    enum Position {
+        CLOSE,
+        NOTCLOSE
+    }
+
+    private Team team;
+    private Position position;
 }
