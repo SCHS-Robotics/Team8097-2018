@@ -44,7 +44,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
 
-//    Servo servoCamera;
     Servo servoLeftGrab;
     Servo servoRightGrab;
     Servo servoHorizontalHit;
@@ -59,6 +58,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
     BNO055IMU imu;
 
+    ColorSensor colorSensorArm;
+
     // State used for updating telemetry
     Orientation angles;
     double heading;
@@ -70,16 +71,14 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final double VERTICAL_END_POS = 1.0;
     final double HORIZONTAL_END_POS = .404;
     final double HORIZONTAL_RIGHT_END_POS = .537;
-    final double HORIZONTAN_LEFT_END_POS = .271;
-    final double TICKS_PER_CM_FORWARD = 53.6 / 1.5; //For 40s
-    final double INCHES_TO_CM = 2.54;
-    final double TICKS_PER_CM_FORWARD40 = 53.6 / 1.5;
-    final double TICKS_PER_CM_FORWARD20 = TICKS_PER_CM_FORWARD40 / 2;
+    final double HORIZONTAL_LEFT_END_POS = .271;
+
+    // TODO: Keep getting these over and over literally every time someone does something on hardware.
     final double TICKS_PER_INCH = 100;
     final double TICKS_PER_INCH_SIDE = 150;
-    final double TICKS_FOR_LIFT = 2 * TICKS_PER_CM_FORWARD20; //Test Value and Should be Changed when it works
 
-    final double angleTolerance = 3;
+    // Thing to compensate for imbalance, experimental value.
+    final double DRIVE_WEIGHT_SCALAR = 1;
 
     final Scalar glyphBrownHSV = new Scalar(7.5, 50, 147.5);
     final Scalar glyphBrownColorRadius = new Scalar(7.5, 105, 107.5);
@@ -90,21 +89,16 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final Scalar blueHSV = new Scalar(200, 200, 154);
     final Scalar blueColorRadius = new Scalar(20, 55, 110);
 
-    protected String detectColor;
-    protected boolean              mIsColorSelected = false;
-    protected Mat mRgba;
-    protected Scalar               mBlobColorRgba;
-    protected Scalar               mBlobColorHsv;
-    protected Scalar               mBlobColorRadius;
-    protected ColorBlobDetector    mDetector;
-    protected Mat                  mSpectrum;
-    protected Size                 SPECTRUM_SIZE;
-    protected Scalar               CONTOUR_COLOR;
-
-    // Trying to get range sensor to work: -Includes changing I2C address
-    //DistanceSensor rangeSensor;
-
-    ColorSensor colorSensorArm;
+    protected String                detectColor;
+    protected boolean               mIsColorSelected = false;
+    protected Mat                   mRgba;
+    protected Scalar                mBlobColorRgba;
+    protected Scalar                mBlobColorHsv;
+    protected Scalar                mBlobColorRadius;
+    protected ColorBlobDetector     mDetector;
+    protected Mat                   mSpectrum;
+    protected Size                  SPECTRUM_SIZE;
+    protected Scalar                CONTOUR_COLOR;
 
     // Initialization, literally what happens when you select any OpMode and press "init"
     public void initialize()
@@ -117,10 +111,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        //Assigning previously declared variables to expansion hub names
-
-        // Setting up servos
-//        servoCamera = hardwareMap.servo.get("servoCamera");
         colorSensorArm = hardwareMap.colorSensor.get("colorSense");
         colorSensorArm.setI2cAddress(I2cAddr.create7bit(0x39));
         colorSensorArm.enableLed(false);
@@ -141,7 +131,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorLeftLift = hardwareMap.dcMotor.get("motorLiftLeft");
         motorRightLift = hardwareMap.dcMotor.get("motorLiftRight");
 
-
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -149,20 +138,12 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
         motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        // Setting servo initial positions on initialize method
-//        servoCamera.setPosition(servoCameraInitPosition);
-//        servoLeftGrab.setPosition(1);
-//        servoRightGrab.setPosition(0);
-
     }
 
     public void resetEncoders(DcMotor...motors) {
@@ -170,6 +151,13 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
             if(motor.getCurrentPosition() != 0){
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             }
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    public void stopMotors(DcMotor...motors) {
+        for(DcMotor motor : motors){
+            motor.setPower(0);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
@@ -267,15 +255,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
 
-        motorBL.setPower(0);
-        motorBR.setPower(0);
-        motorFL.setPower(0);
-        motorFR.setPower(0);
-
-        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
 
     public void strafeLeftDistance (double distance, double speed) throws InterruptedException{
@@ -299,15 +279,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
 
-        motorBL.setPower(0);
-        motorBR.setPower(0);
-        motorFL.setPower(0);
-        motorFR.setPower(0);
-
-        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
 
     public void strafeRightDistance (double distance, double speed) throws InterruptedException{
@@ -331,15 +303,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
 
-        motorBL.setPower(0);
-        motorBR.setPower(0);
-        motorFL.setPower(0);
-        motorFR.setPower(0);
-
-        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
 
     public void waitForEncoders(double encoderTicks) throws InterruptedException {
@@ -354,6 +318,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
     public void turnTo(double angle, double speed, double tolerance) {
         double givenSpeed = speed;
+
         while(Math.abs(getHeading() - angle) > tolerance) {
             if (Math.abs(getHeading() - angle) < 40){
                 if (Math.abs(getHeading() - angle) < 20) {
@@ -367,15 +332,21 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
                 speed = givenSpeed;
             }
 
-            if (getHeading() > angle) {
-                turnRight(speed);
-            } else {
+            if (getHeading() > angle + tolerance) {
                 turnLeft(speed);
+            } else if (getHeading() < angle - tolerance){
+                turnRight(speed);
             }
 
             telemetry.addData("Heading", getHeading());
             telemetry.update();
         }
+
+        stopMotors(motorBL, motorBR, motorFL, motorFR);
+    }
+
+    public void turnFromCurrent(double angle, double speed, double tolerance) {
+        turnTo(getHeading() + angle, speed, tolerance);
     }
 
     public void toggleLift(int direction) throws InterruptedException{
@@ -452,16 +423,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         mIsColorSelected = true;
     }
 
-    public double getHeading() {
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        if (angles.firstAngle < 0){
-            return angles.firstAngle += 360;
-        }
-        else{
-            return angles.firstAngle;
-        }
-    }
-
     public Scalar convertScalarHsv2Rgba(Scalar hsvColor) {
         Mat pointMatRgba = new Mat();
         Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
@@ -483,36 +444,14 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         FtcRobotControllerActivity.mOpenCvCameraView.disableView();
     }
 
-    void composeTelemetry() {
-
-        telemetry.addAction(new Runnable() { @Override public void run() {
-            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            if(angles.firstAngle < 0){
-                angles.firstAngle += 360;
-                heading = angles.firstAngle + 360;
-            } else {
-                heading = angles.firstAngle;
-            }
+    public double getHeading() {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        if (angles.firstAngle < 0){
+            return angles.firstAngle += 360;
         }
-        });
-
-        telemetry.addLine()
-                .addData("heading", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, getHeading());
-                    }
-                })
-                .addData("heading", heading);
+        else{
+            return angles.firstAngle;
         }
-
-    String formatAngle(AngleUnit angleUnit, double angle) {
-        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
-
-    String formatDegrees(double degrees){
-        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
-    }
-
-
 }
 

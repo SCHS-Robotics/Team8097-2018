@@ -36,7 +36,7 @@ import static org.firstinspires.ftc.teamcode.Autonomous.Position.NOTCLOSE;
 import static org.firstinspires.ftc.teamcode.Autonomous.Team.BLUE;
 import static org.firstinspires.ftc.teamcode.Autonomous.Team.RED;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Autonomous", group ="Concept")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "Concept")
 public abstract class Autonomous extends BaseOpMode {
 
     public void hitJewel() {
@@ -47,9 +47,8 @@ public abstract class Autonomous extends BaseOpMode {
                 telemetry.addData("Color Blue", colorSensorArm.blue());
                 if (Math.abs(colorSensorArm.blue()) >= 20) {
                     servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-                }
-                else {
-                    servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
+                } else {
+                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
                 }
                 break;
             case RED:
@@ -57,9 +56,8 @@ public abstract class Autonomous extends BaseOpMode {
                 telemetry.update();
                 if (Math.abs(colorSensorArm.red()) >= 20) {
                     servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-                }
-                else {
-                    servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
+                } else {
+                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
                 }
                 break;
         }
@@ -71,42 +69,26 @@ public abstract class Autonomous extends BaseOpMode {
     }
 
     public void moveToCrypto() {
-        if (team == BLUE) {
-            try {
+        try {
+            if (team == BLUE) {
                 strafeLeftDistance(45, 0.5);
-            }
-            catch (InterruptedException e) {
-
-            }
-        }
-
-        else if(team == RED) {
-            try {
+            } else if (team == RED) {
                 strafeRightDistance(45, 0.5);
             }
-            catch (InterruptedException e) {
 
-            }
-        }
+            if (position == CLOSE) {
+                turnTo(180, 0.5, 10);
 
-        if (position == CLOSE) {
-            turnTo(180, 0.5, 10);
-
-        }
-
-        else if (position == NOTCLOSE) {
-            try {
+            } else if (position == NOTCLOSE) {
                 goForwardDistance(10, 0.5);
                 if (team == RED) {
                     turnTo(90, 0.5, 10);
-                }
-                else {
+                } else {
                     turnTo(270, 0.5, 10);
                 }
             }
-            catch (InterruptedException e) {
-
-            }
+        }
+        catch (InterruptedException e) {
         }
     }
 
@@ -121,12 +103,11 @@ public abstract class Autonomous extends BaseOpMode {
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mSpectrum = new Mat();
-        CONTOUR_COLOR = new Scalar(165,255,255,255);
+        CONTOUR_COLOR = new Scalar(165, 255, 255, 255);
         SPECTRUM_SIZE = new Size(200, 64);
 
         // The color that should be detected by default on start
         setDetectColor("brown");
-
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {

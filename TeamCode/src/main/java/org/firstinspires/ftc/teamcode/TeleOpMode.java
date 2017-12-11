@@ -79,9 +79,6 @@ public class TeleOpMode extends BaseOpMode {
     private int hitStatus = 2; //2 = autonomous 1 = teleop 0 = down
     private int grabStatus = 0; //0 = full open 1 = full closed 2 = half open
 
-
-    private int                 selectedAngle = 0;
-
     @Override
     public void runOpMode() {
 
@@ -96,8 +93,6 @@ public class TeleOpMode extends BaseOpMode {
         cooldown.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
 
-        composeTelemetry();
-
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double inputX = gamepad1.left_stick_x;
@@ -108,7 +103,6 @@ public class TeleOpMode extends BaseOpMode {
             // Telemetry fun
             telemetry.update();
 
-            telemetry.addData("Selected turn angle: ", selectedAngle);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
             telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
@@ -205,19 +199,19 @@ public class TeleOpMode extends BaseOpMode {
             }
 
             if(gamepad1.dpad_left && hitStatus == 0) {
-                servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
+                servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
             }
             else if (gamepad1.dpad_right && hitStatus == 0) {
                 servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
             }
 
             if(gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {
-                turnTo(selectedAngle, 0.75, 1);
+                turnFromCurrent(-90, 0.75, 5);
                 buttonLBCooldown = cooldown.time();
             }
 
             if(gamepad1.right_bumper && Math.abs(cooldown.time() - buttonRBCooldown) >= 1) {
-                selectTurnAngle();
+                turnFromCurrent(90, 0.75, 5);
                 buttonRBCooldown = cooldown.time();
             }
         }
@@ -265,20 +259,6 @@ public class TeleOpMode extends BaseOpMode {
         }
     }
 
-    public void selectTurnAngle() {
-
-        switch (selectedAngle) {
-            case 0: selectedAngle = 90;
-                break;
-            case 90: selectedAngle = 180;
-                break;
-            case 180: selectedAngle = 270;
-                break;
-            case 270: selectedAngle = 0;
-                break;
-        }
-    }
-
     // OpenCV functions
     public void onCameraViewStarted(int width, int height) {
 
@@ -290,9 +270,6 @@ public class TeleOpMode extends BaseOpMode {
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-
-        mRgba = inputFrame.rgba();
-
-        return mRgba;
+        return null;
     }
 }
