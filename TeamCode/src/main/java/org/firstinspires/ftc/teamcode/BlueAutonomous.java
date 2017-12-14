@@ -75,6 +75,7 @@ public class BlueAutonomous extends Autonomous {
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
             moveToCrypto();
+            break;
         }
     }
 }

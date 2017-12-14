@@ -82,9 +82,9 @@ public abstract class Autonomous extends BaseOpMode {
             } else if (position == NOTCLOSE) {
                 goForwardDistance(10, 0.5);
                 if (team == RED) {
-                    turnTo(90, 0.5, 10);
+                    turnRightFromCurrent(45, 0.5,10);
                 } else {
-                    turnTo(270, 0.5, 10);
+                    turnLeftFromCurrent(45, 0.5, 10);
                 }
             }
         }

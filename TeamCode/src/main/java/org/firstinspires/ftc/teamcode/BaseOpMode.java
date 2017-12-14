@@ -78,6 +78,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final double TICKS_PER_INCH_SIDE = 150;
 
     // Thing to compensate for imbalance, experimental value.
+    // It sure would be nice if I DIDN'T HAVE TO INCLUDE THIS, BUT SURELY IT WOULD BE TOO BIG OF A PROBLEM FOR HARDWARE TO FIX, NOW WOULDN'T IT
     final double DRIVE_WEIGHT_SCALAR = .68;
 
     final Scalar glyphBrownHSV = new Scalar(7.5, 50, 147.5);
@@ -274,10 +275,36 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         motorBL.setPower(-speed);
         motorBR.setPower(-speed);
-        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
-        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
 
-        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+        double leftScalar = DRIVE_WEIGHT_SCALAR;
+        double rightScalar = DRIVE_WEIGHT_SCALAR;
+        motorFL.setPower(speed * leftScalar);
+        motorFR.setPower(speed * rightScalar);
+
+        double initialHeading = getHeading();
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {
+            double currentHeading = getHeading();
+
+            if (initialHeading > currentHeading) {
+                rightScalar = DRIVE_WEIGHT_SCALAR + .15;
+                leftScalar = DRIVE_WEIGHT_SCALAR - .15;
+
+            } else if (initialHeading < currentHeading) {
+                leftScalar = DRIVE_WEIGHT_SCALAR + .15;
+                rightScalar = DRIVE_WEIGHT_SCALAR - .15;
+
+            } else {
+                leftScalar = DRIVE_WEIGHT_SCALAR;
+                rightScalar = DRIVE_WEIGHT_SCALAR;
+            }
+
+            motorFL.setPower(speed * leftScalar);
+            motorFR.setPower(speed * rightScalar);
+            telemetry.addData("Initial Heading ", initialHeading);
+            telemetry.addData("Current Heading ", getHeading());
+            telemetry.update();
+        }
 
         stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
@@ -298,10 +325,35 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         motorBL.setPower(-speed);
         motorBR.setPower(-speed);
-        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
-        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        double leftScalar = DRIVE_WEIGHT_SCALAR;
+        double rightScalar = DRIVE_WEIGHT_SCALAR;
+        motorFL.setPower(speed * leftScalar);
+        motorFR.setPower(speed * rightScalar);
 
-        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+        double initialHeading = getHeading();
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {
+            double currentHeading = getHeading();
+
+            if (initialHeading > currentHeading) {
+                leftScalar = DRIVE_WEIGHT_SCALAR + .15;
+                rightScalar = DRIVE_WEIGHT_SCALAR - .15;
+
+            } else if (initialHeading < currentHeading) {
+                rightScalar = DRIVE_WEIGHT_SCALAR + .15;
+                leftScalar = DRIVE_WEIGHT_SCALAR - .15;
+
+            } else {
+                leftScalar = DRIVE_WEIGHT_SCALAR;
+                rightScalar = DRIVE_WEIGHT_SCALAR;
+            }
+
+            motorFL.setPower(speed * leftScalar);
+            motorFR.setPower(speed * rightScalar);
+            telemetry.addData("Initial Heading ", initialHeading);
+            telemetry.addData("Current Heading ", getHeading());
+            telemetry.update();
+        }
 
         stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
