@@ -206,12 +206,12 @@ public class TeleOpMode extends BaseOpMode {
             }
 
             if(gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {
-                turnFromCurrent(-90, 0.75, 5);
+                turnLeftFromCurrent(90, 0.75, 15);
                 buttonLBCooldown = cooldown.time();
             }
 
             if(gamepad1.right_bumper && Math.abs(cooldown.time() - buttonRBCooldown) >= 1) {
-                turnFromCurrent(90, 0.75, 5);
+                turnRightFromCurrent(90, 0.75, 15);
                 buttonRBCooldown = cooldown.time();
             }
         }

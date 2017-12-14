@@ -78,7 +78,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final double TICKS_PER_INCH_SIDE = 150;
 
     // Thing to compensate for imbalance, experimental value.
-    final double DRIVE_WEIGHT_SCALAR = 1;
+    final double DRIVE_WEIGHT_SCALAR = .68;
 
     final Scalar glyphBrownHSV = new Scalar(7.5, 50, 147.5);
     final Scalar glyphBrownColorRadius = new Scalar(7.5, 105, 107.5);
@@ -140,10 +140,10 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
-        motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void resetEncoders(DcMotor...motors) {
@@ -166,56 +166,56 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     public void turnRight(double speed) {
         motorBL.setPower(-speed);
         motorBR.setPower(-speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(-speed);
+        motorFL.setPower(-speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(-speed * DRIVE_WEIGHT_SCALAR);
     }
 
     public void turnLeft(double speed) {
         motorBL.setPower(speed);
         motorBR.setPower(speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
     }
     
     public void goForward(double speed) {
         motorBL.setPower(speed);
         motorBR.setPower(-speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(-speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(-speed * DRIVE_WEIGHT_SCALAR);
     }
 
     public void goBackward(double speed) {
         motorBL.setPower(-speed);
         motorBR.setPower(speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(speed);
+        motorFL.setPower(-speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
     }
 
     public void goLeft(double speed) {
         motorBL.setPower(-speed);
         motorBR.setPower(-speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
     }
 
     public void goRight(double speed) {
         motorBL.setPower(speed);
         motorBR.setPower(speed);
-        motorFL.setPower(-speed);
-        motorFR.setPower(-speed);
+        motorFL.setPower(-speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(-speed * DRIVE_WEIGHT_SCALAR);
     }
 
     public void goDiagonalForwardRight(double speed) {
         motorBL.setPower(speed);
         motorBR.setPower(0);
         motorFL.setPower(0);
-        motorFR.setPower(-speed);
+        motorFR.setPower(-speed * DRIVE_WEIGHT_SCALAR);
     }
 
     public void goDiagonalForwardLeft(double speed) {
         motorBL.setPower(0);
         motorBR.setPower(-speed);
-        motorFL.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
         motorFR.setPower(0);
     }
 
@@ -223,7 +223,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         motorBL.setPower(0);
         motorBR.setPower(speed);
-        motorFL.setPower(-speed);
+        motorFL.setPower(-speed * DRIVE_WEIGHT_SCALAR);
         motorFR.setPower(0);
     }
 
@@ -231,7 +231,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorBL.setPower(-speed);
         motorBR.setPower(0);
         motorFL.setPower(0);
-        motorFR.setPower(speed);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
     }
 
     public void goForwardDistance(double distance, double speed) throws InterruptedException{
@@ -250,8 +250,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         motorBL.setPower(speed);
         motorBR.setPower(speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
 
         while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
 
@@ -274,15 +274,15 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         motorBL.setPower(-speed);
         motorBR.setPower(-speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
 
         while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
 
         stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
 
-    public void strafeRightDistance (double distance, double speed) throws InterruptedException{
+    public void strafeRightDistance (double distance, double speed) throws InterruptedException {
         double targetPosition = -distance * TICKS_PER_INCH_SIDE;
         resetEncoders(motorBL, motorBR, motorFL, motorFR);
 
@@ -298,8 +298,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
         motorBL.setPower(-speed);
         motorBR.setPower(-speed);
-        motorFL.setPower(speed);
-        motorFR.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
 
         while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
 
@@ -319,34 +319,26 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     public void turnTo(double angle, double speed, double tolerance) {
         double givenSpeed = speed;
 
-        while(Math.abs(getHeading() - angle) > tolerance) {
-            if (Math.abs(getHeading() - angle) < 40){
-                if (Math.abs(getHeading() - angle) < 20) {
-                    speed = 0.1;
-                }
-                else {
-                    speed = 0.2;
-                }
-            }
-            else {
-                speed = givenSpeed;
-            }
-
-            if (getHeading() > angle + tolerance) {
-                turnLeft(speed);
-            } else if (getHeading() < angle - tolerance){
+        while (opModeIsActive() && Math.abs(getHeading() - angle) > tolerance) {
+            if (getHeading() > angle) {
                 turnRight(speed);
+            } else {
+                turnLeft(speed);
             }
-
             telemetry.addData("Heading", getHeading());
             telemetry.update();
         }
-
         stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
 
-    public void turnFromCurrent(double angle, double speed, double tolerance) {
-        turnTo(getHeading() + angle, speed, tolerance);
+    public void turnRightFromCurrent(double angle, double speed, double tolerance) {
+        double turnAngle = getHeading() - Math.abs(angle);
+        turnTo(turnAngle, speed, tolerance);
+    }
+
+    public void turnLeftFromCurrent(double angle, double speed, double tolerance) {
+        double turnAngle = getHeading() + Math.abs(angle);
+        turnTo(turnAngle, speed, tolerance);
     }
 
     public void toggleLift(int direction) throws InterruptedException{
@@ -446,12 +438,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
     public double getHeading() {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        if (angles.firstAngle < 0){
-            return angles.firstAngle += 360;
-        }
-        else{
-            return angles.firstAngle;
-        }
+        return angles.firstAngle;
     }
 }
 
