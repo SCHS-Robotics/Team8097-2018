@@ -393,9 +393,10 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         turnTo(turnAngle, speed, tolerance);
     }
 
-    public void toggleLift(int direction) throws InterruptedException{
-        switch (direction) {
-            case 0:
+    public void toggleLift() throws InterruptedException{
+        switch (liftState) {
+            case DOWN:
+                liftState = LiftState.UP;
                 motorLeftLift.setTargetPosition(600);
                 motorRightLift.setTargetPosition(-600);
 
@@ -415,7 +416,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
                 break;
 
-            case 1:
+            case UP:
+                liftState = LiftState.DOWN;
                 motorLeftLift.setTargetPosition(0);
                 motorRightLift.setTargetPosition(0);
 
@@ -432,6 +434,15 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                break;
+        }
+    }
+
+    public void togglePusher() throws InterruptedException{
+        switch (pusherState) {
+            case IN:
+                break;
+            case OUT:
                 break;
         }
     }
@@ -492,5 +503,33 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
     }
+
+    enum PusherState {
+        IN,
+        OUT
+    }
+
+    enum LiftState {
+        UP,
+        DOWN
+    }
+
+    enum HitStatus {
+        INITIAL,
+        UP,
+        DOWN
+    }
+
+    enum GrabStatus {
+        OPEN,
+        CLOSE,
+        HALFOPEN
+    }
+
+    public PusherState pusherState;
+    public LiftState liftState;
+    public HitStatus hitStatus;
+    public GrabStatus grabStatus;
+
 }
 
