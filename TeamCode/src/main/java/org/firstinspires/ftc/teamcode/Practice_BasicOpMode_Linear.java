@@ -29,7 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -44,35 +50,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Autonomous")
-public class BlueAutonomous extends Autonomous {
-    private int timeThrough = 0;
+@TeleOp(name="Uselesscodes", group="Linear Opmode")
+public class Practice_BasicOpMode_Linear extends LinearOpMode {
+
+    // Declare OpMode members.
+    private ElapsedTime runtime = new ElapsedTime();
+    DcMotor frontright;
+
+    @Override
     public void runOpMode() {
-        ElapsedTime runtime = new ElapsedTime();
-        team = Team.BLUE;
-        position = Position.CLOSE;
 
-        initialize();
-
-        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
-        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-        servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
-
-        runtime.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        waitForStart();
-
-        while (opModeIsActive()) {
-            hitJewel();
-
-            servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
-            sleep(1000);
-            servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
-
-            moveToCrypto();
-            break;
-        }
     }
 }

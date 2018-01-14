@@ -64,10 +64,7 @@ public class RedAutonomous extends Autonomous {
         waitForStart();
 
         while (opModeIsActive()) {
-            if (timeThrough == 0) {
-                hitJewel();
-                timeThrough = 1;
-            }
+            hitJewel();
 
             servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
             sleep(1000);

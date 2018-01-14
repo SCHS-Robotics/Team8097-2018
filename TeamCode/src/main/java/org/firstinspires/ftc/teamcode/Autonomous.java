@@ -40,24 +40,39 @@ import static org.firstinspires.ftc.teamcode.Autonomous.Team.RED;
 public abstract class Autonomous extends BaseOpMode {
 
     public void hitJewel() {
+        servoLeftGrab.setPosition(0.3);
+        servoRightGrab.setPosition(0.7);
         setArmDown();
-        sleep(5000);
+        sleep(3000);
         switch (team) {
             case BLUE:
-                telemetry.addData("Color Blue", colorSensorArm.blue());
-                if (Math.abs(colorSensorArm.blue()) >= 20) {
-                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-                } else {
+                double totalBlue = 0;
+                setArmDown();
+                for (int i = 5; i > 0; i--) {
+                    totalBlue = totalBlue + colorSensorArm.blue();
+                }
+                totalBlue = totalBlue / 5;
+                telemetry.addData("Color Blue", totalBlue);
+                telemetry.update();
+                if (Math.abs(totalBlue) >= 22) {
                     servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+                } else if (Math.abs(colorSensorArm.red()) >= 22){
+                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
                 }
                 break;
             case RED:
-                telemetry.addData("Color Red", colorSensorArm.red());
+                double totalRed = 0;
+                setArmDown();
+                for (int i = 5; i > 0; i--) {
+                    totalRed = totalRed + colorSensorArm.red();
+                }
+                totalRed = totalRed / 5;
+                telemetry.addData("Color BRed", totalRed);
                 telemetry.update();
-                if (Math.abs(colorSensorArm.red()) >= 20) {
-                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-                } else {
+                if (Math.abs(totalRed) >= 22) {
                     servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+                } else if (Math.abs(totalRed) >= 22){
+                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
                 }
                 break;
         }
@@ -66,26 +81,45 @@ public abstract class Autonomous extends BaseOpMode {
     public void setArmDown() {
         servoVerticalHit.setPosition(VERTICAL_END_POS);
         servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
+        sleep(1000);
     }
 
     public void moveToCrypto() {
         try {
             if (team == BLUE) {
-                strafeLeftDistance(45, 0.5);
+                goForwardDistance(1, .5);
+                turnLeftFromCurrent(85, .5, 5);
+                goForwardDistance(25, .5);
             } else if (team == RED) {
-                strafeRightDistance(45, 0.5);
+                goForwardDistance(1, .5);
+                turnRightFromCurrent(85, .5, 5);
+                goForwardDistance(25, .5);
             }
 
             if (position == CLOSE) {
+                goForwardDistance(20, .5);
                 turnTo(180, 0.5, 10);
+                goForwardDistance(10, .5);
+                servoLeftGrab.setPosition(1);
+                servoRightGrab.setPosition(0);
+                goBackwardDistance(3, .5);
 
             } else if (position == NOTCLOSE) {
-                goForwardDistance(10, 0.5);
                 if (team == RED) {
-                    turnRightFromCurrent(45, 0.5,10);
+                    turnLeftFromCurrent(85, 0.5,10);
+                    goForwardDistance(10, 0.5);
+                    turnRightFromCurrent(85, 0.5, 10);
+                    goForwardDistance(5, .5);
                 } else {
-                    turnLeftFromCurrent(45, 0.5, 10);
+                    turnRightFromCurrent(85, 0.5, 10);
+                    goForwardDistance(10, 0.5);
+                    turnLeftFromCurrent(85, 0.5, 10);
+                    goForwardDistance(5, .5);
+
                 }
+                servoLeftGrab.setPosition(1);
+                servoRightGrab.setPosition(0);
+                goBackwardDistance(3, .5);
             }
         }
         catch (InterruptedException e) {

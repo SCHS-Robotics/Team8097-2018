@@ -73,7 +73,7 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     final double HORIZONTAL_RIGHT_END_POS = .537;
     final double HORIZONTAL_LEFT_END_POS = .271;
 
-    // TODO: Keep getting these over and over literally every time someone does something on hardware.
+    // TODO: Keep getting these over and over literally every time someone does something on hardware. You're gonna have a fun time doing it again :)
     final double TICKS_PER_INCH = 100;
     final double TICKS_PER_INCH_SIDE = 150;
 
@@ -259,6 +259,30 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         stopMotors(motorBL, motorBR, motorFL, motorFR);
     }
 
+    public void goBackwardDistance(double distance, double speed) throws InterruptedException{
+        double targetPosition = distance * TICKS_PER_INCH;
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        motorBL.setTargetPosition((int)targetPosition);
+        motorFL.setTargetPosition((int)targetPosition);
+        motorBR.setTargetPosition((int)-targetPosition);
+        motorFR.setTargetPosition((int)-targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(speed);
+        motorBR.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        stopMotors(motorBL, motorBR, motorFL, motorFR);
+    }
+
     public void strafeLeftDistance (double distance, double speed) throws InterruptedException{
         double targetPosition = -distance * TICKS_PER_INCH_SIDE;
         resetEncoders(motorBL, motorBR, motorFL, motorFR);
@@ -397,8 +421,8 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         switch (liftState) {
             case DOWN:
                 liftState = LiftState.UP;
-                motorLeftLift.setTargetPosition(600);
-                motorRightLift.setTargetPosition(-600);
+                motorLeftLift.setTargetPosition(800);
+                motorRightLift.setTargetPosition(-800);
 
                 motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);

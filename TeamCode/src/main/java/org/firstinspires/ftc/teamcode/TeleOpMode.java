@@ -183,7 +183,7 @@ public class TeleOpMode extends BaseOpMode {
             }
 
             if (gamepad1.y && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
-                if (hitStatus == HitStatus.DOWN) {
+                if (hitStatus == HitStatus.DOWN || hitStatus == HitStatus.INITIAL) {
                     hitStatus = HitStatus.UP;
                     servoHorizontalHit.setPosition(HORIZONTAL_TELEOP_START_POS);
                     servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
