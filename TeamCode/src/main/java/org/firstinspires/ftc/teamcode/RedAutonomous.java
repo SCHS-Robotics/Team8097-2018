@@ -45,7 +45,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Red Autonomous", group ="Autonomous")
-public class RedAutonomous extends Autonomous {
+public class RedAutonomous extends AutonomousNew {
     private int timeThrough = 0;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
@@ -54,17 +54,17 @@ public class RedAutonomous extends Autonomous {
 
         initialize();
 
-        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+        /*servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
+        servoRightGrab.setPosition(0);*/
 
         runtime.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
+        resetEncoders(motorBL, motorBR, motorFL, motorFR/*, motorLeftLift, motorRightLift*/);
         waitForStart();
 
         while (opModeIsActive()) {
-            if (timeThrough == 0) {
+            /*if (timeThrough == 0) {
                 hitJewel();
                 timeThrough = 1;
             }
@@ -72,7 +72,7 @@ public class RedAutonomous extends Autonomous {
             servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
             sleep(1000);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);*/
 
             moveToCrypto();
             break;
