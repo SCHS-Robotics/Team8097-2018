@@ -123,6 +123,24 @@ public class TeleOpModeNew extends BaseOpModeNew {
                 servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() - .005);
             }
 
+            if (gamepad1.right_stick_y >= .1) {
+                motorRelicArm.setPower(motorRelicArm.getPower() + .01);
+            }
+            else if (gamepad1.right_stick_y <= -.1) {
+                motorRelicArm.setPower(motorRelicArm.getPower() - .01);
+            }
+            else if (Math.abs(gamepad1.right_stick_y) <= .1 && Math.abs(motorRelicArm.getPower()) != 0){
+                if (motorRelicArm.getPower() >= .01) {
+                    motorRelicArm.setPower(motorRelicArm.getPower() - .01);
+                }
+                else if (motorRelicArm.getPower() <= -.01) {
+                    motorRelicArm.setPower(motorRelicArm.getPower() + .01);
+                }
+                else{
+                    motorRelicArm.setPower(0);
+                }
+            }
+
             if (gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= 1) {
                 if (handStatus == HandStatus.OPEN){
                     handStatus = HandStatus.CLOSE;
