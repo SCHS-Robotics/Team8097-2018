@@ -57,6 +57,8 @@ public class TeleOpModeNew extends BaseOpModeNew {
         telemetry.update();
 
         hitStatus = HitStatus.INITIAL;
+        grabStatus = GrabStatus.OPEN;
+        handStatus = HandStatus.OPEN;
 
         initialize();
 
@@ -65,7 +67,7 @@ public class TeleOpModeNew extends BaseOpModeNew {
 
         runtime.reset();
         cooldown.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorRelicArm);
 
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -121,15 +123,55 @@ public class TeleOpModeNew extends BaseOpModeNew {
                 servoHorizontalHit.setPosition(servoHorizontalHit.getPosition() - .005);
             }
 
+            if (gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= 1) {
+                if (handStatus == HandStatus.OPEN){
+                    handStatus = HandStatus.CLOSE;
+                    servoHand.setPosition(0);
+                }
+                else if (handStatus == HandStatus.CLOSE){
+                    handStatus = HandStatus.OPEN;
+                    servoHand.setPosition(0);
+                }
+                buttonACooldown = cooldown.time();
+            }
 
             if (gamepad1.y && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
                 if (hitStatus == HitStatus.DOWN) {
                     hitStatus = HitStatus.UP;
+                    servoHorizontalHit.setPosition(HORIZONTAL_TELEOP_START_POS);
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
                 }
                 else if (hitStatus == HitStatus.UP) {
                     hitStatus = HitStatus.DOWN;
+                    servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
+                    while (Math.abs(servoVerticalHit.getPosition() - VERTICAL_END_POS) >= .01) {
+                        servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .005);
+                    }
                 }
                 buttonYCooldown = cooldown.time();
+            }
+
+            if (gamepad1.b && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
+                if (grabStatus == GrabStatus.OPEN) {
+                    grabStatus = GrabStatus.CLOSE;
+                    servoLeftGrab.setPosition(0);
+                }
+                else if (grabStatus == GrabStatus.CLOSE) {
+                    grabStatus = GrabStatus.HALFOPEN;
+                    servoLeftGrab.setPosition(0);
+                }
+                else if (grabStatus == GrabStatus.HALFOPEN) {
+                    grabStatus = GrabStatus.OPEN;
+                    servoLeftGrab.setPosition(0);
+                }
+                buttonBCooldown = cooldown.time();
+            }
+
+            if(gamepad1.dpad_left && hitStatus == HitStatus.DOWN) {
+                servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+            }
+            else if (gamepad1.dpad_right && hitStatus == HitStatus.DOWN) {
+                servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
             }
 
             if(gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {

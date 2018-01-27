@@ -26,6 +26,7 @@ public abstract class AutonomousNew extends BaseOpModeNew {
 
     public void hitJewel() {
         setArmDown();
+
         sleep(5000);
         switch (team) {
             case BLUE:
