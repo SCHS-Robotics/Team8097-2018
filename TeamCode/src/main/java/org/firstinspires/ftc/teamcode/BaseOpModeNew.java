@@ -27,13 +27,11 @@ public abstract class BaseOpModeNew extends LinearOpMode implements CameraBridge
     Servo servoHorizontalHit;
     Servo servoVerticalHit;
     Servo servoLeftGrab;
-    Servo servoHand;
 
     DcMotor motorBL;
     DcMotor motorBR;
     DcMotor motorFL;
     DcMotor motorFR;
-    DcMotor motorRelicArm;
 
     BNO055IMU imu;
 
@@ -47,14 +45,14 @@ public abstract class BaseOpModeNew extends LinearOpMode implements CameraBridge
     final double TICKS_PER_INCH = 100;
     final double TICKS_PER_INCH_SIDE = 150;
 
-    final double VERTICAL_AUTO_START_POS = .031;
-    final double HORIZONTAL_AUTO_START_POS = .46;
+    final double VERTICAL_AUTO_START_POS = 1;
+    final double HORIZONTAL_AUTO_START_POS = .54;
     final double VERTICAL_TELEOP_START_POS = .576;
     final double HORIZONTAL_TELEOP_START_POS = .404;
-    final double VERTICAL_END_POS = 1.0;
-    final double HORIZONTAL_END_POS = .404;
-    final double HORIZONTAL_RIGHT_END_POS = .537;
-    final double HORIZONTAL_LEFT_END_POS = .271;
+    final double VERTICAL_END_POS = 0;
+    final double HORIZONTAL_END_POS = .4;
+    final double HORIZONTAL_RIGHT_END_POS = .463;
+    final double HORIZONTAL_LEFT_END_POS = .2;
 
     // Thing to compensate for imbalance, experimental value.
     // It sure would be nice if I DIDN'T HAVE TO INCLUDE THIS, BUT SURELY IT WOULD BE TOO BIG OF A PROBLEM FOR HARDWARE TO FIX, NOW WOULDN'T IT
@@ -94,20 +92,18 @@ public abstract class BaseOpModeNew extends LinearOpMode implements CameraBridge
         colorSensorArm = hardwareMap.colorSensor.get("colorSense");
         colorSensorArm.setI2cAddress(I2cAddr.create7bit(0x39));
         colorSensorArm.enableLed(false);
-
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
         servoHorizontalHit = hardwareMap.servo.get("servoHorizontalHit");
         servoVerticalHit = hardwareMap.servo.get("servoVerticalHit");
-        servoHand = hardwareMap.servo.get("servoHand");
+        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
 
         // Creating motors
         motorBL = hardwareMap.dcMotor.get("motorBackLeft");
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
-        motorRelicArm = hardwareMap.dcMotor.get("motorRelicArm");
 
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

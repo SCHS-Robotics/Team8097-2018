@@ -26,22 +26,49 @@ public abstract class AutonomousNew extends BaseOpModeNew {
 
     public void hitJewel() {
         setArmDown();
-
-        sleep(5000);
+        sleep(3000);
         switch (team) {
             case BLUE:
-                break;
+
+                telemetry.update();
+                if ((colorSensorArm.red() - colorSensorArm.blue()) >= 7) {
+                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
+                    sleep(100);
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
+                } else if ((colorSensorArm.blue() - colorSensorArm.red()) >= 7){
+                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+                    sleep(100);
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
+                } else {
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
+                }
             case RED:
+                telemetry.addData("Color Red", colorSensorArm.red());
+                telemetry.addData("Color Blue", colorSensorArm.blue());
+                telemetry.addData("Red - blue", Math.abs(colorSensorArm.red()) - Math.abs(colorSensorArm.blue()));
+                telemetry.addData("Blue - red", Math.abs(colorSensorArm.blue()) - Math.abs(colorSensorArm.red()));
+
+                telemetry.update();
+                if ((colorSensorArm.blue() - colorSensorArm.red()) > 7) {
+                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
+                } else if ((colorSensorArm.red() - colorSensorArm.blue()) > 7){
+                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+                } else {
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
+                }
                 break;
         }
     }
 
     public void setArmDown() {
-        //TODO
+        servoVerticalHit.setPosition(VERTICAL_END_POS);
+        servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
     }
 
     public void moveToCrypto() {
         try {
+            goForwardDistance(1, 0.25);
+
             if (team == BLUE) {
                 strafeLeftDistance(45, 0.5);
             } else if (team == RED) {

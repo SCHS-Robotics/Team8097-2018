@@ -54,30 +54,31 @@ public class BlueAutonomous extends AutonomousNew {
 
         initialize();
 
-/*
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
-*/
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR/*, motorLeftLift, motorRightLift*/);
         waitForStart();
 
         while (opModeIsActive()) {
-/*            if (timeThrough == 0) {
+            telemetry.addData("Color Blue", colorSensorArm.blue());
+            telemetry.addData("Color Red", colorSensorArm.red());
+            telemetry.addData("Red - blue", Math.abs(colorSensorArm.red()) - Math.abs(colorSensorArm.blue()));
+            telemetry.addData("Blue - red", Math.abs(colorSensorArm.blue()) - Math.abs(colorSensorArm.red()));
+            telemetry.update();
+
+            if (timeThrough == 0) {
                 hitJewel();
                 timeThrough = 1;
             }
 
-            servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
-            sleep(1000);
+            sleep(500);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);*/
+            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
             moveToCrypto();
-            break;
-        }
+            break;}
     }
 }

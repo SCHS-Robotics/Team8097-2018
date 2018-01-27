@@ -45,20 +45,25 @@ public abstract class Autonomous extends BaseOpMode {
         switch (team) {
             case BLUE:
                 telemetry.addData("Color Blue", colorSensorArm.blue());
-                if (Math.abs(colorSensorArm.blue()) >= 20) {
-                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-                } else {
-                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
-                }
+//                if (Math.abs(colorSensorArm.blue()) >= 27) {
+//                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
+//                } else if (Math.abs(colorSensorArm.red()) >= 27){
+//                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+//                }
+
+
                 break;
             case RED:
                 telemetry.addData("Color Red", colorSensorArm.red());
                 telemetry.update();
-                if (Math.abs(colorSensorArm.red()) >= 20) {
-                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-                } else {
-                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
-                }
+//                if (Math.abs(colorSensorArm.red()) >= 27) {
+//                    servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
+//                } else if (Math.abs(colorSensorArm.blue()) >= 27){
+//                    servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+//                }
+
+
+
                 break;
         }
     }
