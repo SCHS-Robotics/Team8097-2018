@@ -512,9 +512,9 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         HALFOPEN
     }
 
-    public LiftState liftState;
-    public HitStatus hitStatus;
-    public GrabStatus grabStatus;
+    protected LiftState liftState;
+    protected HitStatus hitStatus;
+    protected GrabStatus grabStatus;
 
 }
 
