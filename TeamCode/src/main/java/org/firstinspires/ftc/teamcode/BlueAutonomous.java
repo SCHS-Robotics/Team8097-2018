@@ -29,9 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -46,40 +44,41 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Concept")
-public class BlueAutonomous extends Autonomous {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Autonomous")
+public class BlueAutonomous extends AutonomousNew {
     private int timeThrough = 0;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
+        team = Team.BLUE;
+        position = Position.CLOSE;
 
         initialize();
 
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
 
         runtime.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
+        resetEncoders(motorBL, motorBR, motorFL, motorFR/*, motorLeftLift, motorRightLift*/);
         waitForStart();
 
         while (opModeIsActive()) {
+            telemetry.addData("Color Blue", colorSensorArm.blue());
+            telemetry.addData("Color Red", colorSensorArm.red());
+            telemetry.addData("Red - blue", Math.abs(colorSensorArm.red()) - Math.abs(colorSensorArm.blue()));
+            telemetry.addData("Blue - red", Math.abs(colorSensorArm.blue()) - Math.abs(colorSensorArm.red()));
+            telemetry.update();
+
             if (timeThrough == 0) {
-                hitJewel("blue");
+                hitJewel();
                 timeThrough = 1;
             }
 
-            servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
-            sleep(1000);
+            sleep(500);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
-            try {
-                strafeRightDistance(45, 0.5);
-                sleep(25000);
-            } catch (InterruptedException e) {
-
-            }
-        }
+            moveToCrypto();
+            break;}
     }
 }

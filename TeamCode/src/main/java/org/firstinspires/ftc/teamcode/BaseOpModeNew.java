@@ -1,60 +1,37 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Camera;
-import android.graphics.drawable.ScaleDrawable;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cAddr;
-import com.qualcomm.robotcore.hardware.I2cDevice;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorREVColorDistance;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-
-import java.util.HashMap;
-import java.util.Locale;
-
-public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
+public abstract class BaseOpModeNew extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2{
 
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
-
-    Servo servoLeftGrab;
-    Servo servoRightGrab;
     Servo servoHorizontalHit;
     Servo servoVerticalHit;
+    Servo servoLeftGrab;
 
     DcMotor motorBL;
     DcMotor motorBR;
     DcMotor motorFL;
     DcMotor motorFR;
-    DcMotor motorLeftLift;
-    DcMotor motorRightLift;
 
     BNO055IMU imu;
 
@@ -64,22 +41,22 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     Orientation angles;
     double heading;
 
-    final double VERTICAL_AUTO_START_POS = .031;
-    final double HORIZONTAL_AUTO_START_POS = .46;
-    final double VERTICAL_TELEOP_START_POS = .576;
-    final double HORIZONTAL_TELEOP_START_POS = .404;
-    final double VERTICAL_END_POS = 1.0;
-    final double HORIZONTAL_END_POS = .404;
-    final double HORIZONTAL_RIGHT_END_POS = .537;
-    final double HORIZONTAL_LEFT_END_POS = .271;
-
     // TODO: Keep getting these over and over literally every time someone does something on hardware.
     final double TICKS_PER_INCH = 100;
     final double TICKS_PER_INCH_SIDE = 150;
 
+    final double VERTICAL_AUTO_START_POS = 1;
+    final double HORIZONTAL_AUTO_START_POS = .54;
+    final double VERTICAL_TELEOP_START_POS = .576;
+    final double HORIZONTAL_TELEOP_START_POS = .404;
+    final double VERTICAL_END_POS = 0;
+    final double HORIZONTAL_END_POS = .4;
+    final double HORIZONTAL_RIGHT_END_POS = .463;
+    final double HORIZONTAL_LEFT_END_POS = .2;
+
     // Thing to compensate for imbalance, experimental value.
     // It sure would be nice if I DIDN'T HAVE TO INCLUDE THIS, BUT SURELY IT WOULD BE TOO BIG OF A PROBLEM FOR HARDWARE TO FIX, NOW WOULDN'T IT
-    final double DRIVE_WEIGHT_SCALAR = .68;
+    final double DRIVE_WEIGHT_SCALAR = 1;
 
     final Scalar glyphBrownHSV = new Scalar(7.5, 50, 147.5);
     final Scalar glyphBrownColorRadius = new Scalar(7.5, 105, 107.5);
@@ -115,30 +92,24 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         colorSensorArm = hardwareMap.colorSensor.get("colorSense");
         colorSensorArm.setI2cAddress(I2cAddr.create7bit(0x39));
         colorSensorArm.enableLed(false);
-
-        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
-        servoHorizontalHit = hardwareMap.servo.get("servoHorizontalHit");
-        servoVerticalHit = hardwareMap.servo.get("servoVerticalHit");
-
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        servoHorizontalHit = hardwareMap.servo.get("servoHorizontalHit");
+        servoVerticalHit = hardwareMap.servo.get("servoVerticalHit");
+        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
 
         // Creating motors
         motorBL = hardwareMap.dcMotor.get("motorBackLeft");
         motorBR = hardwareMap.dcMotor.get("motorBackRight");
         motorFL = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFR = hardwareMap.dcMotor.get("motorFrontRight");
-        motorLeftLift = hardwareMap.dcMotor.get("motorLiftLeft");
-        motorRightLift = hardwareMap.dcMotor.get("motorLiftRight");
 
         // Setting up encoders
         motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Testing, ignore this for now. Allows the motors to "coast" instead of active braking.
         motorBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -393,51 +364,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         turnTo(turnAngle, speed, tolerance);
     }
 
-    public void toggleLift() throws InterruptedException{
-        switch (liftState) {
-            case DOWN:
-                liftState = LiftState.UP;
-                motorLeftLift.setTargetPosition(600);
-                motorRightLift.setTargetPosition(-600);
-
-                motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                motorLeftLift.setPower(-.20);
-                motorRightLift.setPower(-.20);
-
-                while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
-
-                motorRightLift.setPower(0);
-                motorLeftLift.setPower(0);
-
-                motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-                break;
-
-            case UP:
-                liftState = LiftState.DOWN;
-                motorLeftLift.setTargetPosition(0);
-                motorRightLift.setTargetPosition(0);
-
-                motorLeftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motorRightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                motorLeftLift.setPower(.20);
-                motorRightLift.setPower(.20);
-
-                while (motorLeftLift.isBusy() && motorRightLift.isBusy()) {}
-
-                motorRightLift.setPower(0);
-                motorLeftLift.setPower(0);
-
-                motorLeftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                motorRightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                break;
-        }
-    }
-
     // OpenCV code
     public void setDetectColor(String newColor) {
         mIsColorSelected = false;
@@ -495,11 +421,6 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         return angles.firstAngle;
     }
 
-    enum LiftState {
-        UP,
-        DOWN
-    }
-
     enum HitStatus {
         INITIAL,
         UP,
@@ -512,9 +433,13 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         HALFOPEN
     }
 
-    protected LiftState liftState;
+    enum HandStatus {
+        OPEN,
+        CLOSE
+    }
+
     protected HitStatus hitStatus;
     protected GrabStatus grabStatus;
-
+    protected HandStatus handStatus;
 }
 

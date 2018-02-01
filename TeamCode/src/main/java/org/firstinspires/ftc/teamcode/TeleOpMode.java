@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.sun.tools.javac.comp.Todo;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -60,12 +61,8 @@ import org.opencv.videoio.VideoCapture;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-
-/**
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-public class BasicOpMode_Linear extends BaseOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpMode", group="Linear Opmode")
+public class TeleOpMode extends BaseOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -79,22 +76,22 @@ public class BasicOpMode_Linear extends BaseOpMode {
     private double                 buttonXCooldown;
     private double                 buttonYCooldown;
 
-    private int liftDirection = 0; //0 = Down 1 = Up
-    private int hitStatus = 2; //2 = autonomous 1 = teleop 0 = down
-    private int grabStatus = 0; //0 = full open 1 = full closed 2 = half open
-
-
-    private int                 selectedAngle = 0;
-
     @Override
     public void runOpMode() {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        initialize();
-        startOpenCV(this);
+        liftState = LiftState.DOWN;
+        grabStatus = GrabStatus.OPEN;
+        hitStatus = HitStatus.INITIAL;
 
+        initialize();
+        servoLeftGrab.setPosition(1);
+        servoRightGrab.setPosition(0);
+
+        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
@@ -102,7 +99,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
         cooldown.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
 
-        composeTelemetry();
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double inputX = gamepad1.left_stick_x;
@@ -113,10 +109,7 @@ public class BasicOpMode_Linear extends BaseOpMode {
             // Telemetry fun
             telemetry.update();
 
-//            telemetry.addData("Servo Camera Pos: ", servoCamera.getPosition());
-            telemetry.addData("Selected turn angle: ", selectedAngle);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Glyph Detection Color", detectColor);
             telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
             telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
             telemetry.addData("Color Sense Red", colorSensorArm.red());
@@ -164,59 +157,38 @@ public class BasicOpMode_Linear extends BaseOpMode {
             }
 
             if(gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= .2) {
-                if (grabStatus == 0) {
-                    grabStatus = 1;
+                if (grabStatus == GrabStatus.OPEN) {
+                    grabStatus = GrabStatus.CLOSE;
                     servoLeftGrab.setPosition(0.3);
                     servoRightGrab.setPosition(0.7);
-                } else if (grabStatus == 2){
-                    grabStatus = 0;
+                } else if (grabStatus == GrabStatus.HALFOPEN){
+                    grabStatus = GrabStatus.OPEN;
                     servoLeftGrab.setPosition(1);
                     servoRightGrab.setPosition(0);
                 } else {
-                    grabStatus = 2;
+                    grabStatus = GrabStatus.HALFOPEN;
                     servoLeftGrab.setPosition(.6);
                     servoRightGrab.setPosition(.4);
                 }
                 buttonACooldown = cooldown.time();
             }
 
-            if(gamepad1.b && Math.abs(cooldown.time() - buttonBCooldown) >= 1) {
-                switch (detectColor){
-                    case "brown": setDetectColor("gray");
-                        break;
-                    case "gray": setDetectColor("red");
-                        break;
-                    case "red": setDetectColor("blue");
-                        break;
-                    case "blue": setDetectColor("brown");
-                        break;
-                }
-                buttonBCooldown = cooldown.time();
-            }
-
             if (gamepad1.x && Math.abs(cooldown.time() - buttonXCooldown) >= 1) {
                 try {
-                    if (liftDirection == 0){
-                        liftDirection = 1;
-                        toggleLift(0);
-                    }
-                    else {
-                        liftDirection = 0;
-                        toggleLift(1);
-                    }
+                    toggleLift();
                 } catch (InterruptedException e) {}
 
                 buttonXCooldown = cooldown.time();
             }
 
             if (gamepad1.y && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
-                if (hitStatus != 1) {
-                    hitStatus = 1;
+                if (hitStatus == HitStatus.DOWN) {
+                    hitStatus = HitStatus.UP;
                     servoHorizontalHit.setPosition(HORIZONTAL_TELEOP_START_POS);
                     servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
                 }
-                else if (hitStatus == 1) {
-                    hitStatus = 0;
+                else if (hitStatus == HitStatus.UP) {
+                    hitStatus = HitStatus.DOWN;
                     servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
                     while (Math.abs(servoVerticalHit.getPosition() - VERTICAL_END_POS) >= .01) {
                         servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .005);
@@ -225,26 +197,23 @@ public class BasicOpMode_Linear extends BaseOpMode {
                 buttonYCooldown = cooldown.time();
             }
 
-            if(gamepad1.dpad_left && hitStatus == 0) {
-                servoHorizontalHit.setPosition(HORIZONTAN_LEFT_END_POS);
+            if(gamepad1.dpad_left && hitStatus == HitStatus.DOWN) {
+                servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
             }
-            else if (gamepad1.dpad_right && hitStatus == 0) {
+            else if (gamepad1.dpad_right && hitStatus == HitStatus.DOWN) {
                 servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
             }
 
             if(gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {
-                turnTo(selectedAngle, 0.75, 1);
+                turnLeftFromCurrent(90, 0.75, 15);
                 buttonLBCooldown = cooldown.time();
             }
 
             if(gamepad1.right_bumper && Math.abs(cooldown.time() - buttonRBCooldown) >= 1) {
-                selectTurnAngle();
+                turnRightFromCurrent(90, 0.75, 15);
                 buttonRBCooldown = cooldown.time();
             }
         }
-
-        stopOpenCV();
-
     }
 
     // Direction Functions
@@ -289,32 +258,8 @@ public class BasicOpMode_Linear extends BaseOpMode {
         }
     }
 
-    public void selectTurnAngle() {
-
-        switch (selectedAngle) {
-            case 0: selectedAngle = 90;
-                break;
-            case 90: selectedAngle = 180;
-                break;
-            case 180: selectedAngle = 270;
-                break;
-            case 270: selectedAngle = 0;
-                break;
-        }
-    }
-
     // OpenCV functions
     public void onCameraViewStarted(int width, int height) {
-
-        // Creating display, color detector, defining variables for outlines (contours), not sure what a spectrum is, but we should figure that out
-        mRgba = new Mat(height, width, CvType.CV_8UC4);
-        mDetector = new ColorBlobDetector();
-        mSpectrum = new Mat();
-        CONTOUR_COLOR = new Scalar(165,255,255,255);
-        SPECTRUM_SIZE = new Size(200, 64);
-
-        // The color that should be detected by default on start
-        setDetectColor("brown");
 
     }
 
@@ -324,20 +269,6 @@ public class BasicOpMode_Linear extends BaseOpMode {
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-
-        mRgba = inputFrame.rgba();
-        if (mIsColorSelected) {
-            mDetector.process(mRgba);
-            List<MatOfPoint> contours = mDetector.getContours();
-            Log.e("Tag", "Contours count: " + contours.size());
-            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-
-            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
-            colorLabel.setTo(mBlobColorRgba);
-
-            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
-            mSpectrum.copyTo(spectrumLabel);
-        }
-        return mRgba;
+        return null;
     }
 }
