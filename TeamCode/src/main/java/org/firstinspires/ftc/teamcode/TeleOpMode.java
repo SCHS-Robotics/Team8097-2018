@@ -84,11 +84,11 @@ public class TeleOpMode extends BaseOpMode {
 
         liftState = LiftState.DOWN;
         grabStatus = GrabStatus.OPEN;
-        hitStatus = HitStatus.INITIAL;
+        hitStatus = HitStatus.DOWN;
 
         initialize();
-        servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
+        //servoLeftGrab.setPosition(1);
+        //servoRightGrab.setPosition(0);
 
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
@@ -112,8 +112,6 @@ public class TeleOpMode extends BaseOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
             telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
-            telemetry.addData("Color Sense Red", colorSensorArm.red());
-            telemetry.addData("Color Sense Blue", colorSensorArm.blue());
             telemetry.addData("Motor BL Pos", motorBL.getCurrentPosition());
             telemetry.addData("Motor BR Pos", motorBR.getCurrentPosition());
             telemetry.addData("Motor FL Pos", motorFL.getCurrentPosition());

@@ -58,19 +58,20 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
     BNO055IMU imu;
 
-    ColorSensor colorSensorArm;
+    ColorSensor colorSensorLeft;
+    ColorSensor colorSensorRight;
 
     // State used for updating telemetry
     Orientation angles;
     double heading;
 
     final double VERTICAL_AUTO_START_POS = 1;
-    final double HORIZONTAL_AUTO_START_POS = .54;
+    final double HORIZONTAL_AUTO_START_POS = .4;
     final double VERTICAL_TELEOP_START_POS = .576;
     final double HORIZONTAL_TELEOP_START_POS = .404;
     final double VERTICAL_END_POS = 0;
     final double HORIZONTAL_END_POS = .4;
-    final double HORIZONTAL_RIGHT_END_POS = .463;
+    final double HORIZONTAL_RIGHT_END_POS = .6;
     final double HORIZONTAL_LEFT_END_POS = .2;
 
     // TODO: Keep getting these over and over literally every time someone does something on hardware.
@@ -112,12 +113,17 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        colorSensorArm = hardwareMap.colorSensor.get("colorSense");
-        colorSensorArm.setI2cAddress(I2cAddr.create7bit(0x39));
-        colorSensorArm.enableLed(false);
+        colorSensorLeft = hardwareMap.colorSensor.get("colorSenseLeft");
+        colorSensorLeft.setI2cAddress(I2cAddr.create7bit(0x39));
+        colorSensorLeft.enableLed(false);
+        colorSensorRight = hardwareMap.colorSensor.get("colorSenseRight");
+        colorSensorRight.setI2cAddress(I2cAddr.create7bit(0x40));
+        colorSensorRight.enableLed(false);
 
-        servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-        servoRightGrab = hardwareMap.servo.get("servoRightGrab");
+
+
+        //servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
+        //servoRightGrab = hardwareMap.servo.get("servoRightGrab");
         servoHorizontalHit = hardwareMap.servo.get("servoHorizontalHit");
         servoVerticalHit = hardwareMap.servo.get("servoVerticalHit");
 

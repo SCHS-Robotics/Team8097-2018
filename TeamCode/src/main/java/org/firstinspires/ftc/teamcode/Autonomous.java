@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
@@ -38,18 +39,17 @@ import static org.firstinspires.ftc.teamcode.Autonomous.Team.RED;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "Concept")
 public abstract class Autonomous extends BaseOpMode {
-
     public void hitJewel() {
         setArmDown();
         sleep(5000);
         switch (team) {
             case BLUE:
                 telemetry.update();
-                if ((colorSensorArm.red() - colorSensorArm.blue()) >= 7) {
+                if ((colorSensorLeft.blue() - colorSensorLeft.red() >= 7)) {
                     servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
                     sleep(100);
                     servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
-                } else if ((colorSensorArm.blue() - colorSensorArm.red()) >= 7){
+                } else if ((colorSensorLeft.red() - colorSensorLeft.blue() >= 7)){
                     servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
                     sleep(100);
                     servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
@@ -57,16 +57,15 @@ public abstract class Autonomous extends BaseOpMode {
                     servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
                 }
             case RED:
-                telemetry.addData("Color Red", colorSensorArm.red());
-                telemetry.addData("Color Blue", colorSensorArm.blue());
-                telemetry.addData("Red - blue", Math.abs(colorSensorArm.red()) - Math.abs(colorSensorArm.blue()));
-                telemetry.addData("Blue - red", Math.abs(colorSensorArm.blue()) - Math.abs(colorSensorArm.red()));
-
                 telemetry.update();
-                if ((colorSensorArm.blue() - colorSensorArm.red()) > 7) {
+                if ((colorSensorLeft.red() - colorSensorLeft.blue() >= 7)) {
                     servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
-                } else if ((colorSensorArm.red() - colorSensorArm.blue()) > 7){
+                    sleep(100);
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
+                } else if ((colorSensorLeft.blue() - colorSensorLeft.red() >= 7)){
                     servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
+                    sleep(100);
+                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
                 } else {
                     servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
                 }
@@ -84,44 +83,48 @@ public abstract class Autonomous extends BaseOpMode {
             goForwardDistance(1, 0.25);
 
             if (team == BLUE) {
-                turnLeftFromCurrent(45, 0.5, 5);
+                turnLeftFromCurrent(90, 0.5, 5);
             } else if (team == RED) {
-                turnRightFromCurrent(45, 0.5, 5);
+                turnRightFromCurrent(90, 0.5, 5);
             }
 
-            goForwardDistance(10, .5);
+            goForwardDistance(20, .5);
 
             if (position == CLOSE) {
                 turnTo(180, 0.5, 10);
                 goForwardDistance(2, .5);
-                servoLeftGrab.setPosition(0.3);
-                servoRightGrab.setPosition(0.7);
+//                servoLeftGrab.setPosition(0.3);
+//                servoRightGrab.setPosition(0.7);
                 goBackwardDistance(1 , .5);
 
             } else if (position == NOTCLOSE) {
                 goForwardDistance(10, 0.5);
                 if (team == RED) {
-                    turnRightFromCurrent(90, 0.5,5);
+                    turnLeftFromCurrent(90, 0.5,5);
                 } else {
-                    turnLeftFromCurrent(90, 0.5, 5);
+                    turnRightFromCurrent(90, 0.5, 5);
                 }
-
-                goForwardDistance(3, .5);
-
-                if (team == RED) {
-                    turnRightFromCurrent(90, 0.5,5);
-                } else {
-                    turnLeftFromCurrent(90, 0.5, 5);
-                }
-
-                goForwardDistance(2, .5);
-                servoLeftGrab.setPosition(0.3);
-                servoRightGrab.setPosition(0.7);
-                goBackwardDistance(1 , .5);
             }
         }
         catch (InterruptedException e) {
         }
+    }
+
+    public void alignToCrypto(int num) {
+        try {
+            goForwardDistance(6 + (8 * (num - 1)), .5);
+
+            if (team == RED) {
+                turnRightFromCurrent(90, 0.5, 5);
+            } else {
+                turnLeftFromCurrent(90, 0.5, 5);
+            }
+
+            goForwardDistance(10, .5);
+//                servoLeftGrab.setPosition(0.3);
+//                servoRightGrab.setPosition(0.7);
+            goBackwardDistance(1, .5);
+        } catch (InterruptedException e) {}
     }
 
     public void onCameraViewStopped() {
@@ -158,6 +161,18 @@ public abstract class Autonomous extends BaseOpMode {
             mSpectrum.copyTo(spectrumLabel);
         }
         return mRgba;
+    }
+
+    public int targetColumnDistance(RelicRecoveryVuMark vuMarkFound) {
+        switch (vuMarkFound) {
+            case RIGHT:
+                return 1;
+            case CENTER:
+                return 2;
+            case LEFT:
+                return 3;
+        }
+        return 0;
     }
 
     enum Team {

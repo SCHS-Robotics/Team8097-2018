@@ -31,6 +31,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -51,25 +57,44 @@ public class BlueAutonomous extends Autonomous {
         team = Team.BLUE;
         position = Position.CLOSE;
 
-        initialize();
+        // Lazily added vuforia, add to each autonomous
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = "AWRsObH/////AAAAGU5bp4bnDkCYjwnKsD5okRCL7t6ejVuLHi3TwTkPTSo+EuLnlmB+G2Rz4GOel217l0cjjlYjJfot5pvsspqgEUJvtNDeoOacTA3bzKaeAFUoBeQA2r3VwolpdWR/6xxq9EraYiLIkOLee51c2Uqtzlvk8Qav301W2TJOdPbotZUAndR6QlIQ7m2UVZWY+2qlenB36jIF3ZGotK/QwihY0/96KWzHtbIPUheU4CiJmRlIi3xMGREt3SYgcPV3L/WMPi+WW7GSSoh9IVaVnfGmTZD2cWSGeB/x4RDHdUbePjZrEQ1OPNR/LvjbRYWkX+QgQUqmyff0/Etuf9o0oJ9PlYeeteZPv1m/2hiB/mUG9tz1";
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        VuforiaLocalizer  vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+        VuforiaTrackables relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
+        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate");
+        RelicRecoveryVuMark vuMark = null;
 
-        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
-        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-        servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
+        initialize();
+//        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+//        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+//        servoLeftGrab.setPosition(1);
+//        servoRightGrab.setPosition(0);
+
+        relicTrackables.activate();
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
         waitForStart();
-
+        telemetry.addData("VuMark", vuMark = RelicRecoveryVuMark.from(relicTemplate));
         while (opModeIsActive()) {
+            do {
+                vuMark = RelicRecoveryVuMark.from(relicTemplate);
+                telemetry.update();
+            } while(vuMark == RelicRecoveryVuMark.UNKNOWN);
             hitJewel();
+            telemetry.update();
 
             sleep(500);
-            servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+//            servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+//            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
             moveToCrypto();
-            break;}
+            alignToCrypto(targetColumnDistance(vuMark));
+            break;
+        }
     }
 }
