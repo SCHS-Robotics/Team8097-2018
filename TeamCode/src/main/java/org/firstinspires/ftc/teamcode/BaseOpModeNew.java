@@ -206,14 +206,14 @@ public abstract class BaseOpModeNew extends LinearOpMode implements CameraBridge
         motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
     }
 
-    public void goForwardDistance(double distance, double speed) throws InterruptedException{
+    public void goForwardDistance(double distance, double speed) throws InterruptedException {
         double targetPosition = -distance * TICKS_PER_INCH;
         resetEncoders(motorBL, motorBR, motorFL, motorFR);
 
-        motorBL.setTargetPosition((int)targetPosition);
-        motorFL.setTargetPosition((int)targetPosition);
-        motorBR.setTargetPosition((int)-targetPosition);
-        motorFR.setTargetPosition((int)-targetPosition);
+        motorBL.setTargetPosition((int) targetPosition);
+        motorFL.setTargetPosition((int) targetPosition);
+        motorBR.setTargetPosition((int) -targetPosition);
+        motorFR.setTargetPosition((int) -targetPosition);
 
         motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -225,7 +225,8 @@ public abstract class BaseOpModeNew extends LinearOpMode implements CameraBridge
         motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
         motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
 
-        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {
+        }
 
         stopMotors(motorBL, motorBR, motorFL, motorFR);
     }

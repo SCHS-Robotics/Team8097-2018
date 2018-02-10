@@ -45,8 +45,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Autonomous")
-public class BlueAutonomous extends AutonomousNew {
-    private int timeThrough = 0;
+public class BlueAutonomous extends Autonomous {
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
         team = Team.BLUE;
@@ -57,22 +56,14 @@ public class BlueAutonomous extends AutonomousNew {
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoLeftGrab.setPosition(1);
+        servoRightGrab.setPosition(0);
 
         runtime.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR/*, motorLeftLift, motorRightLift*/);
+        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
         waitForStart();
 
         while (opModeIsActive()) {
-            telemetry.addData("Color Blue", colorSensorArm.blue());
-            telemetry.addData("Color Red", colorSensorArm.red());
-            telemetry.addData("Red - blue", Math.abs(colorSensorArm.red()) - Math.abs(colorSensorArm.blue()));
-            telemetry.addData("Blue - red", Math.abs(colorSensorArm.blue()) - Math.abs(colorSensorArm.red()));
-            telemetry.update();
-
-            if (timeThrough == 0) {
-                hitJewel();
-                timeThrough = 1;
-            }
+            hitJewel();
 
             sleep(500);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);

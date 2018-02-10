@@ -64,14 +64,14 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     Orientation angles;
     double heading;
 
-    final double VERTICAL_AUTO_START_POS = .031;
-    final double HORIZONTAL_AUTO_START_POS = .46;
+    final double VERTICAL_AUTO_START_POS = 1;
+    final double HORIZONTAL_AUTO_START_POS = .54;
     final double VERTICAL_TELEOP_START_POS = .576;
     final double HORIZONTAL_TELEOP_START_POS = .404;
-    final double VERTICAL_END_POS = 1.0;
-    final double HORIZONTAL_END_POS = .404;
-    final double HORIZONTAL_RIGHT_END_POS = .537;
-    final double HORIZONTAL_LEFT_END_POS = .271;
+    final double VERTICAL_END_POS = 0;
+    final double HORIZONTAL_END_POS = .4;
+    final double HORIZONTAL_RIGHT_END_POS = .463;
+    final double HORIZONTAL_LEFT_END_POS = .2;
 
     // TODO: Keep getting these over and over literally every time someone does something on hardware.
     final double TICKS_PER_INCH = 100;
@@ -243,6 +243,30 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
         motorFL.setTargetPosition((int)targetPosition);
         motorBR.setTargetPosition((int)-targetPosition);
         motorFR.setTargetPosition((int)-targetPosition);
+
+        motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorBL.setPower(speed);
+        motorBR.setPower(speed);
+        motorFL.setPower(speed * DRIVE_WEIGHT_SCALAR);
+        motorFR.setPower(speed * DRIVE_WEIGHT_SCALAR);
+
+        while (motorBL.isBusy() && motorFR.isBusy() && motorBR.isBusy() && motorFL.isBusy()) {}
+
+        stopMotors(motorBL, motorBR, motorFL, motorFR);
+    }
+
+    public void goBackwardDistance(double distance, double speed) throws InterruptedException{
+        double targetPosition = -distance * TICKS_PER_INCH;
+        resetEncoders(motorBL, motorBR, motorFL, motorFR);
+
+        motorBL.setTargetPosition((int)-targetPosition);
+        motorFL.setTargetPosition((int)-targetPosition);
+        motorBR.setTargetPosition((int)targetPosition);
+        motorFR.setTargetPosition((int)targetPosition);
 
         motorBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);

@@ -45,7 +45,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Red Autonomous", group ="Autonomous")
-public class RedAutonomous extends AutonomousNew {
+public class RedAutonomous extends Autonomous {
     private int timeThrough = 0;
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
@@ -54,20 +54,17 @@ public class RedAutonomous extends AutonomousNew {
 
         initialize();
 
-        /*servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);*/
+        servoRightGrab.setPosition(0);
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR/*, motorLeftLift, motorRightLift*/);
         waitForStart();
 
         while (opModeIsActive()) {
-            if (timeThrough == 0) {
-                hitJewel();
-                timeThrough = 1;
-            }
+            hitJewel();
 
             sleep(500);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
