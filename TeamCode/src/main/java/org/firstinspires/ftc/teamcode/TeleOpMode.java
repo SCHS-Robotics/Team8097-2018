@@ -87,8 +87,10 @@ public class TeleOpMode extends BaseOpMode {
         hitStatus = HitStatus.DOWN;
 
         initialize();
-        //servoLeftGrab.setPosition(1);
-        //servoRightGrab.setPosition(0);
+        servoTopLeftGrab.setPosition(1);
+        servoTopRightGrab.setPosition(0);
+        servoBottomLeftGrab.setPosition(1);
+        servoTopRightGrab.setPosition(0);
 
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
@@ -157,16 +159,22 @@ public class TeleOpMode extends BaseOpMode {
             if(gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= .2) {
                 if (grabStatus == GrabStatus.OPEN) {
                     grabStatus = GrabStatus.CLOSE;
-                    servoLeftGrab.setPosition(0.3);
-                    servoRightGrab.setPosition(0.7);
+                    servoTopLeftGrab.setPosition(0.3);
+                    servoTopRightGrab.setPosition(0.7);
+                    servoBottomLeftGrab.setPosition(0.3);
+                    servoTopRightGrab.setPosition(0.7);
                 } else if (grabStatus == GrabStatus.HALFOPEN){
                     grabStatus = GrabStatus.OPEN;
-                    servoLeftGrab.setPosition(1);
-                    servoRightGrab.setPosition(0);
+                    servoTopLeftGrab.setPosition(1);
+                    servoTopRightGrab.setPosition(0);
+                    servoBottomLeftGrab.setPosition(1);
+                    servoTopRightGrab.setPosition(0);
                 } else {
                     grabStatus = GrabStatus.HALFOPEN;
-                    servoLeftGrab.setPosition(.6);
-                    servoRightGrab.setPosition(.4);
+                    servoTopLeftGrab.setPosition(.6);
+                    servoTopRightGrab.setPosition(.4);
+                    servoBottomLeftGrab.setPosition(.6);
+                    servoTopRightGrab.setPosition(.4);
                 }
                 buttonACooldown = cooldown.time();
             }

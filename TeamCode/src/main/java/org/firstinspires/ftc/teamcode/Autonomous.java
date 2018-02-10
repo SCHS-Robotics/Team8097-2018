@@ -93,8 +93,10 @@ public abstract class Autonomous extends BaseOpMode {
             if (position == CLOSE) {
                 turnTo(180, 0.5, 10);
                 goForwardDistance(2, .5);
-//                servoLeftGrab.setPosition(0.3);
-//                servoRightGrab.setPosition(0.7);
+                servoTopLeftGrab.setPosition(.3);
+                servoTopRightGrab.setPosition(.7);
+                servoBottomLeftGrab.setPosition(.3);
+                servoTopRightGrab.setPosition(.7);
                 goBackwardDistance(1 , .5);
 
             } else if (position == NOTCLOSE) {
@@ -121,8 +123,10 @@ public abstract class Autonomous extends BaseOpMode {
             }
 
             goForwardDistance(10, .5);
-//                servoLeftGrab.setPosition(0.3);
-//                servoRightGrab.setPosition(0.7);
+            servoTopLeftGrab.setPosition(.3);
+            servoTopRightGrab.setPosition(.7);
+            servoBottomLeftGrab.setPosition(.3);
+            servoTopRightGrab.setPosition(.7);
             goBackwardDistance(1, .5);
         } catch (InterruptedException e) {}
     }

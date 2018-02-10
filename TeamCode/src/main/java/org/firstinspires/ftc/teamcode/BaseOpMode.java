@@ -44,8 +44,10 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
     //decalaring "type" of variable to variable, doing this allows it to access the methods created
     //for it, ex: .setPositon for a servo
 
-    Servo servoLeftGrab;
-    Servo servoRightGrab;
+    Servo servoTopLeftGrab;
+    Servo servoTopRightGrab;
+    Servo servoBottomLeftGrab;
+    Servo servoBottomRightGrab;
     Servo servoHorizontalHit;
     Servo servoVerticalHit;
 
@@ -122,8 +124,10 @@ public abstract class BaseOpMode extends LinearOpMode implements CameraBridgeVie
 
 
 
-        //servoLeftGrab = hardwareMap.servo.get("servoLeftGrab");
-        //servoRightGrab = hardwareMap.servo.get("servoRightGrab");
+        servoTopLeftGrab = hardwareMap.servo.get("servoTopLeftGrab");
+        servoTopRightGrab = hardwareMap.servo.get("servoTopRightGrab");
+        servoBottomLeftGrab = hardwareMap.servo.get("servoBottomLeftGrab");
+        servoBottomRightGrab = hardwareMap.servo.get("servoBottomRightGrab");
         servoHorizontalHit = hardwareMap.servo.get("servoHorizontalHit");
         servoVerticalHit = hardwareMap.servo.get("servoVerticalHit");
 

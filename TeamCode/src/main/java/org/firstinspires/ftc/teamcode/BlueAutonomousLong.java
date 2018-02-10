@@ -72,8 +72,10 @@ public class BlueAutonomousLong extends Autonomous {
 
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-        servoLeftGrab.setPosition(1);
-        servoRightGrab.setPosition(0);
+        servoTopLeftGrab.setPosition(1);
+        servoTopRightGrab.setPosition(0);
+        servoBottomLeftGrab.setPosition(1);
+        servoTopRightGrab.setPosition(0);
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
@@ -89,8 +91,8 @@ public class BlueAutonomousLong extends Autonomous {
             telemetry.update();
 
             sleep(500);
-//            servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-//            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+            servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
             moveToCrypto();
             alignToCrypto(targetColumnDistance(vuMark));

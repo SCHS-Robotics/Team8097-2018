@@ -69,10 +69,12 @@ public class BlueAutonomous extends Autonomous {
         RelicRecoveryVuMark vuMark = null;
 
         initialize();
-//        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
-//        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-//        servoLeftGrab.setPosition(1);
-//        servoRightGrab.setPosition(0);
+        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+        servoTopLeftGrab.setPosition(1);
+        servoTopRightGrab.setPosition(0);
+        servoBottomLeftGrab.setPosition(1);
+        servoTopRightGrab.setPosition(0);
 
         relicTrackables.activate();
 
@@ -89,8 +91,8 @@ public class BlueAutonomous extends Autonomous {
             telemetry.update();
 
             sleep(500);
-//            servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
-//            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+            servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+            servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
 
             moveToCrypto();
             alignToCrypto(targetColumnDistance(vuMark));
