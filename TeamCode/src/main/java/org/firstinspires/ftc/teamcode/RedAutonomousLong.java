@@ -78,10 +78,12 @@ public class RedAutonomousLong extends Autonomous {
         servoBottomLeftGrab.setPosition(1);
         servoTopRightGrab.setPosition(0);
 
+        relicTrackables.activate();
+
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR/*, motorLeftLift, motorRightLift*/);
         waitForStart();
-
+        telemetry.addData("VuMark", vuMark = RelicRecoveryVuMark.from(relicTemplate));
         while (opModeIsActive()) {
             do {
                 vuMark = RelicRecoveryVuMark.from(relicTemplate);

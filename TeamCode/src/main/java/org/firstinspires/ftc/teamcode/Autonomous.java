@@ -114,7 +114,7 @@ public abstract class Autonomous extends BaseOpMode {
 
     public void alignToCrypto(int num) {
         try {
-            goForwardDistance(6 + (8 * (num - 1)), .5);
+            goForwardDistance(6 + (8 * (num - 1)), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
 
             if (team == RED) {
                 turnRightFromCurrent(90, 0.5, 5);

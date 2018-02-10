@@ -69,6 +69,7 @@ public class BlueAutonomous extends Autonomous {
         RelicRecoveryVuMark vuMark = null;
 
         initialize();
+
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoTopLeftGrab.setPosition(1);
