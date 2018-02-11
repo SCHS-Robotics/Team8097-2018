@@ -1,38 +1,40 @@
+/* Copyright (c) 2017 FIRST. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted (subject to the limitations in the disclaimer below) provided that
+ * the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice, this
+ * list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or
+ * promote products derived from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Log;
-
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-
-/**
- * Created by test on 11/19/17.
- */
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.vuforia.PIXEL_FORMAT;
-
-import java.util.List;
-
+import com.qualcomm.robotcore.util.ElapsedTime;
 import static org.firstinspires.ftc.teamcode.Autonomous.Position.CLOSE;
 import static org.firstinspires.ftc.teamcode.Autonomous.Position.NOTCLOSE;
 import static org.firstinspires.ftc.teamcode.Autonomous.Team.BLUE;
@@ -44,8 +46,10 @@ public abstract class Autonomous extends BaseOpMode {
     private VuforiaLocalizer vuforia = null;
     private VuforiaTrackables relicTrackables = null;
     private VuforiaTrackable relicTemplate = null;
+    private RelicRecoveryVuMark foundVuMark = RelicRecoveryVuMark.UNKNOWN;
+    ElapsedTime runtime = new ElapsedTime();
 
-    public void hitJewel() {
+    void hitJewel() {
         setArmDown();
         sleep(5000);
         switch (team) {
@@ -79,12 +83,32 @@ public abstract class Autonomous extends BaseOpMode {
         }
     }
 
-    public void setArmDown() {
+    void setArmDown() {
         servoVerticalHit.setPosition(VERTICAL_END_POS);
         servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
     }
 
-    public void moveToCrypto() {
+    void initGrabServos() {
+        servoTopLeftGrab.setPosition(1);
+        servoTopRightGrab.setPosition(0);
+        servoBottomLeftGrab.setPosition(1);
+        servoBottomRightGrab.setPosition(0);
+    }
+
+    void setArmUp() {
+        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+        servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
+    }
+
+    void raiseLift() {
+        motorLeftLift.setPower(0.15);
+        motorRightLift.setPower(-0.15);
+        sleep(1000);
+        motorRightLift.setPower(0);
+        motorLeftLift.setPower(0);
+    }
+
+    void moveToCrypto() {
         try {
             goForwardDistance(1, 0.25);
 
@@ -111,14 +135,14 @@ public abstract class Autonomous extends BaseOpMode {
         }
     }
 
-    public void alignToCrypto(int num) {
+    void alignToCrypto(int targetColumn) {
         try {
             if (position == CLOSE) {
-                goForwardDistance(num , .5);
+                goForwardDistance(targetColumn, .5);
                 turnTo(180, 0.5, 10);
             }
             if (position == NOTCLOSE) {
-                goForwardDistance(6 + (8 + num), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
+                goForwardDistance(6 + (8 + targetColumn), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
 
                 if (team == RED) {
                     turnRightFromCurrent(90, 0.5, 5);
@@ -136,64 +160,44 @@ public abstract class Autonomous extends BaseOpMode {
         catch(InterruptedException e){}
     }
 
-    public void onCameraViewStopped() {
-
-        mRgba.release();
+    void initializeVuforia() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = "AWRsObH/////AAAAGU5bp4bnDkCYjwnKsD5okRCL7t6ejVuLHi3TwTkPTSo+EuLnlmB+G2Rz4GOel217l0cjjlYjJfot5pvsspqgEUJvtNDeoOacTA3bzKaeAFUoBeQA2r3VwolpdWR/6xxq9EraYiLIkOLee51c2Uqtzlvk8Qav301W2TJOdPbotZUAndR6QlIQ7m2UVZWY+2qlenB36jIF3ZGotK/QwihY0/96KWzHtbIPUheU4CiJmRlIi3xMGREt3SYgcPV3L/WMPi+WW7GSSoh9IVaVnfGmTZD2cWSGeB/x4RDHdUbePjZrEQ1OPNR/LvjbRYWkX+QgQUqmyff0/Etuf9o0oJ9PlYeeteZPv1m/2hiB/mUG9tz1";
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+        relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate");
     }
 
-    public void onCameraViewStarted(int width, int height) {
-
-        // Creating display, color detector, defining variables for outlines (contours), not sure what a spectrum is, but we should figure that out
-        mRgba = new Mat(height, width, CvType.CV_8UC4);
-        mDetector = new ColorBlobDetector();
-        mSpectrum = new Mat();
-        CONTOUR_COLOR = new Scalar(165, 255, 255, 255);
-        SPECTRUM_SIZE = new Size(200, 64);
-
-        // The color that should be detected by default on start
-        setDetectColor("brown");
+    void startVuforia() {
+        relicTrackables.activate();
     }
 
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-
-        mRgba = inputFrame.rgba();
-        if (mIsColorSelected) {
-            mDetector.process(mRgba);
-            List<MatOfPoint> contours = mDetector.getContours();
-            Log.e("Tag", "Contours count: " + contours.size());
-            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-
-            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
-            colorLabel.setTo(mBlobColorRgba);
-
-            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
-            mSpectrum.copyTo(spectrumLabel);
-        }
-        return mRgba;
+    private RelicRecoveryVuMark getVuMark() {
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        return vuMark;
     }
 
-//    public void initializeVuforia() {
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-//        parameters.vuforiaLicenseKey = "AWRsObH/////AAAAGU5bp4bnDkCYjwnKsD5okRCL7t6ejVuLHi3TwTkPTSo+EuLnlmB+G2Rz4GOel217l0cjjlYjJfot5pvsspqgEUJvtNDeoOacTA3bzKaeAFUoBeQA2r3VwolpdWR/6xxq9EraYiLIkOLee51c2Uqtzlvk8Qav301W2TJOdPbotZUAndR6QlIQ7m2UVZWY+2qlenB36jIF3ZGotK/QwihY0/96KWzHtbIPUheU4CiJmRlIi3xMGREt3SYgcPV3L/WMPi+WW7GSSoh9IVaVnfGmTZD2cWSGeB/x4RDHdUbePjZrEQ1OPNR/LvjbRYWkX+QgQUqmyff0/Etuf9o0oJ9PlYeeteZPv1m/2hiB/mUG9tz1";
-//        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-//
-//        vuforia = ClassFactory.createVuforiaLocalizer(parameters);
-//        relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
-//        relicTemplate = relicTrackables.get(0);
-//        relicTemplate.setName("relicVuMarkTemplate");
-//    }
-//
-//    public void startVuforia() {
-//        relicTrackables.activate();
-//    }
-//
-//    public RelicRecoveryVuMark getVuMark() {
-//        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-//        return vuMark;
-//    }
+    RelicRecoveryVuMark getFoundVuMark() {
+        return foundVuMark;
+    }
 
-    public int targetColumnDistance(RelicRecoveryVuMark vuMarkFound) {
+    void vuforiaDetect() {
+        double vuTimer = runtime.time();
+        do {
+            foundVuMark = getVuMark();
+            if (runtime.time() - vuTimer >= 5) {
+                telemetry.addLine("VuMark Not Found in time, giving up and blaming hardware");
+                telemetry.update();
+                break;
+            }
+        } while(foundVuMark == RelicRecoveryVuMark.UNKNOWN);
+        telemetry.addData("VuMark: ", foundVuMark);
+    }
+
+    int targetColumnDistance(RelicRecoveryVuMark vuMarkFound) {
         switch (vuMarkFound) {
             case RIGHT:
                 if(team == RED) {
@@ -227,6 +231,6 @@ public abstract class Autonomous extends BaseOpMode {
         NOTCLOSE
     }
 
-    public Team team;
-    public Position position;
+    Team team;
+    Position position;
 }

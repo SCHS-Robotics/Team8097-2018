@@ -29,37 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.sun.tools.javac.comp.Todo;
-
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
-
-import java.util.ConcurrentModificationException;
-import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpMode", group="Linear Opmode")
 public class TeleOpMode extends BaseOpMode {
@@ -70,11 +40,10 @@ public class TeleOpMode extends BaseOpMode {
 
     // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
     private double                 buttonACooldown;
-    private double                 buttonBCooldown;
-    private double                 buttonLBCooldown;
-    private double                 buttonRBCooldown;
     private double                 buttonXCooldown;
     private double                 buttonYCooldown;
+    private double                 buttonLBCooldown;
+    private double                 buttonRBCooldown;
 
     @Override
     public void runOpMode() {
@@ -203,19 +172,19 @@ public class TeleOpMode extends BaseOpMode {
                 buttonYCooldown = cooldown.time();
             }
 
-            if(gamepad1.dpad_left && hitStatus == HitStatus.DOWN) {
+            if (gamepad1.dpad_left && hitStatus == HitStatus.DOWN) {
                 servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS);
             }
             else if (gamepad1.dpad_right && hitStatus == HitStatus.DOWN) {
                 servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS);
             }
 
-            if(gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {
+            if (gamepad1.left_bumper && Math.abs(cooldown.time() - buttonLBCooldown) >= 1) {
                 turnLeftFromCurrent(90, 0.75, 15);
                 buttonLBCooldown = cooldown.time();
             }
 
-            if(gamepad1.right_bumper && Math.abs(cooldown.time() - buttonRBCooldown) >= 1) {
+            if (gamepad1.right_bumper && Math.abs(cooldown.time() - buttonRBCooldown) >= 1) {
                 turnRightFromCurrent(90, 0.75, 15);
                 buttonRBCooldown = cooldown.time();
             }
@@ -223,7 +192,7 @@ public class TeleOpMode extends BaseOpMode {
     }
 
     // Direction Functions
-    public boolean angleIsNearAngle(double angle1, double angle2) {
+    private boolean angleIsNearAngle(double angle1, double angle2) {
 
         while (angle1 >= 360) {
             angle1 -= 360;
@@ -241,7 +210,7 @@ public class TeleOpMode extends BaseOpMode {
         return diff <= 45.0 / 2 || diff >= 360 - 45.0 / 2;
     }
 
-    public void goDirection(double magnitude, double angle) throws InterruptedException {
+    private void goDirection(double magnitude, double angle) throws InterruptedException {
 
         if (angleIsNearAngle(angle, 0)) {
             goRight(magnitude);
@@ -262,19 +231,5 @@ public class TeleOpMode extends BaseOpMode {
         } else {
             System.out.print("Where will this go");
         }
-    }
-
-    // OpenCV functions
-    public void onCameraViewStarted(int width, int height) {
-
-    }
-
-    public void onCameraViewStopped() {
-
-        mRgba.release();
-    }
-
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        return null;
     }
 }
