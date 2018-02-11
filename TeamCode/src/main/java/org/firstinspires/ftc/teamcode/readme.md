@@ -1,121 +1,117 @@
-## TeamCode Module
+## Teamcode-Modul
 
-Welcome!
+Willkommen zu unserem Team-Code-Modul. Hier haben wir Code. Wenn du aus einem zukünftigen Jahr der Team 8097 Software kommst, würdest du wahrscheinlich noch ein Jahr auf Ryans Code zurückgehen, was wesentlich besser ist als bei uns. Danke fürs Lesen.
 
-This module, TeamCode, is the place where you will write/paste the code for your team's
-robot controller App. This module is currently empty (a clean slate) but the
-process for adding OpModes is straightforward.
+## Erstellen Sie Ihre eigenen OpModes
 
-## Creating your own OpModes
+Die einfachste Möglichkeit, einen eigenen OpMode zu erstellen, besteht darin, einen Sample-OpMode zu kopieren und ihn zu einem eigenen zu machen.
 
-The easiest way to create your own OpMode is to copy a Sample OpMode and make it your own.
+Beispielopmodes sind im FtcRobotController-Modul vorhanden.
+Um diese Beispiele zu finden, suchen Sie das Modul FtcRobotController auf der Registerkarte "Projekt / Android".
 
-Sample opmodes exist in the FtcRobotController module.
-To locate these samples, find the FtcRobotController module in the "Project/Android" tab.
+Erweitern Sie die folgenden Baumelemente:
+ FtcRobotController / java / org.firstihinspires.ftc.robotcontroller / externe / Proben
 
-Expand the following tree elements:
- FtcRobotController / java / org.firstinspires.ftc.robotcontroller / external / samples
+In diesem Ordner kann eine Reihe verschiedener Beispielklassen angezeigt werden.
+Die Klassennamen folgen einer Namenskonvention, die den Zweck jeder Klasse angibt.
+Die vollständige Beschreibung dieser Konvention finden Sie in der Datei samples / sample_convention.md.
 
-A range of different samples classes can be seen in this folder.
-The class names follow a naming convention which indicates the purpose of each class.
-The full description of this convention is found in the samples/sample_convention.md file.
+Eine kurze Zusammenfassung der Namenskonvention finden Sie hier:
+Der Präfix des Namens ist einer der folgenden:
 
-A brief synopsis of the naming convention is given here:
-The prefix of the name will be one of the following:
+* Basic: Dies ist ein minimal funktionaler OpMode zur Veranschaulichung des Skeletts / der Struktur
+            eines bestimmten Stils von OpMode. Dies sind Nackten Knochen Beispiele.
+* Sensor: Dies ist ein Sample-OpMode, der zeigt, wie ein bestimmter Sensor verwendet wird.
+            Es ist nicht als funktionierender Roboter gedacht, es zeigt lediglich den minimalen Code
+            erforderlich, um die Sensorwerte zu lesen und anzuzeigen.
+* Hardware: Dies ist kein tatsächlicher OpMode, sondern eine Hilfsklasse, die zur Beschreibung verwendet wird
+            die Hardware eines bestimmten Roboters: zB: für einen Pushbot. Sieh dir irgendwas an
+            Pushbot-Beispiel, um zu sehen, wie dies in einem OpMode verwendet werden kann.
+            Teams können eine davon kopieren, um ihre eigene Roboterdefinition zu erstellen.
+* Pushbot: Dies ist ein Sample-OpMode, der die Pushbot-Roboterstruktur als Basis verwendet.
+* Konzept: Dies ist ein Beispiel-OpMode, der die Ausführung einer bestimmten Funktion oder eines bestimmten Konzepts veranschaulicht.
+            Diese können komplex sein, aber ihre Funktionsweise sollte in den Kommentaren klar erläutert werden,
+            oder die Kopfzeile sollte auf ein externes Dokument, eine Anleitung oder ein Tutorial verweisen.
+* Bibliothek: Dies ist eine Klasse oder eine Gruppe von Klassen, die zur Implementierung einer Strategie verwendet werden.
+            Diese implementieren normalerweise keinen vollständigen OpMode. Stattdessen werden sie einbezogen
+            durch einen OpMode, um einige Stand-alone-Fähigkeiten bereitzustellen.
 
-* Basic:    This is a minimally functional OpMode used to illustrate the skeleton/structure
-            of a particular style of OpMode.  These are bare bones examples.
-* Sensor:   This is a Sample OpMode that shows how to use a specific sensor.
-            It is not intended as a functioning robot, it is simply showing the minimal code
-            required to read and display the sensor values.
-* Hardware: This is not an actual OpMode, but a helper class that is used to describe
-            one particular robot's hardware devices: eg: for a Pushbot.  Look at any
-            Pushbot sample to see how this can be used in an OpMode.
-            Teams can copy one of these to create their own robot definition.
-* Pushbot:  This is a Sample OpMode that uses the Pushbot robot structure as a base.
-* Concept:	This is a sample OpMode that illustrates performing a specific function or concept.
-            These may be complex, but their operation should be explained clearly in the comments,
-            or the header should reference an external doc, guide or tutorial.
-* Library:  This is a class, or set of classes used to implement some strategy.
-            These will typically NOT implement a full OpMode.  Instead they will be included
-            by an OpMode to provide some stand-alone capability.
+Sobald Sie sich mit der Auswahl der verfügbaren Muster vertraut gemacht haben, können Sie eines davon auswählen
+Grundlage für Ihren eigenen Roboter. In allen Fällen muss das gewünschte Sample kopiert werden
+Ihr TeamCode-Modul wird verwendet.
 
-Once you are familiar with the range of samples available, you can choose one to be the
-basis for your own robot.  In all cases, the desired sample(s) needs to be copied into
-your TeamCode module to be used.
+Dies geschieht direkt in Android Studio mit den folgenden Schritten:
 
-This is done inside Android Studio directly, using the following steps:
+ 1) Suchen Sie die gewünschte Beispielklasse in der Projekt / Android-Struktur.
 
- 1) Locate the desired sample class in the Project/Android tree.
+ 2) Klicken Sie mit der rechten Maustaste auf die Beispielklasse und wählen Sie "Kopieren"
 
- 2) Right click on the sample class and select "Copy"
+ 3) Erweitern Sie den Ordner TeamCode / java
 
- 3) Expand the  TeamCode / java folder
+ 4) Klicken Sie mit der rechten Maustaste auf den Ordner org.firstinspires.ftc.teamcode und wählen Sie "Einfügen"
 
- 4) Right click on the org.firstinspires.ftc.teamcode folder and select "Paste"
+ 5) Sie werden nach einem Klassennamen für die Kopie gefragt.
+    Wählen Sie basierend auf dem Zweck dieser Klasse etwas Sinnvolles.
+    Beginnen Sie mit einem Großbuchstaben und denken Sie daran, dass später möglicherweise ähnliche Klassen vorhanden sind.
 
- 5) You will be prompted for a class name for the copy.
-    Choose something meaningful based on the purpose of this class.
-    Start with a capital letter, and remember that there may be more similar classes later.
+Sobald Ihre Kopie erstellt wurde, sollten Sie sie für den Einsatz auf Ihrem Roboter vorbereiten.
+Dies geschieht, indem der Name des OpModes angepasst und auf dem angezeigt wird
+Die OpMode-Liste der Treiberstation.
 
-Once your copy has been created, you should prepare it for use on your robot.
-This is done by adjusting the OpMode's name, and enabling it to be displayed on the
-Driver Station's OpMode list.
-
-Each OpMode sample class begins with several lines of code like the ones shown below:
+Jede OpMode-Beispielklasse beginnt mit mehreren Codezeilen wie die folgenden:
 
 ```
  @TeleOp(name="Template: Linear OpMode", group="Linear Opmode")
  @Disabled
 ```
 
-The name that will appear on the driver station's "opmode list" is defined by the code:
+Der Name, der auf der "opmode list" der Treiberstation erscheint, wird durch den Code definiert:
  ``name="Template: Linear OpMode"``
-You can change what appears between the quotes to better describe your opmode.
-The "group=" portion of the code can be used to help organize your list of OpModes.
+Sie können das, was zwischen den Anführungszeichen steht, ändern, um Ihren Opmode besser zu beschreiben.
+Der "group =" - Teil des Codes kann verwendet werden, um bei der Organisation Ihrer OpModes-Liste zu helfen.
 
-As shown, the current OpMode will NOT appear on the driver station's OpMode list because of the
-  ``@Disabled`` annotation which has been included.
-This line can simply be deleted , or commented out, to make the OpMode visible.
+Wie gezeigt, wird der aktuelle OpMode NICHT auf der OpMode-Liste der Treiberstation angezeigt
+  ``@Disabled`` Anmerkung, die enthalten ist.
+Diese Zeile kann einfach gelöscht oder auskommentiert werden, um den OpMode sichtbar zu machen.
 
 
 
-## ADVANCED Multi-Team App management:  Cloning the TeamCode Module
+## ADVANCED Multi-Team App-Verwaltung: Klonen des TeamCode-Moduls
 
-In some situations, you have multiple teams in your club and you want them to all share
-a common code organization, with each being able to *see* the others code but each having
-their own team module with their own code that they maintain themselves.
+In einigen Situationen haben Sie mehrere Teams in Ihrem Club und möchten, dass sie alle teilen
+eine gemeinsame Code-Organisation, wobei jeder in der Lage ist, * den * anderen Code * zu sehen, aber jeder hat
+ein eigenes Teammodul mit eigenem Code, den sie selbst pflegen.
 
-In this situation, you might wish to clone the TeamCode module, once for each of these teams.
-Each of the clones would then appear along side each other in the Android Studio module list,
-together with the FtcRobotController module (and the original TeamCode module).
+In diesem Fall möchten Sie möglicherweise das TeamCode-Modul einmal für jedes dieser Teams klonen.
+Jeder der Klone würde dann nebeneinander in der Android Studio-Modulliste erscheinen,
+zusammen mit dem FtcRobotController-Modul (und dem ursprünglichen TeamCode-Modul).
 
-Selective Team phones can then be programmed by selecting the desired Module from the pulldown list
-prior to clicking to the green Run arrow.
+Selektive Team-Telefone können dann programmiert werden, indem das gewünschte Modul aus der Pulldown-Liste ausgewählt wird
+vor dem Klicken auf den grünen Run-Pfeil.
 
-Warning:  This is not for the inexperienced Software developer.
-You will need to be comfortable with File manipulations and managing Android Studio Modules.
-These changes are performed OUTSIDE of Android Studios, so close Android Studios before you do this.
+Warnung: Dies ist nicht für den unerfahrenen Softwareentwickler.
+Sie müssen mit den Dateimanipulationen und der Verwaltung von Android Studio-Modulen vertraut sein.
+Diese Änderungen werden AUSSERHALB von Android Studios durchgeführt, also schließen Sie Android Studios, bevor Sie dies tun.
  
-Also.. Make a full project backup before you start this :)
+Auch .. Machen Sie eine vollständige Projekt-Backup, bevor Sie das beginnen :)
 
-To clone TeamCode, do the following:
+Um TeamCode zu klonen, gehen Sie folgendermaßen vor:
 
-Note: Some names start with "Team" and others start with "team".  This is intentional.
+Hinweis: Einige Namen beginnen mit "Team" und andere beginnen mit "Team". Dies ist beabsichtigt.
 
-1)  Using your operating system file management tools, copy the whole "TeamCode"
-    folder to a sibling folder with a corresponding new name, eg: "Team0417".
+1) Kopieren Sie den gesamten "TeamCode" mit den Dateiverwaltungstools Ihres Betriebssystems
+    Ordner zu einem Geschwisterordner mit einem entsprechenden neuen Namen, zB: "Team0417".
 
-2)  In the new Team0417 folder, delete the TeamCode.iml file.
+2) Löschen Sie im neuen Ordner Team0417 die Datei TeamCode.iml.
 
-3)  the new Team0417 folder, rename the "src/main/java/org/firstinspires/ftc/teamcode" folder
-    to a matching name with a lowercase 'team' eg:  "team0417".
+3) den neuen Ordner Team0417, benennen Sie den Ordner "src / main / java / org / fireinspires / ftc / teamcode" um
+    zu einem passenden Namen mit einem Kleinbuchstaben "Team" zB: "team0417".
 
-4)  In the new Team0417/src/main folder, edit the "AndroidManifest.xml" file, change the line that contains
-         package="org.firstinspires.ftc.teamcode"
-    to be
-         package="org.firstinspires.ftc.team0417"
+4) Bearbeiten Sie im neuen Ordner Team0417 / src / main die Datei "AndroidManifest.xml", und ändern Sie die Zeile, die enthält
+         package = "org.firstinspires.ftc.teamcode"
+    sein
+         package = "org.firstinspires.ftc.team0417"
 
-5)  Add:    include ':Team0417' to the "/settings.gradle" file.
+5) Hinzufügen: Fügen Sie ': Team0417' in die Datei "/settings.gradle" ein.
     
-6)  Open up Android Studios and clean out any old files by using the menu to "Build/Clean Project""
+6) Öffnen Sie Android Studios und bereinigen Sie alle alten Dateien, indem Sie das Menü "Build / Clean Project" verwenden. "
