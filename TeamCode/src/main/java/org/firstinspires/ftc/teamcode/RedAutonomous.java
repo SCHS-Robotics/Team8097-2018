@@ -76,21 +76,30 @@ public class RedAutonomous extends Autonomous {
         servoTopLeftGrab.setPosition(1);
         servoTopRightGrab.setPosition(0);
         servoBottomLeftGrab.setPosition(1);
-        servoTopRightGrab.setPosition(0);
+        servoBottomRightGrab.setPosition(0);
 
         relicTrackables.activate();
 
-        runtime.reset();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR/*, motorLeftLift, motorRightLift*/);
+        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
         waitForStart();
-        telemetry.addData("VuMark", vuMark = RelicRecoveryVuMark.from(relicTemplate));
+        runtime.reset();
         while (opModeIsActive()) {
+            motorLeftLift.setPower(0.15);
+            motorRightLift.setPower(-0.15);
+            sleep(1000);
+            motorRightLift.setPower(0);
+            motorLeftLift.setPower(0);
+            double vuTimer = runtime.time();
             do {
                 vuMark = RelicRecoveryVuMark.from(relicTemplate);
-                telemetry.update();
+                if (runtime.time() - vuTimer >= 5) {
+                    vuMark = RelicRecoveryVuMark.CENTER;
+                    break;
+                }
             } while(vuMark == RelicRecoveryVuMark.UNKNOWN);
-            hitJewel();
+            telemetry.addData("VuMark", vuMark = RelicRecoveryVuMark.from(relicTemplate));
             telemetry.update();
+            hitJewel();
 
             sleep(500);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);

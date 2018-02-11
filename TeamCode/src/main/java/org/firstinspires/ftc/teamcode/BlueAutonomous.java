@@ -52,12 +52,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous", group ="Autonomous")
 public class BlueAutonomous extends Autonomous {
+    RelicRecoveryVuMark vuMark = null;
+
     public void runOpMode() {
         ElapsedTime runtime = new ElapsedTime();
         team = Team.BLUE;
         position = Position.CLOSE;
 
         // Lazily added vuforia, add to each autonomous
+
+        initialize();
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AWRsObH/////AAAAGU5bp4bnDkCYjwnKsD5okRCL7t6ejVuLHi3TwTkPTSo+EuLnlmB+G2Rz4GOel217l0cjjlYjJfot5pvsspqgEUJvtNDeoOacTA3bzKaeAFUoBeQA2r3VwolpdWR/6xxq9EraYiLIkOLee51c2Uqtzlvk8Qav301W2TJOdPbotZUAndR6QlIQ7m2UVZWY+2qlenB36jIF3ZGotK/QwihY0/96KWzHtbIPUheU4CiJmRlIi3xMGREt3SYgcPV3L/WMPi+WW7GSSoh9IVaVnfGmTZD2cWSGeB/x4RDHdUbePjZrEQ1OPNR/LvjbRYWkX+QgQUqmyff0/Etuf9o0oJ9PlYeeteZPv1m/2hiB/mUG9tz1";
@@ -68,29 +73,38 @@ public class BlueAutonomous extends Autonomous {
         relicTemplate.setName("relicVuMarkTemplate");
         RelicRecoveryVuMark vuMark = null;
 
-        initialize();
 
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
         servoTopLeftGrab.setPosition(1);
         servoTopRightGrab.setPosition(0);
         servoBottomLeftGrab.setPosition(1);
-        servoTopRightGrab.setPosition(0);
-
+        servoBottomRightGrab.setPosition(0);
         relicTrackables.activate();
 
         runtime.reset();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
         waitForStart();
-        telemetry.addData("VuMark", vuMark = RelicRecoveryVuMark.from(relicTemplate));
+        runtime.reset();
+
         while (opModeIsActive()) {
+            motorLeftLift.setPower(0.15);
+            motorRightLift.setPower(-0.15);
+            sleep(1000);
+            motorRightLift.setPower(0);
+            motorLeftLift.setPower(0);
+            double vuTimer = runtime.time();
             do {
                 vuMark = RelicRecoveryVuMark.from(relicTemplate);
-                telemetry.update();
+                if (runtime.time() - vuTimer >= 5) {
+                    vuMark = RelicRecoveryVuMark.CENTER;
+                    break;
+                }
             } while(vuMark == RelicRecoveryVuMark.UNKNOWN);
-            hitJewel();
+            telemetry.addData("VuMark", vuMark = RelicRecoveryVuMark.from(relicTemplate));
             telemetry.update();
 
+            hitJewel();
             sleep(500);
             servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
             servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);

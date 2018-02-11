@@ -29,6 +29,7 @@ import org.opencv.imgproc.Imgproc;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.vuforia.PIXEL_FORMAT;
 
 import java.util.List;
 
@@ -39,6 +40,11 @@ import static org.firstinspires.ftc.teamcode.Autonomous.Team.RED;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "Concept")
 public abstract class Autonomous extends BaseOpMode {
+
+    private VuforiaLocalizer vuforia = null;
+    private VuforiaTrackables relicTrackables = null;
+    private VuforiaTrackable relicTemplate = null;
+
     public void hitJewel() {
         setArmDown();
         sleep(5000);
@@ -91,13 +97,6 @@ public abstract class Autonomous extends BaseOpMode {
             goForwardDistance(20, .5);
 
             if (position == CLOSE) {
-                turnTo(180, 0.5, 10);
-                goForwardDistance(2, .5);
-                servoTopLeftGrab.setPosition(.3);
-                servoTopRightGrab.setPosition(.7);
-                servoBottomLeftGrab.setPosition(.3);
-                servoTopRightGrab.setPosition(.7);
-                goBackwardDistance(1 , .5);
 
             } else if (position == NOTCLOSE) {
                 goForwardDistance(10, 0.5);
@@ -114,21 +113,27 @@ public abstract class Autonomous extends BaseOpMode {
 
     public void alignToCrypto(int num) {
         try {
-            goForwardDistance(6 + (8 * (num - 1)), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
-
-            if (team == RED) {
-                turnRightFromCurrent(90, 0.5, 5);
-            } else {
-                turnLeftFromCurrent(90, 0.5, 5);
+            if (position == CLOSE) {
+                goForwardDistance(num , .5);
+                turnTo(180, 0.5, 10);
             }
+            if (position == NOTCLOSE) {
+                goForwardDistance(6 + (8 + num), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
 
+                if (team == RED) {
+                    turnRightFromCurrent(90, 0.5, 5);
+                } else {
+                    turnLeftFromCurrent(90, 0.5, 5);
+                }
+            }
             goForwardDistance(10, .5);
             servoTopLeftGrab.setPosition(.3);
             servoTopRightGrab.setPosition(.7);
             servoBottomLeftGrab.setPosition(.3);
-            servoTopRightGrab.setPosition(.7);
-            goBackwardDistance(1, .5);
-        } catch (InterruptedException e) {}
+            servoBottomRightGrab.setPosition(.7);
+            goBackwardDistance(3, .5);
+        }
+        catch(InterruptedException e){}
     }
 
     public void onCameraViewStopped() {
@@ -167,14 +172,47 @@ public abstract class Autonomous extends BaseOpMode {
         return mRgba;
     }
 
+//    public void initializeVuforia() {
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+//        parameters.vuforiaLicenseKey = "AWRsObH/////AAAAGU5bp4bnDkCYjwnKsD5okRCL7t6ejVuLHi3TwTkPTSo+EuLnlmB+G2Rz4GOel217l0cjjlYjJfot5pvsspqgEUJvtNDeoOacTA3bzKaeAFUoBeQA2r3VwolpdWR/6xxq9EraYiLIkOLee51c2Uqtzlvk8Qav301W2TJOdPbotZUAndR6QlIQ7m2UVZWY+2qlenB36jIF3ZGotK/QwihY0/96KWzHtbIPUheU4CiJmRlIi3xMGREt3SYgcPV3L/WMPi+WW7GSSoh9IVaVnfGmTZD2cWSGeB/x4RDHdUbePjZrEQ1OPNR/LvjbRYWkX+QgQUqmyff0/Etuf9o0oJ9PlYeeteZPv1m/2hiB/mUG9tz1";
+//        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+//
+//        vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+//        relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
+//        relicTemplate = relicTrackables.get(0);
+//        relicTemplate.setName("relicVuMarkTemplate");
+//    }
+//
+//    public void startVuforia() {
+//        relicTrackables.activate();
+//    }
+//
+//    public RelicRecoveryVuMark getVuMark() {
+//        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+//        return vuMark;
+//    }
+
     public int targetColumnDistance(RelicRecoveryVuMark vuMarkFound) {
         switch (vuMarkFound) {
             case RIGHT:
-                return 1;
+                if(team == RED) {
+                    return -8;
+                } else if(team == BLUE) {
+                    return 8;
+                }
             case CENTER:
-                return 2;
+                if(team == RED) {
+                    return 0;
+                } else if(team == BLUE) {
+                    return 0;
+                }
             case LEFT:
-                return 3;
+                if(team == RED) {
+                    return 8;
+                } else if(team == BLUE) {
+                    return -8;
+                }
         }
         return 0;
     }

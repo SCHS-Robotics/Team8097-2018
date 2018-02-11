@@ -162,19 +162,19 @@ public class TeleOpMode extends BaseOpMode {
                     servoTopLeftGrab.setPosition(0.3);
                     servoTopRightGrab.setPosition(0.7);
                     servoBottomLeftGrab.setPosition(0.3);
-                    servoTopRightGrab.setPosition(0.7);
+                    servoBottomRightGrab.setPosition(0.7);
                 } else if (grabStatus == GrabStatus.HALFOPEN){
                     grabStatus = GrabStatus.OPEN;
                     servoTopLeftGrab.setPosition(1);
                     servoTopRightGrab.setPosition(0);
                     servoBottomLeftGrab.setPosition(1);
-                    servoTopRightGrab.setPosition(0);
+                    servoBottomRightGrab.setPosition(0);
                 } else {
                     grabStatus = GrabStatus.HALFOPEN;
                     servoTopLeftGrab.setPosition(.6);
                     servoTopRightGrab.setPosition(.4);
                     servoBottomLeftGrab.setPosition(.6);
-                    servoTopRightGrab.setPosition(.4);
+                    servoBottomRightGrab.setPosition(.4);
                 }
                 buttonACooldown = cooldown.time();
             }
