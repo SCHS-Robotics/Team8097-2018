@@ -128,12 +128,12 @@ public abstract class Autonomous extends BaseOpMode {
             }
             tts.setLanguage(Locale.ENGLISH);
             tts.speak("It goes", TextToSpeech.QUEUE_ADD, null);
-            tts.setLanguage(Locale.JAPAN);
             telemetry.addData("Current distance: ", distance);
             telemetry.addLine("Press A to accept positioning");
             telemetry.update();
 
             if(gamepad1.a) {
+                tts.setLanguage(Locale.JAPAN);
                 tts.stop();
                 complete = true;
             }
