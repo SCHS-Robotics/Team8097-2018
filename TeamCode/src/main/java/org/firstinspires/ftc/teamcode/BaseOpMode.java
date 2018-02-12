@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.speech.tts.TextToSpeech;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
@@ -13,6 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import java.util.Locale;
 
 public abstract class BaseOpMode extends LinearOpMode {
 
@@ -39,6 +43,8 @@ public abstract class BaseOpMode extends LinearOpMode {
     ColorSensor colorSensorRight;
 
     ModernRoboticsI2cRangeSensor rangeSensor;
+
+    TextToSpeech tts;
 
     // State used for updating telemetry
     Orientation angles;
@@ -117,6 +123,25 @@ public abstract class BaseOpMode extends LinearOpMode {
         motorBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    void initializeTts() {
+        tts = new TextToSpeech(hardwareMap.appContext, null);
+        tts.setLanguage(Locale.JAPAN);
+        tts.setPitch(1.5f);
+        tts.setSpeechRate(1.5f);
+        tts.speak("Kawaii neko robotto-chan is ready, senpai", TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    void ttsSpeak(String text) {
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    void ttsSpeak(String text, Locale locale) {
+        Locale prevLanguage = tts.getLanguage();
+        tts.setLanguage(locale);
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        tts.setLanguage(prevLanguage);
     }
 
     void resetEncoders(DcMotor...motors) {

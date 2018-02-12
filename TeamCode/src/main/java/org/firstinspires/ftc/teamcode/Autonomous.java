@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.speech.tts.TextToSpeech;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
@@ -36,6 +38,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import java.util.Locale;
+
 import static org.firstinspires.ftc.teamcode.Autonomous.Position.CLOSE;
 import static org.firstinspires.ftc.teamcode.Autonomous.Position.NOTCLOSE;
 import static org.firstinspires.ftc.teamcode.Autonomous.Team.BLUE;

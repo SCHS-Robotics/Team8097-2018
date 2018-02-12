@@ -42,6 +42,7 @@ public class RedAutonomousLong extends Autonomous {
         initializeVuforia();
         startVuforia();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
+        initializeTts();
         waitForStart();
         runtime.reset();
 
