@@ -126,11 +126,15 @@ public abstract class Autonomous extends BaseOpMode {
             } else {
                 telemetry.addLine("Robot at optimal distance");
             }
+            tts.setLanguage(Locale.ENGLISH);
+            tts.speak("It goes", TextToSpeech.QUEUE_ADD, null);
+            tts.setLanguage(Locale.JAPAN);
             telemetry.addData("Current distance: ", distance);
             telemetry.addLine("Press A to accept positioning");
             telemetry.update();
 
             if(gamepad1.a) {
+                tts.stop();
                 complete = true;
             }
         }
@@ -184,6 +188,7 @@ public abstract class Autonomous extends BaseOpMode {
             servoBottomLeftGrab.setPosition(.3);
             servoBottomRightGrab.setPosition(.7);
             goBackwardDistance(3, .5);
+            ttsSpeak("Be your best desu");
         }
         catch(InterruptedException e){}
     }
@@ -217,12 +222,15 @@ public abstract class Autonomous extends BaseOpMode {
         do {
             foundVuMark = getVuMark();
             if (runtime.time() - vuTimer >= 5) {
-                telemetry.addLine("VuMark Not Found in time, giving up and blaming hardware");
+                telemetry.addLine("VuMark Not Found in time");
+                ttsSpeak("I didn't find a VuMark, hardware must have broken something");
                 telemetry.update();
                 break;
             }
         } while(foundVuMark == RelicRecoveryVuMark.UNKNOWN);
         telemetry.addData("VuMark: ", foundVuMark);
+        String foundTts = "Found vumark " + foundVuMark + " oni-chan";
+        ttsSpeak(foundTts);
     }
 
     int targetColumnDistance(RelicRecoveryVuMark vuMarkFound) {
