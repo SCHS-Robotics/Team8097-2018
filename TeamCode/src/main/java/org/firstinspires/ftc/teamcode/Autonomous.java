@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -106,6 +107,28 @@ public abstract class Autonomous extends BaseOpMode {
         sleep(1000);
         motorRightLift.setPower(0);
         motorLeftLift.setPower(0);
+    }
+
+    void startPositioning() {
+        boolean complete = false;
+        while(complete == false) {
+            double distance = rangeSensor.getDistance(DistanceUnit.CM);
+            if (distance > JEWEL_ARM_MAX_DISTANCE) {
+                telemetry.addLine("Robot too far!");
+            }
+            else if (distance < JEWEL_ARM_MIN_DISTANCE) {
+                telemetry.addLine("Robot too close!");
+            } else {
+                telemetry.addLine("Robot at optimal distance");
+            }
+            telemetry.addData("Current distance: ", distance);
+            telemetry.addLine("Press A to accept positioning");
+            telemetry.update();
+
+            if(gamepad1.a) {
+                complete = true;
+            }
+        }
     }
 
     void moveToCrypto() {

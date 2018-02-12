@@ -40,8 +40,8 @@ public class BlueAutonomous extends Autonomous {
         initGrabServos();
         initializeVuforia();
         startVuforia();
-
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
+        startPositioning();
         waitForStart();
         runtime.reset();
 

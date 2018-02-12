@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,6 +38,8 @@ public abstract class BaseOpMode extends LinearOpMode {
     ColorSensor colorSensorLeft;
     ColorSensor colorSensorRight;
 
+    ModernRoboticsI2cRangeSensor rangeSensor;
+
     // State used for updating telemetry
     Orientation angles;
     double heading;
@@ -50,6 +53,11 @@ public abstract class BaseOpMode extends LinearOpMode {
     final double HORIZONTAL_END_POS = .4;
     final double HORIZONTAL_RIGHT_END_POS = .6;
     final double HORIZONTAL_LEFT_END_POS = .2;
+
+    // TODO: CHANGE THESE WHEN I CAN ACTUALLY SEE THE ROBOT AGAIN
+    final double JEWEL_ARM_MAX_DISTANCE = 10;
+    final double JEWEL_ARM_MIN_DISTANCE = 5;
+
 
     // TODO: Keep getting these over and over literally every time someone does something on hardware.
     final double TICKS_PER_INCH = 100;
@@ -78,6 +86,8 @@ public abstract class BaseOpMode extends LinearOpMode {
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeSensor");
 
         servoTopLeftGrab = hardwareMap.servo.get("servoTopLeftGrab");
         servoTopRightGrab = hardwareMap.servo.get("servoTopRightGrab");

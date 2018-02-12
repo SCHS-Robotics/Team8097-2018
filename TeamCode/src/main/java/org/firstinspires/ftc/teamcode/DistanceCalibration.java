@@ -26,36 +26,33 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+/* This OpMode is essentially a copy of the startPositioning() function in regular autonomous, only
+to be used in the case that we're not allowed to move the robot after initialization. */
 package org.firstinspires.ftc.teamcode;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Blue Autonomous Long", group ="Autonomous")
-public class BlueAutonomousLong extends Autonomous {
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Distance Calibration", group ="Autonomous")
+public class DistanceCalibration extends Autonomous {
     public void runOpMode() {
-        team = Team.BLUE;
-        position = Position.NOTCLOSE;
-
         initialize();
-        setArmUp();
-        initGrabServos();
-        initializeVuforia();
-        startVuforia();
-        resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        startPositioning();
         waitForStart();
-        runtime.reset();
-
         while (opModeIsActive()) {
-            raiseLift();
-            vuforiaDetect();
-            hitJewel();
-            sleep(500);
-            setArmUp();
-            moveToCrypto();
-            alignToCrypto(targetColumnDistance(getFoundVuMark()));
-            break;
+            double distance = rangeSensor.getDistance(DistanceUnit.CM);
+            if (distance > JEWEL_ARM_MAX_DISTANCE) {
+                telemetry.addLine("Robot too far!");
+            }
+            else if (distance < JEWEL_ARM_MIN_DISTANCE) {
+                telemetry.addLine("Robot too close!");
+            } else {
+                telemetry.addLine("Robot at optimal distance");
+            }
+            telemetry.addData("Current distance: ", distance);
+            telemetry.addLine("Press A to accept positioning");
+            telemetry.update();
+            if (gamepad1.a){
+                break;
+            }
         }
     }
 }
-
-
