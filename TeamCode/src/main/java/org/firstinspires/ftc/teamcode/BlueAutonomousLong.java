@@ -36,12 +36,12 @@ public class BlueAutonomousLong extends Autonomous {
         position = Position.NOTCLOSE;
 
         initialize();
+        startPositioning();
         setArmUp();
         initGrabServos();
         initializeVuforia();
         startVuforia();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        startPositioning();
         waitForStart();
         runtime.reset();
 
