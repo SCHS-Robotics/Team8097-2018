@@ -127,8 +127,14 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     void initializeTts() {
-        tts = new TextToSpeech(hardwareMap.appContext, null);
-        tts.setLanguage(Locale.JAPAN);
+        tts = new TextToSpeech(hardwareMap.appContext, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    tts.setLanguage(Locale.JAPAN);
+                }
+            }
+        });
         tts.setPitch(1.5f);
         tts.setSpeechRate(1.5f);
         tts.speak("Kawaii neko robotto-chan is ready, senpai", TextToSpeech.QUEUE_FLUSH, null);
