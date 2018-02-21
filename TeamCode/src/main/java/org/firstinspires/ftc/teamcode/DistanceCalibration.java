@@ -30,6 +30,10 @@
 to be used in the case that we're not allowed to move the robot after initialization. */
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Distance Calibration", group ="Autonomous")
@@ -49,9 +53,24 @@ public class DistanceCalibration extends Autonomous {
             }
             telemetry.addData("Current distance: ", distance);
             telemetry.addLine("Press A to accept positioning");
+            telemetry.addLine("Press B to test Red team");
+            telemetry.addLine("Press X to test Blue team");
+
             telemetry.update();
             if (gamepad1.a){
                 break;
+            }
+            if (gamepad1.b){
+                team = team.RED;
+                hitJewel();
+                telemetry.addLine("Restart to measure more");
+                telemetry.update();
+            }
+            if (gamepad1.x){
+                team = team.BLUE;
+                hitJewel();
+                telemetry.addLine("Restart to measure more");
+                telemetry.update();
             }
         }
     }

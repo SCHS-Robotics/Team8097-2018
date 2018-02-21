@@ -36,13 +36,14 @@ public class BlueAutonomousLong extends Autonomous {
         position = Position.NOTCLOSE;
 
         initialize();
+        initializeTts();
         startPositioning();
+        ttsSpeak("Kawaii neko-robotto chan is ready, senpai ");
         setArmUp();
         initGrabServos();
         initializeVuforia();
         startVuforia();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        initializeTts();
         waitForStart();
         runtime.reset();
 

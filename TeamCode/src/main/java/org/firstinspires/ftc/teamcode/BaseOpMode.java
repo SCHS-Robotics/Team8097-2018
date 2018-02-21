@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -127,17 +128,10 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     void initializeTts() {
-        tts = new TextToSpeech(hardwareMap.appContext, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR) {
-                    tts.setLanguage(Locale.JAPAN);
-                }
-            }
-        });
+        tts = new TextToSpeech(hardwareMap.appContext, null);
         tts.setPitch(1.5f);
         tts.setSpeechRate(1.5f);
-        tts.speak("Kawaii neko robotto-chan is ready, senpai", TextToSpeech.QUEUE_FLUSH, null);
+        tts.setLanguage(Locale.JAPANESE);
     }
 
     void ttsSpeak(String text) {

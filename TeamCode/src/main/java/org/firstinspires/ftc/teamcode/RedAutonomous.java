@@ -36,13 +36,14 @@ public class RedAutonomous extends Autonomous {
         position = Position.CLOSE;
 
         initialize();
+        initializeTts();
         startPositioning();
+        ttsSpeak("Kawaii neko-robotto chan is ready, senpai ");
         setArmUp();
         initGrabServos();
         initializeVuforia();
         startVuforia();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
-        initializeTts();
         waitForStart();
         runtime.reset();
 

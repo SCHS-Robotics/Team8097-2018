@@ -87,6 +87,9 @@ public abstract class Autonomous extends BaseOpMode {
                 }
                 break;
         }
+        tts.setSpeechRate(0.7f);
+        ttsSpeak("ニコ ニコ ニイ〜");
+        tts.setSpeechRate(1.5f);
     }
 
     void setArmDown() {
@@ -126,8 +129,6 @@ public abstract class Autonomous extends BaseOpMode {
             } else {
                 telemetry.addLine("Robot at optimal distance");
             }
-            tts.setLanguage(Locale.ENGLISH);
-            tts.speak("It goes", TextToSpeech.QUEUE_ADD, null);
             telemetry.addData("Current distance: ", distance);
             telemetry.addLine("Press A to accept positioning");
             telemetry.update();
@@ -171,7 +172,7 @@ public abstract class Autonomous extends BaseOpMode {
         try {
             if (position == CLOSE) {
                 goForwardDistance(targetColumn, .5);
-                turnTo(180, 0.5, 10);
+                turnTo(180, 0.5, 5);
             }
             if (position == NOTCLOSE) {
                 goForwardDistance(6 + (8 + targetColumn), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
@@ -188,7 +189,7 @@ public abstract class Autonomous extends BaseOpMode {
             servoBottomLeftGrab.setPosition(.3);
             servoBottomRightGrab.setPosition(.7);
             goBackwardDistance(3, .5);
-            ttsSpeak("Be your best desu");
+            ttsSpeak("Be u best");
         }
         catch(InterruptedException e){}
     }
@@ -223,14 +224,16 @@ public abstract class Autonomous extends BaseOpMode {
             foundVuMark = getVuMark();
             if (runtime.time() - vuTimer >= 5) {
                 telemetry.addLine("VuMark Not Found in time");
-                ttsSpeak("I didn't find a VuMark, hardware must have broken something");
+                ttsSpeak("No vumark, hardware must have broken something");
                 telemetry.update();
                 break;
             }
         } while(foundVuMark == RelicRecoveryVuMark.UNKNOWN);
         telemetry.addData("VuMark: ", foundVuMark);
-        String foundTts = "Found vumark " + foundVuMark + " oni-chan";
-        ttsSpeak(foundTts);
+        if(foundVuMark != RelicRecoveryVuMark.UNKNOWN) {
+            String foundTts = "Found vumark " + foundVuMark + " oni-chan";
+            ttsSpeak(foundTts);
+        }
     }
 
     int targetColumnDistance(RelicRecoveryVuMark vuMarkFound) {
