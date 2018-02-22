@@ -40,6 +40,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class DistanceCalibration extends Autonomous {
     public void runOpMode() {
         initialize();
+        initializeTts();
         waitForStart();
         while (opModeIsActive()) {
             double distance = rangeSensor.getDistance(DistanceUnit.CM);
@@ -51,7 +52,8 @@ public class DistanceCalibration extends Autonomous {
             } else {
                 telemetry.addLine("Robot at optimal distance");
             }
-            telemetry.addData("Current distance: ", distance);
+            telemetry.addData("cm optical", "%.2f cm", rangeSensor.cmOptical());
+            telemetry.addData("cm", "%.2f cm", rangeSensor.getDistance(DistanceUnit.CM));
             telemetry.addLine("Press A to accept positioning");
             telemetry.addLine("Press B to test Red team");
             telemetry.addLine("Press X to test Blue team");

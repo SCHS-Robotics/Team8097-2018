@@ -81,6 +81,7 @@ public class TeleOpMode extends BaseOpMode {
             telemetry.update();
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Servo Vertical", servoVerticalHit.getPosition());
             telemetry.addData("Left Lift Pos", motorLeftLift.getCurrentPosition());
             telemetry.addData("Right Lift Pos", motorRightLift.getCurrentPosition());
             telemetry.addData("Motor BL Pos", motorBL.getCurrentPosition());

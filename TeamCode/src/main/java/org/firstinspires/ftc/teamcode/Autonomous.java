@@ -112,7 +112,7 @@ public abstract class Autonomous extends BaseOpMode {
     void raiseLift() {
         motorLeftLift.setPower(0.15);
         motorRightLift.setPower(-0.15);
-        sleep(1000);
+        sleep(2200);
         motorRightLift.setPower(0);
         motorLeftLift.setPower(0);
     }
@@ -171,11 +171,11 @@ public abstract class Autonomous extends BaseOpMode {
     void alignToCrypto(int targetColumn) {
         try {
             if (position == CLOSE) {
-                goForwardDistance(targetColumn, .5);
+                goForwardDistance(8 + targetColumn, .5);
                 turnTo(180, 0.5, 5);
             }
             if (position == NOTCLOSE) {
-                goForwardDistance(6 + (8 + targetColumn), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
+                goForwardDistance(4 + (8 + targetColumn), .5); // Hahaha this is so convoluted you know you could have just changed the return values for my distance function
 
                 if (team == RED) {
                     turnRightFromCurrent(90, 0.5, 5);
@@ -188,7 +188,7 @@ public abstract class Autonomous extends BaseOpMode {
             servoTopRightGrab.setPosition(.7);
             servoBottomLeftGrab.setPosition(.3);
             servoBottomRightGrab.setPosition(.7);
-            goBackwardDistance(3, .5);
+            goBackwardDistance(5, .5);
             ttsSpeak("Be u best");
         }
         catch(InterruptedException e){}
@@ -240,9 +240,9 @@ public abstract class Autonomous extends BaseOpMode {
         switch (vuMarkFound) {
             case RIGHT:
                 if(team == RED) {
-                    return -8;
+                    return -10;
                 } else if(team == BLUE) {
-                    return 8;
+                    return 9;
                 }
             case CENTER:
                 if(team == RED) {
@@ -252,9 +252,9 @@ public abstract class Autonomous extends BaseOpMode {
                 }
             case LEFT:
                 if(team == RED) {
-                    return 8;
+                    return 9;
                 } else if(team == BLUE) {
-                    return -8;
+                    return -10;
                 }
         }
         return 0;
