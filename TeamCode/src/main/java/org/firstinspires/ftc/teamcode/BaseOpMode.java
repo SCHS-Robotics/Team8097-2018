@@ -65,14 +65,14 @@ public abstract class BaseOpMode extends LinearOpMode {
     final double HORIZONTAL_AUTO_START_POS = .4;
     final double VERTICAL_TELEOP_START_POS = .576;
     final double HORIZONTAL_TELEOP_START_POS = .404;
-    final double VERTICAL_END_POS = 0;
+    final double VERTICAL_END_POS = .05;
     final double HORIZONTAL_END_POS = .4;
     final double HORIZONTAL_RIGHT_END_POS = .6;
     final double HORIZONTAL_LEFT_END_POS = .2;
 
     // TODO: CHANGE THESE WHEN I CAN ACTUALLY SEE THE ROBOT AGAIN
-    final double JEWEL_ARM_MAX_DISTANCE = 10;
-    final double JEWEL_ARM_MIN_DISTANCE = 5;
+    final double JEWEL_ARM_MAX_DISTANCE = 32;
+    final double JEWEL_ARM_MIN_DISTANCE = 31;
 
 
     // TODO: Keep getting these over and over literally every time someone does something on hardware.
