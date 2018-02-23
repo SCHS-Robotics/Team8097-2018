@@ -44,6 +44,7 @@ public class BlueAutonomousLong extends Autonomous {
         initializeVuforia();
         startVuforia();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
+        ttsSpeak(welcomeText());
         waitForStart();
         runtime.reset();
 

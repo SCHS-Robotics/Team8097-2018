@@ -10,15 +10,22 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.internal.android.dex.util.ExceptionWithContext;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import java.util.Locale;
+import java.util.Random;
+
+import static org.firstinspires.ftc.teamcode.BaseOpMode.Language.CHINESE;
+import static org.firstinspires.ftc.teamcode.BaseOpMode.Language.ENGLISH;
+import static org.firstinspires.ftc.teamcode.BaseOpMode.Language.GERMAN;
+import static org.firstinspires.ftc.teamcode.BaseOpMode.Language.JAPANESE;
+import static org.firstinspires.ftc.teamcode.BaseOpMode.Language.KOREAN;
+
 
 public abstract class BaseOpMode extends LinearOpMode {
 
@@ -47,6 +54,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     ModernRoboticsI2cRangeSensor rangeSensor;
 
     TextToSpeech tts;
+    Random generator = new Random();
 
     // State used for updating telemetry
     Orientation angles;
@@ -57,14 +65,14 @@ public abstract class BaseOpMode extends LinearOpMode {
     final double HORIZONTAL_AUTO_START_POS = .4;
     final double VERTICAL_TELEOP_START_POS = .576;
     final double HORIZONTAL_TELEOP_START_POS = .404;
-    final double VERTICAL_END_POS = .05;
+    final double VERTICAL_END_POS = 0;
     final double HORIZONTAL_END_POS = .4;
     final double HORIZONTAL_RIGHT_END_POS = .6;
     final double HORIZONTAL_LEFT_END_POS = .2;
 
     // TODO: CHANGE THESE WHEN I CAN ACTUALLY SEE THE ROBOT AGAIN
-    final double JEWEL_ARM_MAX_DISTANCE = 32;
-    final double JEWEL_ARM_MIN_DISTANCE = 31;
+    final double JEWEL_ARM_MAX_DISTANCE = 10;
+    final double JEWEL_ARM_MIN_DISTANCE = 5;
 
 
     // TODO: Keep getting these over and over literally every time someone does something on hardware.
@@ -129,20 +137,37 @@ public abstract class BaseOpMode extends LinearOpMode {
 
     void initializeTts() {
         tts = new TextToSpeech(hardwareMap.appContext, null);
-        tts.setPitch(1.5f);
-        tts.setSpeechRate(1.5f);
-        tts.setLanguage(Locale.JAPANESE);
+        language = randomLanguage();
+        updateTtsParams(language);
+    }
+
+    void updateTtsParams(Language newLanguage) {
+        switch (newLanguage) {
+            case JAPANESE:
+                tts.setLanguage(Locale.JAPAN);
+                tts.setPitch(1.5f);
+                tts.setSpeechRate(1.5f);
+            case KOREAN:
+                tts.setLanguage(Locale.KOREA);
+                tts.setPitch(1.5f);
+                tts.setSpeechRate(1.5f);
+            case CHINESE:
+                tts.setLanguage(Locale.CHINA);
+                tts.setPitch(1.5f);
+                tts.setSpeechRate(1.5f);
+            case ENGLISH:
+                tts.setLanguage(Locale.UK);
+                tts.setPitch(1f);
+                tts.setSpeechRate(1.3f);
+            case GERMAN:
+                tts.setLanguage(Locale.GERMANY);
+                tts.setPitch(1f);
+                tts.setSpeechRate(1.5f);
+        }
     }
 
     void ttsSpeak(String text) {
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-    }
-
-    void ttsSpeak(String text, Locale locale) {
-        Locale prevLanguage = tts.getLanguage();
-        tts.setLanguage(locale);
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-        tts.setLanguage(prevLanguage);
     }
 
     void resetEncoders(DcMotor...motors) {
@@ -468,6 +493,104 @@ public abstract class BaseOpMode extends LinearOpMode {
         return angles.firstAngle;
     }
 
+    Language randomLanguage() {
+        int i = generator.nextInt(4) + 1;
+        switch (i) {
+            case 0:
+                return JAPANESE;
+            case 1:
+                return KOREAN;
+            case 2:
+                return CHINESE;
+            case 3:
+                return ENGLISH;
+            case 4:
+                return GERMAN;
+            default:
+                return JAPANESE;
+        }
+    }
+
+    void toggleLanguage() {
+        switch (language) {
+            case JAPANESE:
+                language = KOREAN;
+            case KOREAN:
+                language = CHINESE;
+            case CHINESE:
+                language = ENGLISH;
+            case ENGLISH:
+                language = GERMAN;
+            case GERMAN:
+                language = JAPANESE;
+        }
+        updateTtsParams(language);
+    }
+
+    String welcomeText(){
+        switch (language) {
+            case JAPANESE:
+                return "Kawaii neko robotto-chan is ready, senpai";
+            case KOREAN:
+                return "안녕하세요";
+            case CHINESE:
+                return "大家好。我们开始";
+            case ENGLISH:
+                return "";
+            case GERMAN:
+                return "Willkommen in unserem Panzerkampfwagen";
+            default:
+                return null;
+        }
+    }
+
+    String vuMarkSpeech(RelicRecoveryVuMark vuMark) {
+        switch (language) {
+            case JAPANESE:
+                return "Found vumark " + vuMark + " oni-chan";
+            case KOREAN:
+                return "나는 VuMark를 발견했다." + vuMark + "Unnie";
+            case CHINESE:
+                return "我看到VuMark。" + vuMark + "大哥";
+            case ENGLISH:
+                return "I've found the " + vuMark + "VuMark";
+            case GERMAN:
+                return "Ich habe das" + vuMark + "VuMark gefunden";
+            default:
+                return null;
+        }
+    }
+
+    String[] randomLines(){
+        switch (language) {
+            case JAPANESE:
+                return new String[] {"Nico Nico Ni", "Be u best"};
+            case KOREAN:
+                return new String[] {"감사합니다", "대박. 우리는 해냈다."};
+            case CHINESE:
+                return new String[] {"我想我们已经输了", "妈妈你看接了吗", "我们想修这个机器人"};
+            case ENGLISH:
+                return new String[] {"Speed and poweerrrr"};
+            case GERMAN:
+                return new String[] {"Geschwindigkeit und Kraft"};
+            default:
+                return null;
+        }
+    }
+
+    String getRandomLine() {
+        int i = generator.nextInt(3) + 1;
+        return randomLines()[i];
+    }
+
+    enum Language {
+        JAPANESE,
+        KOREAN,
+        CHINESE,
+        ENGLISH,
+        GERMAN,
+    }
+
     enum LiftState {
         UP,
         DOWN
@@ -485,6 +608,7 @@ public abstract class BaseOpMode extends LinearOpMode {
         HALFOPEN
     }
 
+    Language language;
     LiftState liftState;
     HitStatus hitStatus;
     GrabStatus grabStatus;

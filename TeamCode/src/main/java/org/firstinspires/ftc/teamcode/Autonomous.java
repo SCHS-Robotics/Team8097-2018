@@ -87,9 +87,7 @@ public abstract class Autonomous extends BaseOpMode {
                 }
                 break;
         }
-        tts.setSpeechRate(0.7f);
-        ttsSpeak("ニコ ニコ ニイ〜");
-        tts.setSpeechRate(1.5f);
+        ttsSpeak(getRandomLine());
     }
 
     void setArmDown() {
@@ -130,13 +128,16 @@ public abstract class Autonomous extends BaseOpMode {
                 telemetry.addLine("Robot at optimal distance");
             }
             telemetry.addData("Current distance: ", distance);
+            telemetry.addData("Current language: ", language);
             telemetry.addLine("Press A to accept positioning");
+            telemetry.addLine("Press Y to change language");
             telemetry.update();
 
             if(gamepad1.a) {
-                tts.setLanguage(Locale.JAPAN);
-                tts.stop();
                 complete = true;
+            }
+            if(gamepad1.y) {
+                toggleLanguage();
             }
         }
     }
@@ -189,7 +190,7 @@ public abstract class Autonomous extends BaseOpMode {
             servoBottomLeftGrab.setPosition(.3);
             servoBottomRightGrab.setPosition(.7);
             goBackwardDistance(5, .5);
-            ttsSpeak("Be u best");
+            ttsSpeak(getRandomLine());
         }
         catch(InterruptedException e){}
     }
@@ -231,8 +232,7 @@ public abstract class Autonomous extends BaseOpMode {
         } while(foundVuMark == RelicRecoveryVuMark.UNKNOWN);
         telemetry.addData("VuMark: ", foundVuMark);
         if(foundVuMark != RelicRecoveryVuMark.UNKNOWN) {
-            String foundTts = "Found vumark " + foundVuMark + " oni-chan";
-            ttsSpeak(foundTts);
+            ttsSpeak(vuMarkSpeech(foundVuMark));
         }
     }
 

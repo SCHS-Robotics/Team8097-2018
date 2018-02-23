@@ -44,6 +44,7 @@ public class RedAutonomous extends Autonomous {
         initializeVuforia();
         startVuforia();
         resetEncoders(motorBL, motorBR, motorFL, motorFR, motorLeftLift, motorRightLift);
+        ttsSpeak(welcomeText());
         waitForStart();
         runtime.reset();
 
