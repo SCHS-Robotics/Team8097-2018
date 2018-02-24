@@ -536,7 +536,7 @@ public abstract class BaseOpMode extends LinearOpMode {
             case CHINESE:
                 return "大家好。我们开始";
             case ENGLISH:
-                return "";
+                return "Robot is ready to disappoint";
             case GERMAN:
                 return "Willkommen in unserem Panzerkampfwagen";
             default:
@@ -568,18 +568,18 @@ public abstract class BaseOpMode extends LinearOpMode {
             case KOREAN:
                 return new String[] {"감사합니다", "대박. 우리는 해냈다."};
             case CHINESE:
-                return new String[] {"我想我们已经输了", "妈妈你看接了吗", "我们想修这个机器人"};
+                return new String[] {"我想我们已经输了", "妈妈你看接了吗", "我们想修这个机器人", "机器猫，准备摧毁羊"};
             case ENGLISH:
-                return new String[] {"Speed and poweerrrr"};
+                return new String[] {"Speed and poweerrrr", "Green is my pepper", "Install Gentoo", "Be your best"};
             case GERMAN:
-                return new String[] {"Geschwindigkeit und Kraft"};
+                return new String[] {"Geschwindigkeit und Kraft", "Sei dein Bestes"};
             default:
                 return null;
         }
     }
 
     String getRandomLine() {
-        int i = generator.nextInt(3) + 1;
+        int i = generator.nextInt(randomLines().length) + 1;
         return randomLines()[i];
     }
 
