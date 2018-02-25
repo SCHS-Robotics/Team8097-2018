@@ -40,10 +40,13 @@ public class TeleOpMode extends BaseOpMode {
 
     // Button refreshes, at some point there should be a better way to do this, but at the moment there is not so don't complain.
     private double                 buttonACooldown;
+    private double                 buttonBCooldown;
     private double                 buttonXCooldown;
     private double                 buttonYCooldown;
     private double                 buttonLBCooldown;
     private double                 buttonRBCooldown;
+    private double                 buttonStartCooldown;
+    private double                 buttonBackCooldown;
 
     @Override
     public void runOpMode() {
@@ -56,10 +59,11 @@ public class TeleOpMode extends BaseOpMode {
         hitStatus = HitStatus.DOWN;
 
         initialize();
+        initializeTts();
         servoTopLeftGrab.setPosition(TOP_LEFT_OPEN);
         servoTopRightGrab.setPosition(TOP_RIGHT_OPEN);
         servoBottomLeftGrab.setPosition(BOTTOM_LEFT_OPEN);
-        servoTopRightGrab.setPosition(BOTTOM_RIGHT_OPEN);
+        servoBottomRightGrab.setPosition(BOTTOM_RIGHT_OPEN);
 
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
@@ -81,6 +85,7 @@ public class TeleOpMode extends BaseOpMode {
             telemetry.update();
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Language", language);
             telemetry.addData("Servo Vertical", servoVerticalHit.getPosition());
             telemetry.addData("Servo BL Pos: ", servoBottomLeftGrab.getPosition());
             telemetry.addData("Servo BR Pos: ", servoBottomRightGrab.getPosition());
@@ -130,7 +135,7 @@ public class TeleOpMode extends BaseOpMode {
                 motorLeftLift.setPower(0);
             }
 
-            if(gamepad1.a && Math.abs(cooldown.time() - buttonACooldown) >= .2) {
+            if((gamepad1.a || gamepad2.a) && Math.abs(cooldown.time() - buttonACooldown) >= .2) {
                 if (grabStatus == GrabStatus.OPEN) {
                     grabStatus = GrabStatus.CLOSE;
                     servoTopLeftGrab.setPosition(TOP_LEFT_CLOSED);
@@ -141,8 +146,8 @@ public class TeleOpMode extends BaseOpMode {
                     grabStatus = GrabStatus.OPEN;
                     servoTopLeftGrab.setPosition(TOP_LEFT_OPEN);
                     servoTopRightGrab.setPosition(TOP_RIGHT_OPEN);
-                    servoBottomLeftGrab.setPosition(BOTTOM_LEFT_CLOSED);
-                    servoBottomRightGrab.setPosition(BOTTOM_RIGHT_CLOSED);
+                    servoBottomLeftGrab.setPosition(BOTTOM_LEFT_OPEN);
+                    servoBottomRightGrab.setPosition(BOTTOM_RIGHT_OPEN);
                 } else {
                     grabStatus = GrabStatus.HALFOPEN;
                     servoTopLeftGrab.setPosition(TOP_LEFT_HALF);
@@ -153,7 +158,7 @@ public class TeleOpMode extends BaseOpMode {
                 buttonACooldown = cooldown.time();
             }
 
-            if (gamepad1.x && Math.abs(cooldown.time() - buttonXCooldown) >= 1) {
+            if ((gamepad1.x || gamepad2.x) && Math.abs(cooldown.time() - buttonXCooldown) >= 1) {
                 try {
                     toggleLift();
                 } catch (InterruptedException e) {}
@@ -161,20 +166,25 @@ public class TeleOpMode extends BaseOpMode {
                 buttonXCooldown = cooldown.time();
             }
 
-            if (gamepad1.y && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
-                if (hitStatus == HitStatus.DOWN) {
-                    hitStatus = HitStatus.UP;
-                    servoHorizontalHit.setPosition(HORIZONTAL_TELEOP_START_POS);
-                    servoVerticalHit.setPosition(VERTICAL_TELEOP_START_POS);
-                }
-                else if (hitStatus == HitStatus.UP) {
-                    hitStatus = HitStatus.DOWN;
-                    servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
-                    while (Math.abs(servoVerticalHit.getPosition() - VERTICAL_END_POS) >= .01) {
-                        servoVerticalHit.setPosition(servoVerticalHit.getPosition() + .005);
-                    }
-                }
+            if ((gamepad1.y || gamepad2.y) && Math.abs(cooldown.time() - buttonYCooldown) >= 1) {
+                wagTail();
                 buttonYCooldown = cooldown.time();
+            }
+
+            if ((gamepad1.back || gamepad2.back) && Math.abs(cooldown.time() - buttonBackCooldown) >= 1) {
+                toggleLanguage();
+                tts.setLanguage(langToLocale());
+                buttonBackCooldown = cooldown.time();
+            }
+
+            if ((gamepad1.b || gamepad2.b) && Math.abs(cooldown.time() - buttonBCooldown) >= 1) {
+                ttsSpeak(meow());
+                buttonBCooldown = cooldown.time();
+            }
+
+            if ((gamepad1.start || gamepad2.start) && Math.abs(cooldown.time() - buttonStartCooldown) >= 1) {
+                ttsSpeak(getRandomLine());
+                buttonStartCooldown = cooldown.time();
             }
 
             if (gamepad1.dpad_left && hitStatus == HitStatus.DOWN) {

@@ -71,19 +71,19 @@ public abstract class BaseOpMode extends LinearOpMode {
     final double HORIZONTAL_LEFT_END_POS = .2;
 
     final double TOP_LEFT_OPEN = 0;
-    final double TOP_LEFT_CLOSED = 0.57;
+    final double TOP_LEFT_CLOSED = 0.67;
     final double TOP_LEFT_HALF = 0.26;
 
     final double BOTTOM_LEFT_OPEN = 0;
-    final double BOTTOM_LEFT_CLOSED = 0.57;
+    final double BOTTOM_LEFT_CLOSED = 0.67;
     final double BOTTOM_LEFT_HALF = 0.26;
 
     final double BOTTOM_RIGHT_OPEN = 1;
-    final double BOTTOM_RIGHT_CLOSED = 0.42;
+    final double BOTTOM_RIGHT_CLOSED = 0.32;
     final double BOTTOM_RIGHT_HALF = 0.67;
 
     final double TOP_RIGHT_OPEN = 0.67;
-    final double TOP_RIGHT_CLOSED = 0.14;
+    final double TOP_RIGHT_CLOSED = 0.04;
     final double TOP_RIGHT_HALF = 0.5;
 
     // TODO: CHANGE THESE WHEN I CAN ACTUALLY SEE THE ROBOT AGAIN
@@ -479,6 +479,24 @@ public abstract class BaseOpMode extends LinearOpMode {
         turnTo(turnAngle, speed, tolerance);
     }
 
+    void wagTail() {
+        servoVerticalHit.setPosition(VERTICAL_END_POS + 0.15);
+        sleep(500);
+        servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
+        sleep(175);
+        servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS - .2);
+        sleep(175);
+        servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS + .2);
+        sleep(175);
+        servoHorizontalHit.setPosition(HORIZONTAL_LEFT_END_POS - .2);
+        sleep(175);
+        servoHorizontalHit.setPosition(HORIZONTAL_RIGHT_END_POS + .2);
+        sleep(175);
+        servoHorizontalHit.setPosition(HORIZONTAL_END_POS);
+        sleep(175);
+        servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+    }
+
     void toggleLift() throws InterruptedException{
         switch (liftState) {
             case DOWN:
@@ -551,15 +569,21 @@ public abstract class BaseOpMode extends LinearOpMode {
         switch (language) {
             case JAPANESE:
                 language = language.KOREAN;
+                break;
             case KOREAN:
                 language = language.CHINESE;
+                break;
             case CHINESE:
                 language = language.ENGLISH;
+                break;
             case ENGLISH:
                 language = language.GERMAN;
+                break;
             case GERMAN:
                 language = language.JAPANESE;
+                break;
         }
+        telemetry.update();
     }
 
     String welcomeText(){
@@ -596,18 +620,35 @@ public abstract class BaseOpMode extends LinearOpMode {
         }
     }
 
+    String meow() {
+        switch (language) {
+            case JAPANESE:
+                return "ニャー";
+            case KOREAN:
+                return "야옹";
+            case CHINESE:
+                return "喵";
+            case ENGLISH:
+                return "Meow";
+            case GERMAN:
+                return "Miau";
+            default:
+                return null;
+        }
+    }
+
     String[] randomLines(){
         switch (language) {
             case JAPANESE:
                 return new String[] {"Nico Nico Ni", "Be u best"};
             case KOREAN:
-                return new String[] {"감사합니다", "대박. 우리는 해냈다."};
+                return new String[] {"감사합니다", "대박. 우리는 해냈다.", "오빠, 내 마음이 펄럭 거든."};
             case CHINESE:
-                return new String[] {"我想我们已经输了", "妈妈你看接了吗", "我们想修这个机器人", "机器猫，准备摧毁羊"};
+                return new String[] {"我想我们已经输了", "妈妈你看接了吗", "我们想修这个机器人", "机器猫，准备摧毁羊", "四是四。十是十。十四是四十。四十是四十。四十四是四十四", "吃 葡 萄 不 吐 葡 萄 皮 ,不 吃 葡 萄 倒 吐 葡 萄 皮"};
             case ENGLISH:
-                return new String[] {"Speed and poweerrrr", "Green is my pepper", "Install Gentoo", "Be your best"};
+                return new String[] {"Speed and power", "Green is my pepper", "Install Gentoo", "Be your best"};
             case GERMAN:
-                return new String[] {"Geschwindigkeit und Kraft", "Sei dein Bestes"};
+                return new String[] {"Geschwindigkeit und Kraft", "Sei dein Bestes", "Grün ist mein Pfeffer"};
             default:
                 return null;
         }

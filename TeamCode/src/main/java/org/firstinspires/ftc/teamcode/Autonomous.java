@@ -117,8 +117,8 @@ public abstract class Autonomous extends BaseOpMode {
 
     void startPositioning() {
         boolean complete = false;
+        double yRefresh = 0;
         while(complete == false) {
-            double yRefresh = 0;
             double distance = rangeSensor.getDistance(DistanceUnit.CM);
             if (distance > JEWEL_ARM_MAX_DISTANCE) {
                 telemetry.addLine("Robot too far!");
@@ -139,6 +139,8 @@ public abstract class Autonomous extends BaseOpMode {
             }
             if(gamepad1.y && yRefresh > 200) {
                 toggleLanguage();
+                telemetry.update();
+                yRefresh = 0;
             }
             yRefresh ++;
         }
