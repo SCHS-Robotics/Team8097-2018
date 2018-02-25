@@ -70,6 +70,22 @@ public abstract class BaseOpMode extends LinearOpMode {
     final double HORIZONTAL_RIGHT_END_POS = .6;
     final double HORIZONTAL_LEFT_END_POS = .2;
 
+    final double TOP_LEFT_OPEN = 0;
+    final double TOP_LEFT_CLOSED = 0.57;
+    final double TOP_LEFT_HALF = 0.26;
+
+    final double BOTTOM_LEFT_OPEN = 0;
+    final double BOTTOM_LEFT_CLOSED = 0.57;
+    final double BOTTOM_LEFT_HALF = 0.26;
+
+    final double BOTTOM_RIGHT_OPEN = 1;
+    final double BOTTOM_RIGHT_CLOSED = 0.42;
+    final double BOTTOM_RIGHT_HALF = 0.67;
+
+    final double TOP_RIGHT_OPEN = 0.67;
+    final double TOP_RIGHT_CLOSED = 0.14;
+    final double TOP_RIGHT_HALF = 0.5;
+
     // TODO: CHANGE THESE WHEN I CAN ACTUALLY SEE THE ROBOT AGAIN
     final double JEWEL_ARM_MAX_DISTANCE = 32;
     final double JEWEL_ARM_MIN_DISTANCE = 31;
@@ -138,11 +154,14 @@ public abstract class BaseOpMode extends LinearOpMode {
     void initializeTts() {
         tts = new TextToSpeech(hardwareMap.appContext, null);
         language = randomLanguage();
-        updateTtsParams(language);
+        tts.setLanguage(langToLocale());
+        tts.setSpeechRate(1.5f);
+        tts.setPitch(1.5f);
+        telemetry.update();
     }
 
-    void updateTtsParams(Language newLanguage) {
-        switch (newLanguage) {
+    void updateTtsParams() {
+        switch (language) {
             case JAPANESE:
                 tts.setLanguage(Locale.JAPAN);
                 tts.setPitch(1.5f);
@@ -163,6 +182,23 @@ public abstract class BaseOpMode extends LinearOpMode {
                 tts.setLanguage(Locale.GERMANY);
                 tts.setPitch(1f);
                 tts.setSpeechRate(1.5f);
+        }
+    }
+
+    Locale langToLocale() {
+        switch (language) {
+            case JAPANESE:
+                return Locale.JAPAN;
+            case KOREAN:
+                return Locale.KOREA;
+            case CHINESE:
+                return Locale.CHINA;
+            case ENGLISH:
+                return Locale.UK;
+            case GERMAN:
+                return Locale.GERMANY;
+            default:
+                return Locale.ITALY;
         }
     }
 
@@ -494,7 +530,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     Language randomLanguage() {
-        int i = generator.nextInt(4) + 1;
+        int i = generator.nextInt(5);
         switch (i) {
             case 0:
                 return JAPANESE;
@@ -514,17 +550,16 @@ public abstract class BaseOpMode extends LinearOpMode {
     void toggleLanguage() {
         switch (language) {
             case JAPANESE:
-                language = KOREAN;
+                language = language.KOREAN;
             case KOREAN:
-                language = CHINESE;
+                language = language.CHINESE;
             case CHINESE:
-                language = ENGLISH;
+                language = language.ENGLISH;
             case ENGLISH:
-                language = GERMAN;
+                language = language.GERMAN;
             case GERMAN:
-                language = JAPANESE;
+                language = language.JAPANESE;
         }
-        updateTtsParams(language);
     }
 
     String welcomeText(){
@@ -579,7 +614,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     String getRandomLine() {
-        int i = generator.nextInt(randomLines().length) + 1;
+        int i = generator.nextInt(randomLines().length);
         return randomLines()[i];
     }
 

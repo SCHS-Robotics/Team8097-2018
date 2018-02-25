@@ -38,7 +38,10 @@ public class BlueAutonomousLong extends Autonomous {
         initialize();
         initializeTts();
         startPositioning();
-        ttsSpeak("Kawaii neko-robotto chan is ready, senpai ");
+        telemetry.addData("Language: ", language);
+        telemetry.update();
+        tts.setLanguage(langToLocale());
+        telemetry.addData("TTS Language: ", tts.getLanguage());
         setArmUp();
         initGrabServos();
         initializeVuforia();

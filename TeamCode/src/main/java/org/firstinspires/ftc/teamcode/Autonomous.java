@@ -96,10 +96,10 @@ public abstract class Autonomous extends BaseOpMode {
     }
 
     void initGrabServos() {
-        servoTopLeftGrab.setPosition(1);
-        servoTopRightGrab.setPosition(0);
-        servoBottomLeftGrab.setPosition(1);
-        servoBottomRightGrab.setPosition(0);
+        servoTopLeftGrab.setPosition(TOP_LEFT_CLOSED);
+        servoTopRightGrab.setPosition(TOP_RIGHT_CLOSED);
+        servoBottomLeftGrab.setPosition(BOTTOM_LEFT_CLOSED);
+        servoBottomRightGrab.setPosition(BOTTOM_RIGHT_CLOSED);
     }
 
     void setArmUp() {
@@ -118,6 +118,7 @@ public abstract class Autonomous extends BaseOpMode {
     void startPositioning() {
         boolean complete = false;
         while(complete == false) {
+            double yRefresh = 0;
             double distance = rangeSensor.getDistance(DistanceUnit.CM);
             if (distance > JEWEL_ARM_MAX_DISTANCE) {
                 telemetry.addLine("Robot too far!");
@@ -136,9 +137,10 @@ public abstract class Autonomous extends BaseOpMode {
             if(gamepad1.a) {
                 complete = true;
             }
-            if(gamepad1.y) {
+            if(gamepad1.y && yRefresh > 200) {
                 toggleLanguage();
             }
+            yRefresh ++;
         }
     }
 
@@ -185,10 +187,10 @@ public abstract class Autonomous extends BaseOpMode {
                 }
             }
             goForwardDistance(10, .5);
-            servoTopLeftGrab.setPosition(.3);
-            servoTopRightGrab.setPosition(.7);
-            servoBottomLeftGrab.setPosition(.3);
-            servoBottomRightGrab.setPosition(.7);
+            servoTopLeftGrab.setPosition(TOP_LEFT_HALF);
+            servoTopRightGrab.setPosition(TOP_RIGHT_HALF);
+            servoBottomLeftGrab.setPosition(BOTTOM_LEFT_HALF);
+            servoBottomRightGrab.setPosition(BOTTOM_RIGHT_HALF);
             goBackwardDistance(5, .5);
             ttsSpeak(getRandomLine());
         }
