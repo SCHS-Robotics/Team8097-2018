@@ -31,6 +31,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.Locale;
+
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpMode", group="Linear Opmode")
 public class TeleOpMode extends BaseOpMode {
 
@@ -47,10 +49,18 @@ public class TeleOpMode extends BaseOpMode {
     private double                 buttonRBCooldown;
     private double                 buttonStartCooldown;
     private double                 buttonBackCooldown;
+    private double                 buttonLTCooldown;
+    private double yRefresh;
 
     @Override
     public void runOpMode() {
 
+        initializeTts();
+        tts.setLanguage(Locale.UK);
+
+        telemetry.addData("Language: ", language);
+        telemetry.update();
+        tts.setLanguage(langToLocale());
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -59,14 +69,18 @@ public class TeleOpMode extends BaseOpMode {
         hitStatus = HitStatus.DOWN;
 
         initialize();
-        initializeTts();
         servoTopLeftGrab.setPosition(TOP_LEFT_OPEN);
         servoTopRightGrab.setPosition(TOP_RIGHT_OPEN);
         servoBottomLeftGrab.setPosition(BOTTOM_LEFT_OPEN);
         servoBottomRightGrab.setPosition(BOTTOM_RIGHT_OPEN);
 
+
+
         servoHorizontalHit.setPosition(HORIZONTAL_AUTO_START_POS);
         servoVerticalHit.setPosition(VERTICAL_AUTO_START_POS);
+        tts.setLanguage(langToLocale());
+        telemetry.addData("TTS Language: ", tts.getLanguage());
+        telemetry.update();
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
@@ -86,6 +100,7 @@ public class TeleOpMode extends BaseOpMode {
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Language", language);
+            telemetry.addData("TTS Language: ", tts.getLanguage());
             telemetry.addData("Servo Vertical", servoVerticalHit.getPosition());
             telemetry.addData("Servo BL Pos: ", servoBottomLeftGrab.getPosition());
             telemetry.addData("Servo BR Pos: ", servoBottomRightGrab.getPosition());
@@ -171,15 +186,18 @@ public class TeleOpMode extends BaseOpMode {
                 buttonYCooldown = cooldown.time();
             }
 
-            if ((gamepad1.back || gamepad2.back) && Math.abs(cooldown.time() - buttonBackCooldown) >= 1) {
+            if(gamepad2.left_bumper  && buttonLTCooldown > 200) {
                 toggleLanguage();
                 tts.setLanguage(langToLocale());
-                buttonBackCooldown = cooldown.time();
+                telemetry.addData("Language: ", language);
+                telemetry.addData("TTS Language: ", tts.getLanguage());
+                telemetry.update();
+                buttonLTCooldown = cooldown.time();
             }
+            yRefresh ++;
 
             if ((gamepad1.b || gamepad2.b) && Math.abs(cooldown.time() - buttonBCooldown) >= 1) {
                 ttsSpeak(meow());
-                buttonBCooldown = cooldown.time();
             }
 
             if ((gamepad1.start || gamepad2.start) && Math.abs(cooldown.time() - buttonStartCooldown) >= 1) {

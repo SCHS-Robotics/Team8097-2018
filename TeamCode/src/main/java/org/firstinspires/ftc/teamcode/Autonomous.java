@@ -176,7 +176,7 @@ public abstract class Autonomous extends BaseOpMode {
     void alignToCrypto(int targetColumn) {
         try {
             if (position == CLOSE) {
-                goForwardDistance(8 + targetColumn, .5);
+                goForwardDistance(20 + targetColumn, .5);
                 turnTo(180, 0.5, 5);
             }
             if (position == NOTCLOSE) {
@@ -188,12 +188,12 @@ public abstract class Autonomous extends BaseOpMode {
                     turnLeftFromCurrent(90, 0.5, 5);
                 }
             }
-            goForwardDistance(10, .5);
+            goForwardDistance(15, .5);
             servoTopLeftGrab.setPosition(TOP_LEFT_HALF);
             servoTopRightGrab.setPosition(TOP_RIGHT_HALF);
             servoBottomLeftGrab.setPosition(BOTTOM_LEFT_HALF);
             servoBottomRightGrab.setPosition(BOTTOM_RIGHT_HALF);
-            goBackwardDistance(5, .5);
+            goBackwardDistance(4, .5);
             ttsSpeak(getRandomLine());
         }
         catch(InterruptedException e){}
@@ -244,9 +244,9 @@ public abstract class Autonomous extends BaseOpMode {
         switch (vuMarkFound) {
             case RIGHT:
                 if(team == RED) {
-                    return -10;
+                    return -7;
                 } else if(team == BLUE) {
-                    return 9;
+                    return 8;
                 }
             case CENTER:
                 if(team == RED) {
@@ -256,9 +256,9 @@ public abstract class Autonomous extends BaseOpMode {
                 }
             case LEFT:
                 if(team == RED) {
-                    return 9;
+                    return 8;
                 } else if(team == BLUE) {
-                    return -10;
+                    return -8 ;
                 }
         }
         return 0;

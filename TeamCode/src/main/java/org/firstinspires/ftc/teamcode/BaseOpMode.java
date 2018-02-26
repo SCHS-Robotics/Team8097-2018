@@ -640,7 +640,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     String[] randomLines(){
         switch (language) {
             case JAPANESE:
-                return new String[] {"Nico Nico Ni", "Be u best"};
+                return new String[] {"Nico Nico Nii", "Be u best"};
             case KOREAN:
                 return new String[] {"감사합니다", "대박. 우리는 해냈다.", "오빠, 내 마음이 펄럭 거든."};
             case CHINESE:
